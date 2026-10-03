@@ -1,4 +1,10 @@
 {
   "cleanUrls": true,
-  "trailingSlash": false
+  "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/:demo([0-9]{1,3})",
+      "destination": "/index.html"
+    }
+  ]
 }
