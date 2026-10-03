@@ -92,17 +92,20 @@ const PLACEHOLDER_IMG = 'data:image/svg+xml;utf8,' + encodeURIComponent(
    Logo files live in images/logos/ and can be .png/.jpg/.jpeg/.webp/.svg.
 ========================================================== */
 function getDemoNumber() {
-  const raw = new URLSearchParams(window.location.search).get('demo');
-  if (!raw) return null;
-  const n = parseInt(raw, 10);
-  return Number.isInteger(n) && n >= 1 && n <= 100 ? String(n).padStart(2, '0') : null;
-}
+  // Supports both clean URLs (/04) and the original query format (?demo=04).
+  const params = new URLSearchParams(window.location.search);
+  const queryValue = params.get('demo');
 
-function getDemoNumber() {
-  const raw = new URLSearchParams(window.location.search).get('demo');
+  const pathMatch = window.location.pathname.match(/^\/([0-9]{1,3})\/?$/);
+  const pathValue = pathMatch ? pathMatch[1] : null;
+
+  const raw = queryValue || pathValue;
   if (!raw) return null;
+
   const n = parseInt(raw, 10);
-  return Number.isInteger(n) && n >= 1 && n <= 100 ? String(n).padStart(2, '0') : null;
+  return Number.isInteger(n) && n >= 1 && n <= 100
+    ? String(n).padStart(2, '0')
+    : null;
 }
 
 function applyDemoLogo(data) {
