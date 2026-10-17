@@ -355,14 +355,14 @@
     "ar": "الهدايا"
    },
    "text": {
-    "en": "Redeem your points for free gifts with your order.",
-    "es": "Canjea tus puntos por regalos gratis con tu pedido.",
-    "fr": "Échangez vos points contre des cadeaux offerts avec votre commande.",
-    "de": "Löse deine Punkte gegen Gratis-Prämien zu deiner Bestellung ein.",
-    "it": "Riscatta i tuoi punti con premi gratuiti insieme al tuo ordine.",
-    "pt": "Troque os seus pontos por ofertas grátis com o seu pedido.",
-    "nl": "Wissel je punten in voor gratis cadeaus bij je bestelling.",
-    "ar": "استبدل نقاطك بهدايا مجانية مع طلبك."
+    "en": "Redeem your points for gifts of your choice.",
+    "es": "Canjea tus puntos por los regalos que tú elijas.",
+    "fr": "Échangez vos points contre les cadeaux de votre choix.",
+    "de": "Löse deine Punkte gegen Prämien deiner Wahl ein.",
+    "it": "Riscatta i tuoi punti con i premi che preferisci.",
+    "pt": "Troque os seus pontos pelas ofertas que escolher.",
+    "nl": "Wissel je punten in voor cadeaus naar keuze.",
+    "ar": "استبدل نقاطك بهدايا من اختيارك."
    },
    "lockedText": {
     "en": "Sign in to see the gifts",
@@ -451,14 +451,14 @@
     "ar": "الإشعارات"
    },
    "text": {
-    "en": "The latest offers and news from the restaurant.",
-    "es": "Las últimas ofertas y novedades del restaurante.",
-    "fr": "Les dernières offres et nouveautés du restaurant.",
-    "de": "Die neuesten Angebote und News aus dem Restaurant.",
-    "it": "Le ultime offerte e novità del ristorante.",
-    "pt": "As últimas ofertas e novidades do restaurante.",
-    "nl": "De nieuwste aanbiedingen en nieuws van het restaurant.",
-    "ar": "آخر العروض والأخبار من المطعم."
+    "en": "Turn on notifications to get the latest offers from our restaurant.",
+    "es": "Activa las notificaciones para recibir las últimas ofertas de nuestro restaurante.",
+    "fr": "Activez les notifications pour recevoir les dernières offres de notre restaurant.",
+    "de": "Aktiviere die Benachrichtigungen, um die neuesten Angebote unseres Restaurants zu erhalten.",
+    "it": "Attiva le notifiche per ricevere le ultime offerte del nostro ristorante.",
+    "pt": "Ative as notificações para receber as últimas ofertas do nosso restaurante.",
+    "nl": "Zet meldingen aan om de nieuwste aanbiedingen van ons restaurant te ontvangen.",
+    "ar": "فعّل الإشعارات لتصلك آخر العروض من مطعمنا."
    },
    "emptyText": {
     "en": "No notifications yet.",
