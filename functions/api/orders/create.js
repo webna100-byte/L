@@ -1,6 +1,6 @@
 /* POST /api/orders/create (Google-signed-in customers only)
    Body: { branchId, type, zoneId, items:[{productId, qty, selections, notes}],
-           gifts:[{giftId, qty}], customer:{name, phone, address, notes}, lang }
+           gifts:[{giftId, qty}], customer:{name, phone, address, notes} }
 
    Everything is recomputed here from the stored menu (prices, discounts,
    level discount, points). Gift points are checked and deducted inside the
@@ -12,11 +12,13 @@ import { json, fail, handle, readJson, authUser, isGoogleCustomer, loadConfig } 
 import { Firestore } from '../../_lib/firestore.js';
 import { dayKey, orderId } from '../../_lib/orders.js';
 import { branchBusy } from '../busy.js';
+import { siteOf } from '../../_lib/site.js';
 
 const Pricing = globalThis.Pricing;
 const str = (v, n) => String(v == null ? '' : v).trim().slice(0, n);
 
 export const onRequestPost = handle(async ({ request, env }) => {
+  const site = siteOf(request);
   const user = await authUser(request, env);
   if (!isGoogleCustomer(user)) return fail(401, 'login_required');
 
@@ -27,14 +29,14 @@ export const onRequestPost = handle(async ({ request, env }) => {
   const address = str(customer.address, 300);
   const notes = str(customer.notes, 500);
   if (!name) return fail(400, 'name_required');
-  if (!/^\+?[0-9\s-]{6,20}$/.test(phone)) return fail(400, 'phone_invalid');
+  if (!/^\+?[0-9\s().-]{6,24}$/.test(phone)) return fail(400, 'phone_invalid');
   if (body.type === 'delivery' && address.length < 3) return fail(400, 'address_required');
 
-  const config = await loadConfig(env);
+  const config = await loadConfig(env, site);
   if (!config) return fail(503, 'not_configured');
   const branchKey = str(body.branchId, 80);
-  if (/^[\w-]+$/.test(branchKey) && await branchBusy(env, branchKey)) return fail(423, 'restaurant_busy');
-  const fs = new Firestore(env);
+  if (/^[\w-]+$/.test(branchKey) && await branchBusy(env, branchKey, site)) return fail(423, 'restaurant_busy');
+  const fs = new Firestore(env, site);
   const now = Date.now();
   const id = orderId(now);
 
@@ -75,7 +77,7 @@ export const onRequestPost = handle(async ({ request, env }) => {
         giftRefunded: false,
         status: 'pending',
         statusHistory: [{ status: 'pending', at: now, by: 'customer' }],
-        lang: body.lang === 'en' ? 'en' : 'ar',
+        lang: config.settings.lang || config.settings.defaultLang || 'en',
         createdAtMs: now,
         day: dayKey(now, config.settings.timezone),
         createdAt: new Date(now)

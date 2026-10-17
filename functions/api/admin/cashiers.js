@@ -7,12 +7,14 @@
 import { json, fail, handle, readJson, authUser, isAdmin } from '../../_lib/http.js';
 import { hashPassword } from '../../_lib/google.js';
 import { Firestore, where } from '../../_lib/firestore.js';
+import { siteOf } from '../../_lib/site.js';
 
 const USERNAME = /^[a-z0-9._-]{3,32}$/;
 
 async function guard(request, env) {
-  if (!isAdmin(await authUser(request, env))) throw Object.assign(new Error('unauthorized'), { status: 401 });
-  return new Firestore(env);
+  const site = siteOf(request);
+  if (!isAdmin(await authUser(request, env), site)) throw Object.assign(new Error('unauthorized'), { status: 401 });
+  return new Firestore(env, site);
 }
 
 const view = c => ({ id: c.id, name: c.data.name, username: c.data.username, branchId: c.data.branchId, active: !!c.data.active, createdAt: c.data.createdAt });

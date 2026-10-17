@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,7 +13,7 @@
 <style>
   .admin-login-wrap { position: relative; }
   .admin-lang-btn { position: absolute; top: 16px; inset-inline-end: 16px; font-family: var(--font-en); background: #fff; border: 1px solid var(--border); }
-  html[lang="en"] .admin-lang-btn { font-family: var(--font-ar); }
+  .admin-lang-btn[lang="ar"] { font-family: var(--font-ar); }
 </style>
 </head>
 <body class="admin-body">
@@ -30,10 +30,10 @@
   </div>
   <script src="/js/pricing.js"></script><script src="/js/i18n.js"></script><script src="/js/store.js"></script><script src="/js/firebase.js"></script><script src="/js/ui.js"></script>
   <script>
-  window.FORCE_LANG = window.ADMIN_LANG || 'ar';
+  window.FORCE_LANG = window.ADMIN_LANG || 'en';
   (async () => {
     renderIcons();
-    try { await Store.load({ fresh: true }); applyTheme(); await StaffAuth.init(); if (StaffAuth.role() === 'admin') location.replace('/admin/'); } catch (e) { console.error(e); }
+    try { await Store.load({ fresh: true }); if (Store.data && syncAdminLang(contentLang())) return; applyTheme(); await StaffAuth.init(); if (StaffAuth.role() === 'admin') location.replace('/admin/'); } catch (e) { console.error(e); }
     const form = document.getElementById('loginForm'), err = document.getElementById('errorMsg'), btn = document.getElementById('loginBtn');
     form.addEventListener('submit', async e => {
       e.preventDefault();
@@ -44,7 +44,7 @@
         location.href = '/admin/';
       } catch (ex) {
         console.error(ex);
-        err.textContent = ex.message === 'invalid_login' ? L('Wrong password') : ex.message === 'too_many_attempts' ? L('Too many attempts. Wait 10 minutes.') : L('Sign-in failed: {msg}', { msg: ex.message });
+        err.textContent = ex.message === 'invalid_login' ? L('Wrong password') : ex.message === 'too_many_attempts' ? L('Too many attempts. Wait 10 minutes.') : ex.message === 'site_not_found' ? L('This demo site does not exist.') : L('Sign-in failed: {msg}', { msg: ex.message });
         err.classList.remove('hidden'); btn.disabled = false;
       }
     });

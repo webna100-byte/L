@@ -1,3 +1,6 @@
+import '../../public/js/i18n.js';
+import '../../public/js/pricing.js';
+
 export const STATUSES = ['pending', 'preparing', 'delivered', 'cancelled'];
 
 /* What a cashier may do. The admin may move an order to any status. */
@@ -39,24 +42,20 @@ export function statusEffects(order, to) {
   return { pointsAwarded, giftRefunded, points, lifetime, needPoints };
 }
 
-const tf = (f, lang) => (f && typeof f === 'object') ? (f[lang] || f.ar || f.en || '') : (f || '');
-
-export function statusMessage(order, status, restaurantName) {
-  const lang = order.lang === 'en' ? 'en' : 'ar';
-  const name = tf(restaurantName, lang);
-  const n = order.number;
+/* Push text for a status change, in the site's language (the same
+   dictionary the website uses). */
+export function statusMessage(order, status, settings) {
+  const s = settings || {};
+  const lang = s.lang || s.defaultLang || order.lang || 'en';
+  const T = (k, v) => globalThis.translateFor(lang, k, v);
+  const name = globalThis.Pricing ? globalThis.Pricing.textOf(s.restaurantName, lang) : String(s.restaurantName || '');
+  const pe = Number(order.pointsEarned) || 0;
+  const gp = Number(order.giftPoints) || 0;
   const text = {
-    ar: {
-      preparing: 'تم قبول طلبك وهو الآن قيد التحضير.',
-      delivered: Number(order.pointsEarned) > 0 ? `تم تسليم طلبك. أُضيفت ${order.pointsEarned} نقطة إلى حسابك.` : 'تم تسليم طلبك. بالهناء والعافية!',
-      cancelled: Number(order.giftPoints) > 0 ? 'تم إلغاء طلبك وأُعيدت نقاط الهدايا إلى حسابك.' : 'تم إلغاء طلبك.'
-    },
-    en: {
-      preparing: 'Your order was accepted and is being prepared.',
-      delivered: Number(order.pointsEarned) > 0 ? `Your order was delivered. ${order.pointsEarned} points were added to your account.` : 'Your order was delivered. Enjoy!',
-      cancelled: Number(order.giftPoints) > 0 ? 'Your order was cancelled and your gift points were returned.' : 'Your order was cancelled.'
-    }
-  }[lang][status];
+    preparing: T('push_preparing'),
+    delivered: pe > 0 ? T('push_delivered_points', { n: pe }) : T('push_delivered'),
+    cancelled: gp > 0 ? T('push_cancelled_refund') : T('push_cancelled')
+  }[status];
   if (!text) return null;
-  return { title: `${name} · #${n}`, body: text };
+  return { title: `${name} · #${order.number}`, body: text };
 }

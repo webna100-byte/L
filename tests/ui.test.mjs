@@ -7,6 +7,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import assert from 'node:assert/strict';
+import '../public/js/i18n.js';
 
 const require = createRequire(import.meta.url);
 const { chromium, devices } = require(process.env.PLAYWRIGHT || 'playwright');
@@ -50,9 +51,12 @@ const cctx = await context();
 const cust = await cctx.newPage();
 watch(cust, 'customer');
 
-await step('home renders restaurant data (Arabic, RTL) with sign-in card', async () => {
+await step('home renders restaurant data in the site language, no language switch', async () => {
   await cust.goto(SITE + '/', { waitUntil: 'load' });
-  assert.equal(await cust.getAttribute('html', 'dir'), 'rtl');
+  await cust.waitForSelector('#appSplash', { state: 'detached' });
+  assert.equal(await cust.getAttribute('html', 'lang'), site.config.settings.lang || 'en');
+  assert.equal(await cust.getAttribute('html', 'dir'), 'ltr');
+  assert.equal(await cust.locator('#langBtn').count(), 0);
   assert.ok(await cust.isVisible('#homeGoogleBtn'));
   assert.equal(await cust.locator('.bn-item').count(), 5);
 });
@@ -79,7 +83,7 @@ await step('Google sign-in (emulator credential) and back to checkout', async ()
 });
 
 await step('place order', async () => {
-  await cust.fill('#custPhone', '+96551234567');
+  await cust.fill('#custPhone', '+34 612 34 56 78');
   await shot(cust, 'ui-checkout');
   await cust.click('#sendBtn');
   await cust.waitForSelector('.success-card', { timeout: 15000 });
@@ -102,6 +106,8 @@ await step('cashier signs in and sees the new order with the alarm', async () =>
   await cashier.fill('#password', 'secret12');
   await cashier.click('#loginBtn');
   await cashier.waitForURL(/\/cashier\/$/);
+  // the start button only works once the panel has loaded (its label is set then)
+  await cashier.waitForFunction(() => document.getElementById('shiftNote').textContent.length > 0);
   await cashier.click('#shiftBtn');
   await cashier.waitForSelector('.staff-order.is-new', { timeout: 15000 });
   assert.ok(await cashier.isVisible('#alarm.show'), 'alarm must ring while an order is pending');
@@ -138,6 +144,61 @@ await step('admin sections render', async () => {
     await admin.waitForTimeout(400);
     await shot(admin, 'ui-admin-' + key);
   }
+});
+
+/* ---------- demo site in Spanish ---------- */
+const DEMO = 'ui-demo-' + Date.now().toString(36);
+await step('super admin creates a Spanish demo from the Demo sites section', async () => {
+  await admin.click('.admin-mobile-nav [data-key="sites"]');
+  await admin.waitForSelector('#dsName');
+  await admin.fill('#dsName', 'Casa Pepe');
+  await admin.fill('#dsSlug', DEMO);
+  await admin.selectOption('#dsLang', 'es');
+  await admin.fill('#dsPass', 'pepe123');
+  await admin.click('#dsCreate');
+  await admin.waitForSelector(`[data-copy="${DEMO}"]`, { timeout: 15000 });
+  await shot(admin, 'ui-admin-sites');
+});
+
+const dctx = await context();
+const visitor = await dctx.newPage();
+watch(visitor, 'demo visitor');
+await step('the /s/ link opens the demo in Spanish with euro prices', async () => {
+  await visitor.goto(SITE + '/s/' + DEMO, { waitUntil: 'load' });
+  await visitor.waitForURL(SITE + '/');
+  await visitor.waitForSelector('#appSplash', { state: 'detached' });
+  assert.equal(await visitor.getAttribute('html', 'lang'), 'es');
+  assert.equal(await visitor.textContent('#heroTitle'), 'Casa Pepe');
+  assert.match(await visitor.textContent('.bn-item.bn-home'), /Inicio/);
+  await shot(visitor, 'ui-demo-home');
+  await visitor.goto(SITE + '/branches', { waitUntil: 'load' });
+  await visitor.click(`.branch-card[data-id="${branchId}"]`);
+  await visitor.waitForSelector('.product-card');
+  assert.match(await visitor.textContent('.menu-category-title'), /Hamburguesas/);
+  assert.match(await visitor.textContent('.product-card .product-price'), /9,50\s€/);
+  await visitor.click('.product-card');
+  await visitor.waitForSelector('#addToCartBtn');
+  assert.match(await visitor.textContent('#addToCartBtn'), /Añadir al carrito/);
+  await shot(visitor, 'ui-demo-product');
+});
+
+await step('demo admin password opens a Spanish admin panel without Demo sites', async () => {
+  await visitor.goto(SITE + '/admin/login', { waitUntil: 'load' });
+  await visitor.fill('#password', 'pepe123');
+  await visitor.click('#loginBtn');
+  await visitor.waitForSelector('.admin-mobile-nav [data-key="orders"]', { timeout: 15000 });
+  assert.equal(await visitor.getAttribute('html', 'lang'), 'es');
+  assert.match(await visitor.textContent('.admin-mobile-nav [data-key="orders"]'), /Pedidos/);
+  assert.equal(await visitor.locator('.admin-mobile-nav [data-key="sites"]').count(), 0);
+  await visitor.click('.admin-mobile-nav [data-key="products"]');
+  await visitor.waitForTimeout(400);
+  await shot(visitor, 'ui-demo-admin-products');
+});
+
+await step('main site is unchanged after visiting the demo', async () => {
+  await cust.goto(SITE + '/', { waitUntil: 'load' });
+  await cust.waitForSelector('#appSplash', { state: 'detached' });
+  assert.notEqual(await cust.textContent('#heroTitle'), 'Casa Pepe');
 });
 
 await browser.close();

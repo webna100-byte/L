@@ -38,11 +38,15 @@ export function decodeFields(fields) {
 }
 
 export class Firestore {
-  constructor(env) {
+  /* site: '' for the main site, or a demo slug. Every path below is then
+     relative to /sites/<slug>, so demos never see each other's data. */
+  constructor(env, site = '') {
     this.env = env;
-    this.root = `projects/${env.FIREBASE_PROJECT_ID}/databases/(default)/documents`;
+    const db = `projects/${env.FIREBASE_PROJECT_ID}/databases/(default)/documents`;
+    this.root = site ? `${db}/sites/${site}` : db;
     const host = env.FIRESTORE_EMULATOR_HOST ? `http://${env.FIRESTORE_EMULATOR_HOST}` : 'https://firestore.googleapis.com';
-    this.base = `${host}/v1/${this.root}`;
+    this.base = `${host}/v1/${this.root}`;   // document paths and runQuery parent
+    this.dbBase = `${host}/v1/${db}`;        // batchGet / transactions / commit
   }
 
   name(path) { return `${this.root}/${path}`; }
@@ -77,26 +81,26 @@ export class Firestore {
   async getMany(paths, transaction) {
     const body = { documents: paths.map(p => this.name(p)) };
     if (transaction) body.transaction = transaction;
-    const json = await this.req(`${this.base}:batchGet`, { method: 'POST', body: JSON.stringify(body) });
+    const json = await this.req(`${this.dbBase}:batchGet`, { method: 'POST', body: JSON.stringify(body) });
     const byName = {};
     for (const r of json || []) if (r.found) byName[r.found.name] = { id: r.found.name.split('/').pop(), data: decodeFields(r.found.fields) };
     return paths.map(p => byName[this.name(p)] || null);
   }
 
   async beginTransaction() {
-    const json = await this.req(`${this.base}:beginTransaction`, { method: 'POST', body: '{}' });
+    const json = await this.req(`${this.dbBase}:beginTransaction`, { method: 'POST', body: '{}' });
     return json.transaction;
   }
 
   async rollback(transaction) {
-    try { await this.req(`${this.base}:rollback`, { method: 'POST', body: JSON.stringify({ transaction }) }); } catch (e) { /* ignore */ }
+    try { await this.req(`${this.dbBase}:rollback`, { method: 'POST', body: JSON.stringify({ transaction }) }); } catch (e) { /* ignore */ }
   }
 
   /* writes: built with the helpers below */
   async commit(writes, transaction) {
     const body = { writes };
     if (transaction) body.transaction = transaction;
-    return this.req(`${this.base}:commit`, { method: 'POST', body: JSON.stringify(body) });
+    return this.req(`${this.dbBase}:commit`, { method: 'POST', body: JSON.stringify(body) });
   }
 
   /* Runs fn(tx) inside a transaction, retrying on contention. fn returns

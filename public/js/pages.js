@@ -164,7 +164,7 @@ const Pages = {
           <ol class="steps">
             ${steps.map((s, i) => `<li class="${i < idx ? 'done' : i === idx ? 'now' : ''}"><span class="dot">${i < idx || (i === idx && s === 'delivered') ? '<i data-lucide="check"></i>' : ''}</span><span>${t('status_' + s)}</span></li>`).join('')}
           </ol>`}
-          <p class="order-items">${escapeHtml(items.join('، '))}</p>
+          <p class="order-items">${escapeHtml(items.join(getLang() === 'ar' ? '، ' : ', '))}</p>
           <footer class="order-foot">
             <div class="order-points">${pointsLine ? `<span class="${o.pointsAwarded ? 'ok' : ''}"><i data-lucide="sparkles"></i> ${escapeHtml(pointsLine)}</span>` : ''}${giftLine ? `<span><i data-lucide="gift"></i> ${escapeHtml(giftLine)}</span>` : ''}</div>
             <strong>${fmtOrderMoney(o.total)}</strong>
@@ -174,7 +174,7 @@ const Pages = {
 
     try {
       const { m, db } = await FB.firestore();
-      const q = m.query(m.collection(db, 'orders'), m.where('uid', '==', user.uid), m.limit(30));
+      const q = m.query(ordersCollection(m, db), m.where('uid', '==', user.uid), m.limit(30));
       m.onSnapshot(q, snap => {
         const orders = snap.docs.map(d => d.data()).sort((a, b) => b.createdAtMs - a.createdAtMs);
         listEl.innerHTML = orders.length ? orders.map(card).join('') : `<div class="empty-state"><i data-lucide="receipt-text"></i><p>${tx(page.emptyText) || t('no_orders_here')}</p><a class="btn-primary btn-inline" href="/menu">${t('go_to_menu')}</a></div>`;
@@ -193,7 +193,7 @@ const Pages = {
   async notifications(main, data) {
     const page = pageConfig('notifications');
     const list = Store.notifications || [];
-    try { localStorage.setItem('notif_seen', String(Date.now())); } catch (e) { /* ignore */ }
+    try { localStorage.setItem(skey('notif_seen'), String(Date.now())); } catch (e) { /* ignore */ }
     main.innerHTML = heroHtml(page) + `
       <div class="member-body">
         <div class="push-card" id="pushCard"></div>

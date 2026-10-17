@@ -7,18 +7,20 @@ import { json, fail, handle, readJson, authUser, isAdmin, activeCashier, loadCon
 import { Firestore } from '../../_lib/firestore.js';
 import { STATUSES, CASHIER_TRANSITIONS, statusEffects, statusMessage } from '../../_lib/orders.js';
 import { sendToTokens } from '../../_lib/push.js';
+import { siteOf } from '../../_lib/site.js';
 
 export const onRequestPost = handle(async ({ request, env, waitUntil }) => {
+  const site = siteOf(request);
   const user = await authUser(request, env);
-  const admin = isAdmin(user);
-  const cashier = admin ? null : await activeCashier(user, env);
+  const admin = isAdmin(user, site);
+  const cashier = admin ? null : await activeCashier(user, env, site);
   if (!admin && !cashier) return fail(401, 'unauthorized');
 
   const { orderId, status } = await readJson(request, 2000);
   if (!/^[0-9a-z]{10,30}$/.test(String(orderId || ''))) return fail(400, 'invalid_order');
   if (!STATUSES.includes(status)) return fail(400, 'invalid_status');
 
-  const fs = new Firestore(env);
+  const fs = new Firestore(env, site);
   const now = Date.now();
   const by = admin ? 'admin' : `cashier:${cashier.name}`;
 
@@ -56,8 +58,8 @@ export const onRequestPost = handle(async ({ request, env, waitUntil }) => {
         const u = await fs.get(`users/${result.order.uid}`);
         const tokens = u && Array.isArray(u.data.pushTokens) ? u.data.pushTokens : [];
         if (!tokens.length) return;
-        const config = await loadConfig(env);
-        const msg = statusMessage(result.order, status, config && config.settings.restaurantName);
+        const config = await loadConfig(env, site);
+        const msg = statusMessage(result.order, status, config && config.settings);
         if (!msg) return;
         const origin = new URL(request.url).origin;
         const dead = await sendToTokens(env, tokens, { ...msg, link: origin + '/orders' });

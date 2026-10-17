@@ -1,171 +1,149 @@
-# قالب موقع طلبات المطاعم (White Label)
+# Restaurant Ordering Website — White Label
 
-موقع طلبات أونلاين لأي مطعم، ثنائي اللغة (عربي افتراضي + إنجليزي)، مع نقاط ولاء وهدايا ومستويات، ولوحة كاشير بتنبيه صوتي، وإشعارات للزبائن. كل شيء يعمل على **الخطط المجانية** من Cloudflare وFirebase.
+A complete online-ordering website for any restaurant: menu, cart, pickup & delivery, loyalty points, gifts and levels, a live cashier screen with a ringing alarm, push notifications and a full admin panel.
+Every site runs in **one language** — English, Español, Français, Deutsch, Italiano, Português, Nederlands or العربية — and carries only the restaurant's own brand.
+It all runs on the **free plans** of Cloudflare and Firebase.
 
-| الجزء | الخدمة | ملاحظات |
+| Part | Service | Notes |
 |---|---|---|
-| الموقع والصفحات | Cloudflare Pages | مجلد `public/` |
-| الخادم (الطلبات، النقاط، الكاشير، الإشعارات) | Cloudflare Pages Functions | مجلد `functions/` |
-| إعدادات المطعم والقائمة والصور والإشعارات | Cloudflare KV | ربط باسم `STORE` |
-| تسجيل دخول الزبائن (Gmail فقط) | Firebase Authentication | Google فقط |
-| الطلبات ونقاط الزبائن والكاشير | Cloud Firestore | القراءة فقط من المتصفح، والكتابة من الخادم |
-| إشعارات Android / iPhone / الكمبيوتر | Firebase Cloud Messaging | |
+| Website & pages | Cloudflare Pages | `public/` folder |
+| Server (orders, points, cashiers, notifications) | Cloudflare Pages Functions | `functions/` folder |
+| Menu, settings, images, notifications | Cloudflare KV | binding named `STORE` |
+| Customer sign-in (Google) | Firebase Authentication | |
+| Orders, customer points, cashiers | Cloud Firestore | browsers read only, the server writes |
+| Push notifications (Android / iPhone / desktop) | Firebase Cloud Messaging | |
 
-## ما الموجود في الموقع
+## Features
 
-- **الهيدر:** زر اللغة بجانب الشعار، وقائمة همبرجر فيها: تسجيل الدخول/الخروج، سياسة الخصوصية، سياسة الإرجاع والاستبدال.
-- **الشريط السفلي:** المستويات · الهدايا · الرئيسية (في الوسط) · الإشعارات · طلباتي.
-- **الدخول بـ Gmail فقط.** التصفح والسلة متاحة للجميع، وإرسال الطلب يحتاج دخولاً. زر الدخول ظاهر في الرئيسية، ومن يحاول إتمام الطلب بدون دخول يُحوَّل لصفحة الدخول ثم يرجع للدفع.
-- **المستويات (فضي ← ذهبي ← ماسي):** تُحسب من مجموع النقاط المكتسبة، ولا تنزل عند صرف النقاط. لكل مستوى خصم دائم على الفاتورة.
-- **الهدايا:** فئات بالنقاط، وفي كل فئة 3 هدايا. يقدر الزبون أن يأخذ عدة هدايا، أو نفس الهدية أكثر من مرة، ما دام رصيده يكفي.
-- **طلباتي:** حالة كل طلب مباشرة (قيد الانتظار ← قيد التحضير ← تم التسليم، أو ملغي).
-- **الإشعارات:** يرسلها المطعم من لوحة الإدارة، وتظهر أيضاً كقائمة داخل الموقع.
-- **كل صفحة من الثمانية** لها صورة 16:9 تحت الهيدر، ونصوص قابلة للتعديل من لوحة الإدارة > Pages.
+- **One language per site.** The language is chosen in *Admin › Restaurant Settings*: the whole website, receipts and push notifications follow it, and prices use the local format (`12,50 €`, `€12.50`, `12,50 €`…). Visitors get no language switch.
+- **White label.** Name, logo, colors, images, texts, social links and link previews (WhatsApp / Facebook) all come from the admin panel; the installed app icon uses the restaurant's logo. No code edits per client.
+- **Admin panel in the restaurant's language** (with a one-click switch to English for the agency).
+- **Several demo restaurants on one deployment** — see [Demo sites](#demo-sites).
+- **Header:** logo, cart, hamburger menu (sign in/out, privacy policy, refund policy).
+- **Bottom bar:** Levels · Gifts · Home · Notifications · My Orders.
+- **Menu:** categories bar (3 styles), product options (sizes with their own price, paid extras, free choices), product discounts, multiple locations.
+- **Sign-in with Google only.** Browsing and the cart are open to everyone; placing an order needs sign-in.
+- **Levels (Silver → Gold → Diamond)** by lifetime points, each with a permanent discount.
+- **Gifts** redeemed with points; points are deducted in the same transaction that creates the order, so they can never be spent twice.
+- **Discounts:** by order amount (percentage or fixed), on delivery (percentage, fixed or free), minimum delivery order, optional tax.
+- **Cashier screen** `/cashier`: only its location's orders, alarm until each order is accepted or rejected, thermal printing (80 / 58 mm or A4), "busy" switch that pauses new orders.
+- **Prices are recomputed on the server** from the stored menu; nothing the browser sends can change what a customer pays or earns.
 
-### قواعد النقاط (محمية في الخادم)
-- النقاط = قيمة الطلب **بعد الخصومات وبدون التوصيل** ÷ (المبلغ لكل نقطة). تُضاف **فقط عند "تم التسليم"**، ومرة واحدة.
-- **نقاط الهدايا:**
-  - في السلة تكون حجزاً للجلسة فقط (sessionStorage)، ولا يُخصم شيء.
-  - إذا خرج الزبون أو انتهت الجلسة بدون طلب، تختفي الهدايا ورصيده كما هو.
-  - عند إرسال الطلب، يتحقق الخادم من الرصيد ويخصمه ويُنشئ الطلب **في معاملة واحدة**، فلا يمكن صرف النقاط مرتين (من تبويبين أو جهازين أو بطلب مكرر).
-- إذا رُفض الطلب أو أُلغي، تعود نقاط الهدايا مرة واحدة.
-- الخادم يعيد حساب كل الأسعار والخصومات والنقاط من القائمة المحفوظة، ويتجاهل أي سعر يرسله المتصفح.
+## Demo sites
 
-### لوحة الإدارة `/admin` (بكلمة سر)
-أقسامها:
-- **الطلبات:** كل الفروع، مباشرة، مع فلتر بالفترة والحالة والفرع، وتغيير الحالة، وطباعة، وحذف ✕.
-- **المحتوى:** الفروع، المنتجات، الأقسام، مناطق التوصيل.
-- **خصومات الفاتورة:** حسب نطاق القيمة، نسبة أو مبلغ.
-- **خصومات التوصيل:** نسبة، أو مبلغ، أو توصيل مجاني.
-- **النقاط والهدايا والمستويات:** معدل النقاط، فئات الهدايا وصورها، نقاط كل مستوى ونسبة خصمه.
-- **الصفحات والإشعارات.**
-- **حسابات الكاشير:** لكل فرع حساب أو أكثر.
-- **الألوان والإعدادات.**
-- **نسخة احتياطية/استيراد، والبيانات التجريبية.**
+One deployment can host many restaurants, each with **its own link, language, menu, orders, customers, cashiers and admin password**. Use it to show prospects a demo with their own name before they buy.
 
-الواجهة بالإنجليزية، وكل نص يظهر للزبون له حقلان: عربي وإنجليزي.
+1. Sign in to `/admin` with the master password (`ADMIN_PASSWORD`).
+2. Open **Demo sites**, type the restaurant name, pick the language (currency and time zone follow), optionally set a demo admin password, and press **Create demo site**.
+3. Send the link `https://your-site.pages.dev/s/<link-name>`.
+   - `/s/<link-name>/menu` opens a page directly, `/s/<link-name>/admin` its admin panel.
+   - `/s/main` goes back to the main site.
+   - Link previews on WhatsApp / Facebook show the demo restaurant's name and image.
+4. Open the demo's **Admin** button to replace the logo, colors, menu and photos.
+5. With a demo password, the restaurant can sign in to `/admin` of **its own demo only**. Your master password works on every site and is the only one that can create or delete demos.
 
-### لوحة الكاشير `/cashier`
-- يرى الكاشير طلبات فرعه فقط.
-- **التنبيه يرنّ باستمرار** حتى يُقبل الطلب أو يُرفض.
-- يستطيع: قبول ← تم التسليم، أو رفض/إلغاء، وطباعة (حرارية 80 أو 58 ملم أو A4).
-- **لا يستطيع** حذف الطلبات ولا الدخول للإدارة.
-- إذا عطّلت حسابه من الإدارة، يُقفل فوراً.
+How it works: `/s/<link-name>` sets a `rs_site` cookie. The server keeps each demo's data apart (KV keys `site:<name>:…`, Firestore `/sites/<name>/…`), staff sign-ins carry the site they belong to, and the Firestore rules enforce it.
+When a restaurant buys, give it its own deployment (below) and move its menu with *Backup & Data › Download backup* → *Restore*.
 
-### لماذا لا يرجع الموقع لاسم "Urban Table" أبداً
-- البيانات التجريبية المدمجة في الكود حُذفت نهائياً.
-- آخر نسخة ناجحة من بيانات المطعم تُحفظ على جهاز الزائر. إذا انقطع الاتصال تُعرض هذه النسخة، وإذا لم توجد تظهر شاشة "إعادة المحاولة"، ولا تظهر بيانات مطعم آخر أبداً.
-- لوحة الإدارة لا تسمح بالتعديل إذا لم تُحمَّل البيانات الحقيقية.
-- كل حفظ يحمل رقم نسخة، فلا يمكن لتبويب قديم أن يكتب فوق بيانات أحدث.
+## Set up a restaurant (under an hour)
 
----
+### 1) Firebase (about 15 minutes)
+1. At [console.firebase.google.com](https://console.firebase.google.com) create a project on the free **Spark** plan.
+2. **Authentication › Sign-in method:** enable **Google** only.
+3. **Authentication › Settings › Authorized domains:** add `your-project.pages.dev` and the restaurant's domain.
+4. **Firestore Database › Create database:** production mode, a nearby region (e.g. `eur3` for Europe). In **Rules**, paste `firestore.rules` and **Publish**.
+5. **Project settings › General › Your apps:** add a Web app and copy `apiKey`, `projectId`, `appId`, `messagingSenderId`.
+6. **Project settings › Cloud Messaging › Web Push certificates:** *Generate key pair* and copy the key (VAPID).
+7. **Project settings › Service accounts › Generate new private key:** from the JSON file you need `client_email` and `private_key`.
 
-## إعداد مطعم جديد (أقل من ساعة)
+### 2) Cloudflare (about 15 minutes)
+1. Copy this repository for the client (or fork it).
+2. **Workers & Pages › Create › Pages › Connect to Git:** pick the repository. Build command: empty. Build output directory: `public`.
+3. **Workers & Pages › KV › Create namespace** (e.g. `rest-NAME`).
+4. In the Pages project: **Settings › Bindings › Add › KV namespace**, name `STORE`, pick the namespace.
+5. **Settings › Variables and Secrets** (mark sensitive ones as Secret):
 
-### 1) Firebase (حوالي 15 دقيقة)
-1. من [console.firebase.google.com](https://console.firebase.google.com) أنشئ مشروعاً جديداً على **خطة Spark المجانية** (لا تحتاج بطاقة).
-2. **Authentication ← Sign-in method:** فعّل **Google** فقط.
-3. **Authentication ← Settings ← Authorized domains:** أضف `اسم-المشروع.pages.dev` ودومين المطعم إن وُجد.
-4. **Firestore Database ← Create database:**
-   - اختر وضع production، ومنطقة قريبة (مثلاً `me-central2` الدمام للخليج، أو `eur3`).
-   - من تبويب **Rules** الصق محتوى ملف `firestore.rules` واضغط **Publish**.
-5. **Project settings ← General ← Your apps:** أضف تطبيق Web، وانسخ `apiKey` و`projectId` و`appId` و`messagingSenderId`.
-6. **Project settings ← Cloud Messaging ← Web Push certificates:** اضغط Generate key pair وانسخ المفتاح (VAPID).
-7. **Project settings ← Service accounts ← Generate new private key:** ينزل ملف JSON، تحتاج منه `client_email` و`private_key`.
-
-### 2) Cloudflare (حوالي 15 دقيقة)
-1. استنسخ هذا المستودع لمستودع جديد باسم المطعم (أو اعمل له Fork).
-2. **Workers & Pages ← Create ← Pages ← Connect to Git:** اختر المستودع.
-   - Build command: فارغ.
-   - Build output directory: `public`.
-3. **Workers & Pages ← KV ← Create namespace:** باسم مثل `rest-NAME`.
-4. في مشروع Pages: **Settings ← Bindings ← Add ← KV namespace**، الاسم `STORE` واختر الـ namespace.
-5. **Settings ← Variables and Secrets:** أضف المتغيرات التالية (اجعل الحساس منها Secret):
-
-| المتغير | القيمة |
+| Variable | Value |
 |---|---|
 | `FIREBASE_PROJECT_ID` | projectId |
 | `FIREBASE_API_KEY` | apiKey |
 | `FIREBASE_APP_ID` | appId |
 | `FIREBASE_MESSAGING_SENDER_ID` | messagingSenderId |
-| `FIREBASE_VAPID_KEY` | مفتاح Web Push |
-| `FIREBASE_CLIENT_EMAIL` | `client_email` من ملف JSON |
-| `FIREBASE_PRIVATE_KEY` (Secret) | `private_key` من ملف JSON كما هو (مع `\n`) |
-| `ADMIN_PASSWORD` (Secret) | كلمة سر لوحة الإدارة للمطعم |
-| `FIREBASE_AUTH_DOMAIN` (اختياري) | دومين الموقع نفسه، انظر "دخول Google على iPhone" |
+| `FIREBASE_VAPID_KEY` | Web Push key |
+| `FIREBASE_CLIENT_EMAIL` | `client_email` from the JSON file |
+| `FIREBASE_PRIVATE_KEY` (Secret) | `private_key` from the JSON file, as is (with `\n`) |
+| `ADMIN_PASSWORD` (Secret) | master password of the admin panel |
+| `FIREBASE_AUTH_DOMAIN` (optional) | the site's own domain — see "Google sign-in on iPhone" |
 
-6. **Deployments ← Retry deployment** حتى تُطبَّق المتغيرات.
+6. **Deployments › Retry deployment** so the variables apply.
 
-### 3) تخصيص المطعم (حوالي 20 دقيقة)
-1. افتح `https://الموقع/admin` وادخل بكلمة السر، ثم اضغط **Start from demo**.
-2. **Restaurant Settings:** الشعار، الاسم بالعربي والإنجليزي، العملة، المنطقة الزمنية، لغة الموقع الافتراضية، عرض الإيصال.
-3. **Colors:** لون الهيدر واللون الثانوي (الأزرار وزر الدخول).
-4. **Branches** و**Delivery Zones**، ثم **Categories** و**Products**.
-5. **Discounts** و**Points, Gifts & Levels**.
-6. **Pages:** صور ونصوص الصفحات الثمانية، و**Homepage**.
-7. **Cashiers:** حساب لكل فرع، وأعطِ الكاشير رابط `https://الموقع/cashier`.
-8. **Footer & Contact.**
-9. جرّب طلباً من جوالك وتابع وصوله للكاشير.
+### 3) Customize (about 20 minutes)
+1. Open `https://your-site/admin`, sign in, choose the **website language**, currency and time zone, and press **Start from demo**.
+2. **Restaurant Settings:** logo, name, language, currency, time zone, receipt width.
+3. **Colors**, **Branches** (locations) and **Delivery Zones**, **Categories** and **Products**.
+4. **Discounts** and **Points, Gifts & Levels**.
+5. **Pages** (images and texts of the 7 pages) and **Homepage**.
+6. **Cashiers:** one account per location; cashiers use `https://your-site/cashier`.
+7. **Footer & Contact.**
+8. Place a test order from your phone and watch it arrive at the cashier screen.
 
-> **نصيحة:** بعد تجهيز مطعم، احفظ نسخة من **Backup & Data ← Download backup**. يمكنك استيرادها كنقطة بداية لمطعم مشابه.
+> Write all texts in the website's language. Changing the language later does not translate texts you already typed.
 
-### دخول Google على iPhone والتطبيق المثبّت
-Safari يمنع تخزين الطرف الثالث، وهذا قد يُفشل الدخول عند تثبيت الموقع على الشاشة الرئيسية. الحل المدمج:
-1. ضع `FIREBASE_AUTH_DOMAIN` = دومين الموقع (مثلاً `rest-name.pages.dev`). الملف `functions/__/auth/[[path]].js` يمرّر صفحات الدخول من نفس الدومين.
-2. في [Google Cloud Console ← APIs & Services ← Credentials](https://console.cloud.google.com/apis/credentials) افتح "Web client (auto created by Google Service)"، وأضف إلى **Authorized redirect URIs**:
-   `https://دومين-الموقع/__/auth/handler`
+### Google sign-in on iPhone and the installed app
+Safari blocks third-party storage, which can break sign-in when the site is installed on the home screen. Built-in fix:
+1. Set `FIREBASE_AUTH_DOMAIN` to the site's domain (e.g. `rest-name.pages.dev`); `functions/__/auth/[[path]].js` serves the sign-in pages from the same domain.
+2. In [Google Cloud Console › APIs & Services › Credentials](https://console.cloud.google.com/apis/credentials) open "Web client (auto created by Google Service)" and add to **Authorized redirect URIs**: `https://your-domain/__/auth/handler`
 
-### إشعارات iPhone
-تصل على iOS 16.4 أو أحدث **فقط بعد إضافة الموقع إلى الشاشة الرئيسية**، وهذا قيد من Apple. صفحة الإشعارات تشرح للزبون الخطوات تلقائياً. أما Android والكمبيوتر فتعمل مباشرة.
+### iPhone notifications
+iOS 16.4+ delivers web push **only after the site is added to the home screen** (an Apple rule). The Notifications page explains the steps to customers automatically. Android and desktop work right away.
 
----
+## Free-plan limits (far above a normal restaurant)
 
-## الحدود المجانية (لمطعم عادي بعيدة جداً)
-
-| الخدمة | الحد المجاني | الاستهلاك |
+| Service | Free limit | Usage |
 |---|---|---|
-| Cloudflare Pages Functions | 100,000 طلب/يوم | زيارة الصفحة ≈ طلب واحد لـ `/api/site`، مخزّن على الحافة |
-| Cloudflare KV | 100,000 قراءة و1,000 كتابة/يوم | الكتابة فقط عند حفظ الإدارة أو رفع صورة أو إرسال إشعار |
-| Firestore | 50,000 قراءة و20,000 كتابة/يوم | الطلب ≈ 3 كتابات، وتغيير الحالة ≈ 2 |
-| Firebase Auth (Google) | بلا حد عملي | |
-| FCM | مجاني | الإشعار العام = طلب واحد لكل لغة (Topics) |
+| Cloudflare Pages Functions | 100,000 requests/day | a page view ≈ one `/api/site` request, cached at the edge |
+| Cloudflare KV | 100,000 reads, 1,000 writes/day | writes only when the admin saves, uploads an image or sends a notification |
+| Firestore | 50,000 reads, 20,000 writes/day | an order ≈ 3 writes, a status change ≈ 2 |
+| Firebase Auth (Google) | no practical limit | |
+| FCM | free | a broadcast = one request per site (topics) |
 
-الصور تُضغط في المتصفح (WebP) قبل رفعها، وتُقدَّم بتخزين مؤقت لسنة.
+Images are compressed to WebP in the browser before upload and served with a one-year cache.
 
----
-
-## التطوير المحلي والاختبارات
+## Local development & tests
 
 ```bash
 npm install
-cp .dev.vars.example .dev.vars   # ضع أي مفتاح RSA في FIREBASE_PRIVATE_KEY
-npm run emulators                 # Firestore + Auth emulators (يحتاج Java)
-npm run seed:local                # يحمّل البيانات التجريبية في KV المحلي
+cp .dev.vars.example .dev.vars   # put any RSA private key in FIREBASE_PRIVATE_KEY
+npm run emulators                 # Firestore + Auth emulators (needs Java)
+npm run seed:local                # loads the demo data into local KV
 npm run dev                       # http://127.0.0.1:8788
-npm test                          # اختبارات منطق الأسعار والنقاط
-npm run test:api                  # 21 اختبار تكامل: الطلب، النقاط، الهدايا، الكاشير، الصلاحيات
-PLAYWRIGHT=… FIREBASE_PKG=… npm run test:ui   # تجربة كاملة في متصفح بحجم iPhone
+npm test                          # pricing, points, translations, demo-site logic
+npm run test:api                  # 28 integration checks: orders, points, gifts, cashiers, rules, demo sites
+PLAYWRIGHT=… FIREBASE_PKG=… npm run test:ui   # full flow in an iPhone-sized browser, incl. a Spanish demo
 ```
 
-### بنية الملفات
+### Files
 ```
-public/                 الموقع (Cloudflare Pages)
-  js/pricing.js         حساب الأسعار والخصومات والنقاط (يستخدمه المتصفح والخادم معاً)
-  js/i18n.js            نصوص الواجهة عربي/إنجليزي
-  js/store.js           تحميل بيانات المطعم + السلة + سلة الهدايا (session)
-  js/firebase.js        Firebase عند الحاجة فقط + الدخول + الإشعارات
-  js/ui.js              الهيدر، قائمة الهمبرجر، الشريط السفلي، الفوتر
-  js/pages.js           الدخول، المستويات، الهدايا، طلباتي، الإشعارات، السياسات
-  js/admin.js           لوحة الإدارة
-  js/cashier.js         لوحة الكاشير
-  js/receipt.js         الطباعة الحرارية
-  js/icons.js           الأيقونات المستخدمة فقط (scripts/build-icons.mjs)
-  seed/demo-config.json البيانات التجريبية ثنائية اللغة
-functions/              الخادم (Pages Functions)
-  api/site.js           بيانات الموقع العامة (مخزّنة على الحافة)
-  api/orders/*.js       إنشاء الطلب / تغيير الحالة / الحذف
-  api/auth/*.js         دخول الإدارة والكاشير
-  api/admin/*.js        الإعدادات، رفع الصور، الكاشير، الإشعارات
-  _middleware.js        عنوان وصورة المعاينة (Open Graph) لكل مطعم
-firestore.rules         قواعد أمان Firestore
+public/                    the website (Cloudflare Pages)
+  js/i18n.js               storefront texts in 8 languages + single-language helpers
+  js/admin-i18n.js         admin panel language loader
+  js/admin-lang/<lang>.js  admin panel translations (English is the source)
+  js/pricing.js            prices, discounts and points (shared by browser and server)
+  js/store.js              restaurant data, cart, gift cart, per-site browser storage
+  js/firebase.js           Firebase on demand, sign-in, notifications
+  js/ui.js                 header, menu drawer, bottom bar, footer, money/date formats
+  js/pages.js              sign-in, levels, gifts, my orders, notifications, policies
+  js/admin.js              admin panel (incl. Demo sites)
+  js/cashier.js            cashier screen
+  js/receipt.js            thermal receipts
+  seed/demo-config.json    demo restaurant, every text in all 8 languages
+functions/                 the server (Pages Functions)
+  _lib/site.js             which site a request belongs to (main site or a demo)
+  s/[[path]].js            /s/<name> demo links
+  api/site.js              public site data (edge cached)
+  api/orders/*.js          create order / change status / delete
+  api/auth/*.js            admin and cashier sign-in
+  api/admin/*.js           settings, image upload, cashiers, notifications, demo sites
+  _middleware.js           per-restaurant title, language and preview image
+firestore.rules            Firestore security rules
 ```

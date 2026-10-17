@@ -1,10 +1,8 @@
 /* Firebase Cloud Messaging (HTTP v1) + topic management, via REST.
-   Broadcasts go to a per-language topic (one request no matter how many
+   Broadcasts go to one topic per site (one request no matter how many
    subscribers), which keeps every send far inside the Workers free plan's
    per-request subrequest limit. */
 import { accessToken } from './google.js';
-
-export const LANG_TOPICS = { ar: 'all_ar', en: 'all_en' };
 
 async function iid(env, action, topic, tokens) {
   if (env.FIRESTORE_EMULATOR_HOST) return; // no push service in local development

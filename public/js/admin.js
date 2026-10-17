@@ -1,11 +1,12 @@
 /* ===================== Admin Panel =====================
-   Bilingual interface (Arabic default, English) — every UI string goes
-   through L() from admin-i18n.js. Every customer-facing text has Arabic +
-   English fields. Config is loaded fresh from /api/admin/config and saved
-   with optimistic versioning, so a tab that failed to load (or is stale)
-   can never overwrite the restaurant's real data.
+   The panel speaks the site's language (or English) — every UI string goes
+   through L() from admin-i18n.js. The website itself has ONE language, so
+   every customer-facing text is a single field, typed in that language.
+   Config is loaded fresh from /api/admin/config and saved with optimistic
+   versioning, so a tab that failed to load (or is stale) can never
+   overwrite the restaurant's real data.
 ========================================================= */
-window.FORCE_LANG = window.ADMIN_LANG || 'ar';
+window.FORCE_LANG = window.ADMIN_LANG || 'en';
 
 const SECTIONS = [
   ['orders', L('Orders'), 'receipt-text'],
@@ -23,8 +24,10 @@ const SECTIONS = [
   ['colors', L('Colors'), 'palette'],
   ['general', L('Restaurant Settings'), 'settings'],
   ['footer', L('Footer & Contact'), 'panel-bottom'],
-  ['data', L('Backup & Data'), 'database']
+  ['data', L('Backup & Data'), 'database'],
+  ['sites', L('Demo sites'), 'globe', 'super']
 ];
+const visibleSections = () => SECTIONS.filter(x => x[3] !== 'super' || StaffAuth.isSuper());
 
 let CONFIG = null;
 let VERSION = 0;
@@ -32,19 +35,19 @@ let active = 'orders';
 const $ = id => document.getElementById(id);
 
 /* ---------- helpers ---------- */
-function asBi(v) {
-  if (v && typeof v === 'object') return { ar: v.ar || '', en: v.en || '' };
-  return { ar: '', en: v ? String(v) : '' };
+/* Customer-facing text: one field in the site's language. Older bilingual
+   values ({ en, es, ... }) are shown in the site language and saved back
+   as plain text. */
+const asText = v => tField(v, contentLang());
+const textDir = () => (SITE_LANGS[contentLang()].rtl ? 'rtl' : 'ltr');
+function bi(id, label, value, { area = false, ph = '' } = {}) {
+  const v = escapeHtml(asText(value));
+  const attrs = `id="${id}" dir="${textDir()}" lang="${contentLang()}" placeholder="${escapeHtml(ph)}"`;
+  const tag = area ? `<textarea ${attrs}>${v}</textarea>` : `<input type="text" ${attrs} value="${v}">`;
+  return `<div class="form-group"><label>${escapeHtml(label)}</label>${tag}</div>`;
 }
-function bi(id, label, value, { area = false, ph = {} } = {}) {
-  const v = asBi(value);
-  const tag = (lang) => area
-    ? `<textarea id="${id}_${lang}" dir="${lang === 'ar' ? 'rtl' : 'ltr'}" placeholder="${escapeHtml(ph[lang] || '')}">${escapeHtml(v[lang])}</textarea>`
-    : `<input type="text" id="${id}_${lang}" dir="${lang === 'ar' ? 'rtl' : 'ltr'}" value="${escapeHtml(v[lang])}" placeholder="${escapeHtml(ph[lang] || '')}">`;
-  return `<div class="form-group"><label>${escapeHtml(label)}</label><div class="bi-field"><div>${tag('ar')}<span class="bi-tag">AR</span></div><div>${tag('en')}<span class="bi-tag">EN</span></div></div></div>`;
-}
-function readBi(id) { return { ar: ($(id + '_ar')?.value || '').trim(), en: ($(id + '_en')?.value || '').trim() }; }
-const hasBi = v => !!(v.ar || v.en);
+const readBi = id => ($(id)?.value || '').trim();
+const hasBi = v => !!v;
 
 function imgField(id, label, url, { wide = false, note = '' } = {}) {
   return `<div class="form-group"><label>${escapeHtml(label)}</label>
@@ -90,7 +93,7 @@ function branchCheckboxes(name, selected) {
     </div><p class="mini-note">${L('Leave all unchecked to show in every branch.')}</p></div>`;
 }
 const readBranches = name => Array.from(document.querySelectorAll(`.${name}-branch:checked`)).map(c => c.value);
-const nameOf = f => tField(f) || tField(f, getLang() === 'ar' ? 'en' : 'ar') || '—';
+const nameOf = f => asText(f) || '—';
 
 /* ---------- saving ---------- */
 let saving = Promise.resolve();
@@ -123,8 +126,8 @@ const editDelBtns = id => `<button class="btn-sm btn-edit" data-edit="${id}">${L
 
 /* ---------- layout ---------- */
 function renderNav() {
-  $('sideNav').innerHTML = SECTIONS.map(([k, l, i]) => `<button class="admin-nav-item ${active === k ? 'active' : ''}" data-key="${k}"><i data-lucide="${i}"></i><span>${l}</span></button>`).join('');
-  $('mobileNav').innerHTML = SECTIONS.map(([k, l]) => `<button class="${active === k ? 'active' : ''}" data-key="${k}">${l}</button>`).join('');
+  $('sideNav').innerHTML = visibleSections().map(([k, l, i]) => `<button class="admin-nav-item ${active === k ? 'active' : ''}" data-key="${k}"><i data-lucide="${i}"></i><span>${l}</span></button>`).join('');
+  $('mobileNav').innerHTML = visibleSections().map(([k, l]) => `<button class="${active === k ? 'active' : ''}" data-key="${k}">${l}</button>`).join('');
   document.querySelectorAll('[data-key]').forEach(b => b.addEventListener('click', () => { active = b.dataset.key; show(); }));
 }
 function show() {
@@ -143,7 +146,7 @@ const STATUS_LABEL = { pending: L('Pending'), preparing: L('Preparing'), deliver
 
 function staffOrderHtml(o, { admin }) {
   const money = n => fmtMoney(n);
-  const items = (o.items || []).map(i => `<li><span>${i.qty}× ${escapeHtml(nameOf(i.name))}${(i.options && (i.options.en || i.options.ar)) || i.notes ? `<small>${escapeHtml([tField(i.options), i.notes].filter(Boolean).join(' • '))}</small>` : ''}</span><span>${money(i.lineTotal)}</span></li>`).join('')
+  const items = (o.items || []).map(i => `<li><span>${i.qty}× ${escapeHtml(nameOf(i.name))}${asText(i.options) || i.notes ? `<small>${escapeHtml([asText(i.options), i.notes].filter(Boolean).join(' • '))}</small>` : ''}</span><span>${money(i.lineTotal)}</span></li>`).join('')
     + (o.gifts || []).map(g => `<li class="gift-li"><span>🎁 ${g.qty}× ${escapeHtml(nameOf(g.name))}<small>${L('{n} pts', { n: g.points })}</small></span><span>${L('Free')}</span></li>`).join('');
   const line = (l, v) => `<div><span>${l}</span><span>${v}</span></div>`;
   return `
@@ -215,14 +218,14 @@ function renderOrders(el) {
       try { await api('/api/orders/delete', { method: 'POST', token: await StaffAuth.token(), body: { orderId: o.id } }); toast(L('Order deleted')); }
       catch (e) { toast(L('Delete failed')); }
     }));
-    document.querySelectorAll('[data-print]').forEach(b => b.addEventListener('click', () => printReceipt(all.find(x => x.id === b.dataset.print), CONFIG, 'en')));
+    document.querySelectorAll('[data-print]').forEach(b => b.addEventListener('click', () => printReceipt(all.find(x => x.id === b.dataset.print), CONFIG)));
     renderIcons();
   }
   async function listen() {
     if (ordersUnsub) ordersUnsub();
     const [from, to] = range();
     const { m, db } = await FB.firestore('staff');
-    const q = m.query(m.collection(db, 'orders'), m.where('createdAtMs', '>=', from), m.where('createdAtMs', '<', to), m.orderBy('createdAtMs', 'desc'), m.limit(500));
+    const q = m.query(ordersCollection(m, db), m.where('createdAtMs', '>=', from), m.where('createdAtMs', '<', to), m.orderBy('createdAtMs', 'desc'), m.limit(500));
     ordersUnsub = m.onSnapshot(q, snap => { all = snap.docs.map(d => ({ id: d.id, ...d.data() })); draw(); }, err => {
       console.error(err);
       $('ordersBox').innerHTML = `<div class="admin-card"><p class="form-error">${L('Could not load orders: {err}. Check that the Firestore rules from the README are published.', { err: escapeHtml(err.code || err.message) })}</p></div>`;
@@ -252,7 +255,7 @@ function renderBranches(el) {
   }));
 }
 function branchForm(id) {
-  const b = id ? CONFIG.branches.find(x => x.id === id) : { name: {}, image: '', pickupEnabled: true, deliveryEnabled: true };
+  const b = id ? CONFIG.branches.find(x => x.id === id) : { name: '', image: '', pickupEnabled: true, deliveryEnabled: true };
   const type = b.pickupEnabled === false ? 'delivery' : b.deliveryEnabled === false ? 'pickup' : 'both';
   const f = $('branchForm');
   f.classList.remove('hidden');
@@ -312,7 +315,7 @@ function renderCategories(el) {
   }));
 }
 function catForm(id) {
-  const c = id ? CONFIG.categories.find(x => x.id === id) : { name: {}, image: '', branchIds: [], order: CONFIG.categories.length };
+  const c = id ? CONFIG.categories.find(x => x.id === id) : { name: '', image: '', branchIds: [], order: CONFIG.categories.length };
   const f = $('catForm');
   f.classList.remove('hidden');
   f.innerHTML = `<h3>${id ? L('Edit category') : L('New category')}</h3>
@@ -352,7 +355,7 @@ function renderProducts(el) {
 }
 function prodForm(id) {
   const src = id ? CONFIG.products.find(x => x.id === id) : null;
-  const p = src ? JSON.parse(JSON.stringify(src)) : { categoryId: CONFIG.categories[0]?.id || '', image: '', price: 0, discountPercent: 0, branchIds: [], order: CONFIG.products.length, name: {}, description: {}, optionGroups: [] };
+  const p = src ? JSON.parse(JSON.stringify(src)) : { categoryId: CONFIG.categories[0]?.id || '', image: '', price: 0, discountPercent: 0, branchIds: [], order: CONFIG.products.length, name: '', description: '', optionGroups: [] };
   p.optionGroups = p.optionGroups || [];
   const f = $('prodForm');
   f.classList.remove('hidden');
@@ -376,10 +379,10 @@ function prodForm(id) {
   function syncGroupsFromDom() {
     f.querySelectorAll('.option-group-card').forEach(gc => {
       const g = p.optionGroups[Number(gc.dataset.gi)];
-      g.name = { ar: gc.querySelector('.g-ar').value.trim(), en: gc.querySelector('.g-en').value.trim() };
+      g.name = gc.querySelector('.g-name').value.trim();
       gc.querySelectorAll('.option-line').forEach(line => {
         const o = g.options[Number(line.dataset.oi)];
-        o.name = { ar: line.querySelector('.o-ar').value.trim(), en: line.querySelector('.o-en').value.trim() };
+        o.name = line.querySelector('.o-name').value.trim();
         const d = line.querySelector('.o-price');
         if (d) o.priceDelta = Number(d.value) || 0;
       });
@@ -393,11 +396,10 @@ function prodForm(id) {
   function groups() {
     $('groups').innerHTML = p.optionGroups.map((g, gi) => `
       <div class="option-group-card" data-gi="${gi}">
-        <div class="form-row"><div class="form-group"><label>${L('Group name (AR)')}</label><input class="g-ar" dir="rtl" value="${escapeHtml(asBi(g.name).ar)}"></div><div class="form-group"><label>${L('Group name (EN)')}</label><input class="g-en" dir="ltr" value="${escapeHtml(asBi(g.name).en)}"></div></div>
+        <div class="form-group"><label>${L('Group name')}</label><input class="g-name" dir="${textDir()}" value="${escapeHtml(asText(g.name))}" placeholder="${L('e.g. Size')}"></div>
         <div class="form-group"><label>${L('Type')}</label><select class="g-type">${Object.entries(GROUP_TYPES).map(([k, v]) => `<option value="${k}" ${g.type === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
         ${(g.options || []).map((o, oi) => `<div class="option-line" data-oi="${oi}">
-          <input class="o-ar" dir="rtl" placeholder="${L('Option (AR)')}" value="${escapeHtml(asBi(o.name).ar)}">
-          <input class="o-en" dir="ltr" placeholder="${L('Option (EN)')}" value="${escapeHtml(asBi(o.name).en)}">
+          <input class="o-name" dir="${textDir()}" placeholder="${L('Option')}" value="${escapeHtml(asText(o.name))}">
           ${g.type === 'single_price' || g.type === 'multi_priced' ? `<input class="o-price" type="number" step="0.001" style="max-width:100px" placeholder="${g.type === 'single_price' && gi === p.optionGroups.indexOf(Pricing.pricingGroup(p)) ? L('Price') : L('+ Price')}" value="${o.priceDelta || 0}">` : ''}
           <button type="button" class="btn-sm btn-del o-del">×</button></div>`).join('')}
         <button type="button" class="btn-sm btn-edit o-add">${L('+ Option')}</button>
@@ -406,7 +408,7 @@ function prodForm(id) {
     f.querySelectorAll('.option-group-card').forEach(gc => {
       const gi = Number(gc.dataset.gi), g = p.optionGroups[gi];
       gc.querySelector('.g-type').addEventListener('change', e => { syncGroupsFromDom(); g.type = e.target.value; groups(); });
-      gc.querySelector('.o-add').addEventListener('click', () => { syncGroupsFromDom(); (g.options = g.options || []).push({ id: uid('opt'), name: {}, priceDelta: 0 }); groups(); });
+      gc.querySelector('.o-add').addEventListener('click', () => { syncGroupsFromDom(); (g.options = g.options || []).push({ id: uid('opt'), name: '', priceDelta: 0 }); groups(); });
       gc.querySelector('.g-del').addEventListener('click', () => { syncGroupsFromDom(); p.optionGroups.splice(gi, 1); groups(); });
       gc.querySelectorAll('.option-line').forEach(line => line.querySelector('.o-del').addEventListener('click', () => { syncGroupsFromDom(); g.options.splice(Number(line.dataset.oi), 1); groups(); }));
       gc.querySelectorAll('.o-price').forEach(i => i.addEventListener('input', () => { syncGroupsFromDom(); priceState(); }));
@@ -414,7 +416,7 @@ function prodForm(id) {
     priceState();
   }
   groups();
-  $('addGroup').addEventListener('click', () => { syncGroupsFromDom(); p.optionGroups.push({ id: uid('grp'), type: 'single_flat', name: {}, options: [] }); groups(); });
+  $('addGroup').addEventListener('click', () => { syncGroupsFromDom(); p.optionGroups.push({ id: uid('grp'), type: 'single_flat', name: '', options: [] }); groups(); });
   $('pCancel').addEventListener('click', () => f.classList.add('hidden'));
   $('pSave').addEventListener('click', () => {
     syncGroupsFromDom();
@@ -427,7 +429,7 @@ function prodForm(id) {
     p.discountPercent = Math.min(100, Math.max(0, num('pDisc')));
     p.order = num('pOrder');
     p.branchIds = readBranches('prod');
-    p.optionGroups = p.optionGroups.filter(g => hasBi(asBi(g.name)) || (g.options || []).length);
+    p.optionGroups = p.optionGroups.filter(g => asText(g.name) || (g.options || []).length);
     if (id) CONFIG.products[CONFIG.products.findIndex(x => x.id === id)] = p;
     else CONFIG.products.push({ ...p, id: uid('prod') });
     persist(); show();
@@ -443,7 +445,7 @@ function renderDelivery(el) {
     <div class="form-group"><label>${L('Branch')}</label><select id="zBranch">${branches.map(b => `<option value="${b.id}">${escapeHtml(nameOf(b.name))}</option>`).join('')}</select></div>
     <div id="zoneList"></div>
     <div class="form-row" style="align-items:flex-end">
-      <div class="form-group" style="flex:2">${bi('zName', L('New zone name'), {})}</div>
+      <div class="form-group" style="flex:2">${bi('zName', L('New zone name'), '')}</div>
       <div class="form-group"><label>${L('Delivery fee')}</label><input type="number" step="0.001" min="0" id="zPrice" value="0"></div>
     </div>
     <button class="btn-add" id="zAdd">${L('+ Add zone')}</button>`);
@@ -451,7 +453,7 @@ function renderDelivery(el) {
   function list() {
     const b = CONFIG.branches.find(x => x.id === sel.value);
     b.deliveryZones = b.deliveryZones || [];
-    $('zoneList').innerHTML = b.deliveryZones.map(z => `<div class="admin-list-item"><div class="info"><strong>${escapeHtml(nameOf(z.name))}</strong><div class="mini-note">${escapeHtml(tField(z.name, getLang() === 'ar' ? 'en' : 'ar'))}</div></div>
+    $('zoneList').innerHTML = b.deliveryZones.map(z => `<div class="admin-list-item"><div class="info"><strong>${escapeHtml(nameOf(z.name))}</strong></div>
       <input type="number" step="0.001" min="0" value="${z.price}" data-zprice="${z.id}" style="max-width:110px;border:1px solid var(--border);border-radius:10px;padding:8px">
       <div class="actions"><button class="btn-sm btn-del" data-zdel="${z.id}">${L('Delete')}</button></div></div>`).join('') || `<p class="mini-note">${L('No zones for this branch yet.')}</p>`;
     el.querySelectorAll('[data-zprice]').forEach(i => i.addEventListener('change', () => { b.deliveryZones.find(z => z.id === i.dataset.zprice).price = Number(i.value) || 0; persist(); }));
@@ -462,7 +464,7 @@ function renderDelivery(el) {
     const name = readBi('zName');
     if (!hasBi(name)) return toast(L('Zone name is required'));
     CONFIG.branches.find(x => x.id === sel.value).deliveryZones.push({ id: uid('zone'), name, price: num('zPrice') });
-    ['zName_ar', 'zName_en'].forEach(i => { $(i).value = ''; });
+    $('zName').value = '';
     persist(); list();
   });
   list();
@@ -513,7 +515,7 @@ function renderDiscounts(el) {
 function renderLoyalty(el) {
   const LY = CONFIG.loyalty = CONFIG.loyalty || { enabled: true, amountPerPoint: 1, tiers: [], levels: [] };
   LY.tiers = LY.tiers || []; LY.levels = LY.levels || [];
-  while (LY.levels.length < 3) LY.levels.push({ id: ['silver', 'gold', 'diamond'][LY.levels.length], name: {}, points: 0, discountPercent: 0, image: '' });
+  while (LY.levels.length < 3) LY.levels.push({ id: ['silver', 'gold', 'diamond'][LY.levels.length], name: '', points: 0, discountPercent: 0, image: '' });
   const cur = getCurrency().code;
   el.innerHTML =
     card(L('Points'), `
@@ -657,14 +659,14 @@ function renderPages(el) {
 async function renderNotifications(el) {
   el.innerHTML = card(L('Send a notification'), `
     <p class="mini-note">${L('Sent as a push notification to every customer who enabled notifications (Android, desktop, and iPhone when the site is added to the home screen), and shown on the Notifications page.')}</p>
-    ${bi('nTitle', L('Title'), {})}${bi('nBody', L('Message'), {}, { area: true })}
+    ${bi('nTitle', L('Title'), '')}${bi('nBody', L('Message'), '', { area: true })}
     <div class="form-group"><label>${L('Link (optional, e.g. /menu or /gifts)')}</label><input type="text" id="nLink" dir="ltr" placeholder="/menu"></div>
     ${imgField('nImg', L('Image (optional)'), '')}
     ${saveBtn('nSend', L('Send notification'))}`) + card(L('Sent notifications'), `<div id="nList"><p class="mini-note">${L('Loading…')}</p></div>`);
   bindImg('nImg', 1000);
   async function list() {
     try {
-      const site = await (await fetch('/api/site', { cache: 'no-store' })).json();
+      const site = await (await fetch('/api/site', { cache: 'no-store', credentials: 'same-origin' })).json();
       $('nList').innerHTML = (site.notifications || []).map(n => `<div class="admin-list-item"><div class="info"><strong>${escapeHtml(nameOf(n.title))}</strong><div class="mini-note">${escapeHtml(fmtDate(n.at))} · ${escapeHtml(tField(n.body))}</div></div><div class="actions"><button class="btn-sm btn-del" data-ndel="${n.id}">${L('Delete')}</button></div></div>`).join('') || `<p class="mini-note">${L('Nothing sent yet.')}</p>`;
       el.querySelectorAll('[data-ndel]').forEach(b => b.addEventListener('click', async () => { if (!confirm(L('Remove from the Notifications page?'))) return; await api('/api/admin/notify', { method: 'DELETE', token: await StaffAuth.token(), body: { id: b.dataset.ndel } }); setTimeout(list, 300); }));
     } catch (e) { $('nList').innerHTML = `<p class="mini-note">${L('Could not load.')}</p>`; }
@@ -676,7 +678,7 @@ async function renderNotifications(el) {
     e.target.disabled = true;
     try {
       const res = await api('/api/admin/notify', { method: 'POST', token: await StaffAuth.token(), body: { title, body, link: $('nLink').value.trim(), image: readImg('nImg') } });
-      toast(res.push && (res.push.ar === 'failed' || res.push.en === 'failed') ? L('Saved, but push sending failed (check Firebase settings)') : L('Notification sent'));
+      toast(res.push === 'failed' ? L('Saved, but push sending failed (check Firebase settings)') : L('Notification sent'));
       show();
     } catch (err) { toast(L('Send failed')); e.target.disabled = false; }
   });
@@ -741,26 +743,34 @@ function renderColors(el) {
 }
 
 /* ===================== General ===================== */
-const TIMEZONES = ['Asia/Kuwait', 'Asia/Riyadh', 'Asia/Dubai', 'Asia/Qatar', 'Asia/Bahrain', 'Asia/Muscat', 'Asia/Amman', 'Asia/Jerusalem', 'Asia/Baghdad', 'Africa/Cairo', 'Africa/Casablanca', 'Europe/Istanbul', 'Europe/London', 'UTC'];
+const TIMEZONES = ['Europe/Madrid', 'Europe/Paris', 'Europe/Berlin', 'Europe/Rome', 'Europe/Lisbon', 'Europe/Amsterdam', 'Europe/Brussels', 'Europe/Luxembourg', 'Europe/Vienna', 'Europe/Zurich', 'Europe/London', 'Europe/Dublin', 'Europe/Stockholm', 'Europe/Oslo', 'Europe/Copenhagen', 'Europe/Helsinki', 'Europe/Warsaw', 'Europe/Prague', 'Europe/Budapest', 'Europe/Bucharest', 'Europe/Athens', 'Europe/Istanbul', 'Atlantic/Canary', 'Asia/Dubai', 'Asia/Riyadh', 'Asia/Kuwait', 'Asia/Qatar', 'Asia/Bahrain', 'Asia/Muscat', 'Asia/Amman', 'Asia/Jerusalem', 'Africa/Cairo', 'Africa/Casablanca', 'America/New_York', 'America/Toronto', 'UTC'];
+const langOptions = sel => Object.entries(SITE_LANGS).map(([k, v]) => `<option value="${k}" ${k === sel ? 'selected' : ''}>${escapeHtml(v.name)}</option>`).join('');
+const currencyOptions = sel => CURRENCIES.map(c => `<option value="${c.code}" ${c.code === sel ? 'selected' : ''}>${L(c.name)} (${c.code})</option>`).join('');
+const tzOptions = sel => TIMEZONES.map(z => `<option ${z === sel ? 'selected' : ''}>${z}</option>`).join('');
 function renderGeneral(el) {
   const s = CONFIG.settings;
+  const lang = contentLang();
   el.innerHTML = card(L('Restaurant settings'), `
     ${imgField('gLogo', L('Logo'), s.logo, { note: L('Also used as the app icon when customers add the site to their home screen.') })}
     ${bi('gName', L('Restaurant name'), s.restaurantName)}
     <div class="form-row">
-      <div class="form-group"><label>${L('Currency')}</label><select id="gCur">${CURRENCIES.map(c => `<option value="${c.code}" ${c.code === s.currency ? 'selected' : ''}>${L(c.name)} (${c.code})</option>`).join('')}</select></div>
-      <div class="form-group"><label>${L('Time zone')}</label><select id="gTz" dir="ltr">${TIMEZONES.map(z => `<option ${z === s.timezone ? 'selected' : ''}>${z}</option>`).join('')}</select></div>
-      <div class="form-group"><label>${L('Default site language')}</label><select id="gLang"><option value="ar" ${s.defaultLang !== 'en' ? 'selected' : ''}>${L('Arabic')}</option><option value="en" ${s.defaultLang === 'en' ? 'selected' : ''}>${L('English')}</option></select></div>
+      <div class="form-group"><label>${L('Website language')}</label><select id="gLang">${langOptions(lang)}</select></div>
+      <div class="form-group"><label>${L('Currency')}</label><select id="gCur">${currencyOptions(s.currency)}</select></div>
+      <div class="form-group"><label>${L('Time zone')}</label><select id="gTz" dir="ltr">${tzOptions(s.timezone)}</select></div>
       <div class="form-group"><label>${L('Receipt width')}</label><select id="gPaper"><option value="80" ${(s.receipt?.paperWidth || 80) == 80 ? 'selected' : ''}>${L('80 mm')}</option><option value="58" ${s.receipt?.paperWidth == 58 ? 'selected' : ''}>${L('58 mm')}</option><option value="a4" ${s.receipt?.paperWidth === 'a4' ? 'selected' : ''}>${L('A4 / normal printer')}</option></select></div>
-      <div class="form-group"><label>${L('Receipt language')}</label><select id="gRLang"><option value="ar" ${(s.receipt?.lang || 'ar') === 'ar' ? 'selected' : ''}>${L('Arabic')}</option><option value="en" ${s.receipt?.lang === 'en' ? 'selected' : ''}>${L('English')}</option></select></div>
     </div>
+    <p class="mini-note">${L('The whole website (buttons, cart, checkout, receipts and notifications) uses this language. Write your menu and page texts in the same language.')}</p>
     ${saveBtn('gSave')}`);
   bindImg('gLogo', 512);
   $('gSave').addEventListener('click', () => {
     const name = readBi('gName');
     if (!hasBi(name)) return toast(L('Restaurant name is required'));
-    Object.assign(s, { logo: readImg('gLogo'), restaurantName: name, currency: $('gCur').value, timezone: $('gTz').value, defaultLang: $('gLang').value, receipt: { paperWidth: $('gPaper').value === 'a4' ? 'a4' : Number($('gPaper').value), lang: $('gRLang').value } });
-    persist(); toast(L('Saved'));
+    const newLang = $('gLang').value;
+    if (newLang !== lang && !confirm(L('Change the website language? Texts you already typed are not translated automatically.'))) return;
+    Object.assign(s, { logo: readImg('gLogo'), restaurantName: name, lang: newLang, currency: $('gCur').value, timezone: $('gTz').value, receipt: { paperWidth: $('gPaper').value === 'a4' ? 'a4' : Number($('gPaper').value) } });
+    delete s.defaultLang;
+    persist().then(() => { if (newLang !== lang) location.reload(); });
+    toast(L('Saved'));
   });
 }
 
@@ -783,13 +793,25 @@ function renderFooterSettings(el) {
 }
 
 /* ===================== Backup & data ===================== */
+/* The demo restaurant ships in every supported language; it is turned
+   into a single-language config for the chosen language. */
+async function demoConfig(lang, overrides = {}) {
+  const seed = await (await fetch('/seed/demo-config.json', { cache: 'no-store' })).json();
+  const d = localizeConfig(seed, lang);
+  d.settings.lang = lang;
+  delete d.settings.defaultLang;
+  if (overrides.name) { d.settings.restaurantName = overrides.name; if (d.settings.homepage && d.settings.homepage.hero) d.settings.homepage.hero.title = overrides.name; }
+  if (overrides.currency) d.settings.currency = overrides.currency;
+  if (overrides.timezone) d.settings.timezone = overrides.timezone;
+  return d;
+}
 function renderData(el) {
   el.innerHTML = card(L('Backup'), `<p class="mini-note">${L('Download all menu and site settings as a file. Orders and customer points stay in Firebase.')}</p><button class="btn-add" id="dExport">${L('Download backup')}</button>`) +
     card(L('Restore / import'), `<p class="mini-note">${L('Replace all site settings with a backup file. This overwrites the current menu.')}</p><input type="file" id="dImport" accept="application/json">`) +
-    card(L('Demo data'), `<p class="mini-note">${L('Replace everything with the bilingual demo restaurant (useful for showing the template).')}</p><button class="btn-sm btn-del" id="dDemo">${L('Load demo data')}</button>`);
+    card(L('Demo data'), `<p class="mini-note">${L('Replace everything with the demo restaurant in the website language (useful for showing the template).')}</p><button class="btn-sm btn-del" id="dDemo">${L('Load demo data')}</button>`);
   $('dExport').addEventListener('click', () => {
     const blob = new Blob([JSON.stringify(CONFIG, null, 1)], { type: 'application/json' });
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `site-backup-${new Date().toISOString().slice(0, 10)}.json`; a.click();
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `site-backup-${SITE || 'main'}-${new Date().toISOString().slice(0, 10)}.json`; a.click();
   });
   $('dImport').addEventListener('change', async e => {
     const f = e.target.files[0]; if (!f) return;
@@ -800,31 +822,110 @@ function renderData(el) {
       await replaceConfig(data);
     } catch (err) { toast(err.message); }
   });
-  $('dDemo').addEventListener('click', async () => { if (!confirm(L('Replace ALL current settings with the demo restaurant?'))) return; await replaceConfig(await (await fetch('/seed/demo-config.json')).json()); });
+  $('dDemo').addEventListener('click', async () => {
+    if (!confirm(L('Replace ALL current settings with the demo restaurant?'))) return;
+    const s = CONFIG.settings;
+    await replaceConfig(await demoConfig(contentLang(), { currency: s.currency, timezone: s.timezone }));
+  });
 }
 async function replaceConfig(data) {
   data.version = VERSION;
   CONFIG = data;
+  Store.data = CONFIG;
   await persist(L('Imported'));
   show();
 }
 
-const RENDER = { orders: renderOrders, branches: renderBranches, categories: renderCategories, products: renderProducts, delivery: renderDelivery, discounts: renderDiscounts, loyalty: renderLoyalty, homepage: renderHomepage, slider: renderSlider, pages: renderPages, notifications: renderNotifications, cashiers: renderCashiers, colors: renderColors, general: renderGeneral, footer: renderFooterSettings, data: renderData };
+/* ===================== Demo sites (super admin) =====================
+   Every demo is a full copy of the site with its own menu, language,
+   orders, cashiers and admin password, opened with /s/<slug>. */
+const slugify = v => String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40);
+const LANG_CURRENCY_TZ = { es: ['EUR', 'Europe/Madrid'], fr: ['EUR', 'Europe/Paris'], de: ['EUR', 'Europe/Berlin'], it: ['EUR', 'Europe/Rome'], pt: ['EUR', 'Europe/Lisbon'], nl: ['EUR', 'Europe/Amsterdam'], en: ['GBP', 'Europe/London'], ar: ['AED', 'Asia/Dubai'] };
+const siteError = code => ({ invalid_slug: L('Link name: letters, numbers and dashes only'), slug_taken: L('This link name is already used'), weak_password: L('Password must be at least 6 characters'), name_required: L('Restaurant name is required') }[code] || L('Failed: {msg}', { msg: code }));
+async function renderSites(el) {
+  const origin = location.origin;
+  el.innerHTML = card(L('New demo site'), `
+    <p class="mini-note">${L('Create a ready-to-show copy of the website for a prospect, in their language, with its own link. Then replace the logo, colors, menu and photos from its own admin panel.')}</p>
+    <div class="form-row">
+      <div class="form-group"><label>${L('Restaurant name')}</label><input type="text" id="dsName" placeholder="La Paella Valencia"></div>
+      <div class="form-group"><label>${L('Link name')}</label><input type="text" id="dsSlug" dir="ltr" placeholder="la-paella-valencia"><p class="mini-note" dir="ltr" id="dsUrl"></p></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>${L('Website language')}</label><select id="dsLang">${langOptions('es')}</select></div>
+      <div class="form-group"><label>${L('Currency')}</label><select id="dsCur">${currencyOptions('EUR')}</select></div>
+      <div class="form-group"><label>${L('Time zone')}</label><select id="dsTz" dir="ltr">${tzOptions('Europe/Madrid')}</select></div>
+      <div class="form-group"><label>${L('Demo admin password (optional)')}</label><input type="text" id="dsPass" dir="ltr" autocomplete="new-password" placeholder="${L('min 6 characters')}"></div>
+    </div>
+    <p class="mini-note">${L('With a demo admin password the restaurant can open {path} and try the admin panel of their own demo only. Your master password works everywhere.', { path: '<span dir="ltr">/admin</span>' })}</p>
+    ${saveBtn('dsCreate', L('Create demo site'))}`) + card(L('Demo sites'), `<div id="dsList"><p class="mini-note">${L('Loading…')}</p></div>`);
+  let slugTouched = false;
+  const updUrl = () => { $('dsUrl').textContent = `${origin}/s/${$('dsSlug').value || '…'}`; };
+  $('dsName').addEventListener('input', () => { if (!slugTouched) $('dsSlug').value = slugify($('dsName').value); updUrl(); });
+  $('dsSlug').addEventListener('input', () => { slugTouched = true; $('dsSlug').value = slugify($('dsSlug').value); updUrl(); });
+  $('dsLang').addEventListener('change', () => { const d = LANG_CURRENCY_TZ[$('dsLang').value]; if (d) { $('dsCur').value = d[0]; $('dsTz').value = d[1]; } });
+  updUrl();
+  const token = await StaffAuth.token();
+  async function list() {
+    try {
+      const { sites } = await api('/api/admin/sites', { token });
+      $('dsList').innerHTML = sites.map(x => `<div class="admin-list-item"><div class="info"><strong>${escapeHtml(x.name)}</strong> <span class="badge">${escapeHtml((SITE_LANGS[x.lang] || {}).name || x.lang)}</span>${x.hasPassword ? ` <span class="badge">${L('Demo password')}</span>` : ''}<div class="mini-note" dir="ltr">${escapeHtml(origin)}/s/${escapeHtml(x.slug)}</div></div>
+        <div class="actions"><button class="btn-sm btn-edit" data-copy="${escapeHtml(x.slug)}">${L('Copy link')}</button><a class="btn-sm btn-edit" href="/s/${escapeHtml(x.slug)}" target="_blank">${L('Open')}</a><a class="btn-sm btn-edit" href="/s/${escapeHtml(x.slug)}/admin" target="_blank">${L('Admin')}</a><button class="btn-sm" data-pass="${escapeHtml(x.slug)}">${L('Demo password')}</button><button class="btn-sm btn-del" data-sdel="${escapeHtml(x.slug)}">${L('Delete')}</button></div></div>`).join('') || `<p class="mini-note">${L('No demo sites yet.')}</p>`;
+      el.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', async () => {
+        const link = `${origin}/s/${b.dataset.copy}`;
+        try { await navigator.clipboard.writeText(link); toast(L('Link copied')); } catch (e) { prompt(L('Copy link'), link); }
+      }));
+      el.querySelectorAll('[data-pass]').forEach(b => b.addEventListener('click', async () => {
+        const p = prompt(L('New demo admin password (min 6 characters). Leave empty to remove it:'));
+        if (p === null) return;
+        try { await api('/api/admin/sites', { method: 'PATCH', token, body: { slug: b.dataset.pass, password: p } }); toast(L('Saved')); list(); } catch (e) { toast(siteError(e.message)); }
+      }));
+      el.querySelectorAll('[data-sdel]').forEach(b => b.addEventListener('click', async () => {
+        if (!confirm(L('Delete the demo site {slug}? Its link stops working.', { slug: b.dataset.sdel }))) return;
+        try { await api('/api/admin/sites', { method: 'DELETE', token, body: { slug: b.dataset.sdel } }); toast(L('Deleted')); list(); } catch (e) { toast(L('Delete failed')); }
+      }));
+    } catch (e) { $('dsList').innerHTML = `<p class="form-error">${escapeHtml(e.message)}</p>`; }
+  }
+  $('dsCreate').addEventListener('click', async e => {
+    const name = $('dsName').value.trim(), slug = slugify($('dsSlug').value), lang = $('dsLang').value;
+    if (!name) return toast(L('Restaurant name is required'));
+    if (!slug) return toast(siteError('invalid_slug'));
+    e.target.disabled = true;
+    try {
+      const config = await demoConfig(lang, { name, currency: $('dsCur').value, timezone: $('dsTz').value });
+      await api('/api/admin/sites', { method: 'POST', token, body: { slug, name, lang, password: $('dsPass').value.trim(), config } });
+      toast(L('Demo site created'));
+      show();
+    } catch (err) { toast(siteError(err.message)); e.target.disabled = false; }
+  });
+  list();
+}
+
+const RENDER = { orders: renderOrders, branches: renderBranches, categories: renderCategories, products: renderProducts, delivery: renderDelivery, discounts: renderDiscounts, loyalty: renderLoyalty, homepage: renderHomepage, slider: renderSlider, pages: renderPages, notifications: renderNotifications, cashiers: renderCashiers, colors: renderColors, general: renderGeneral, footer: renderFooterSettings, data: renderData, sites: renderSites };
 
 /* ===================== Boot ===================== */
 (async function init() {
   applyDocDir();
   try { await Store.load({ fresh: true }); } catch (e) { /* firebase config comes from here */ }
+  if (Store.data && syncAdminLang(contentLang())) return;
   if (!Store.firebase) { document.body.innerHTML = `<div class="fatal"><p>${L('Could not reach the server.')}</p><button class="btn-primary btn-inline" onclick="location.reload()">${L('Retry')}</button></div>`; return; }
   try { await StaffAuth.init(); } catch (e) { console.error(e); }
   if (!StaffAuth.user || StaffAuth.role() !== 'admin') { location.replace('/admin/login'); return; }
+  if (SITE && Store.data) document.title = `${L('Admin Panel')} · ${tField(Store.data.settings.restaurantName)}`;
   try {
     const { config } = await api('/api/admin/config', { token: await StaffAuth.token() });
     if (!config) {
-      $('section').innerHTML = card(L('Welcome! Set up the site'), `<p>${L('No restaurant data yet. Start from the bilingual demo and edit it, or restore a backup file.')}</p>
+      const guess = Object.keys(SITE_LANGS).find(k => (navigator.language || '').toLowerCase().startsWith(k)) || 'en';
+      const d0 = LANG_CURRENCY_TZ[guess] || ['EUR', 'Europe/Madrid'];
+      $('section').innerHTML = card(L('Welcome! Set up the site'), `<p>${L('No restaurant data yet. Choose the website language and start from the demo restaurant, then edit it — or restore a backup file.')}</p>
+        <div class="form-row">
+          <div class="form-group"><label>${L('Website language')}</label><select id="wLang">${langOptions(guess)}</select></div>
+          <div class="form-group"><label>${L('Currency')}</label><select id="wCur">${currencyOptions(d0[0])}</select></div>
+          <div class="form-group"><label>${L('Time zone')}</label><select id="wTz" dir="ltr">${tzOptions(d0[1])}</select></div>
+        </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn-add" id="startDemo">${L('Start from demo')}</button><label class="btn-sm" style="padding:10px 14px">${L('Restore backup')} <input type="file" id="startImport" accept="application/json" hidden></label></div>`);
-      $('startDemo').addEventListener('click', async () => { const d = await (await fetch('/seed/demo-config.json')).json(); VERSION = 0; d.version = 0; CONFIG = d; await persist(L('Created')); Store.data = CONFIG; show(); });
-      $('startImport').addEventListener('change', async e => { const d = JSON.parse(await e.target.files[0].text()); VERSION = 0; CONFIG = d; await persist(L('Imported')); Store.data = CONFIG; show(); });
+      $('wLang').addEventListener('change', () => { const d = LANG_CURRENCY_TZ[$('wLang').value]; if (d) { $('wCur').value = d[0]; $('wTz').value = d[1]; } });
+      $('startDemo').addEventListener('click', async () => { const d = await demoConfig($('wLang').value, { currency: $('wCur').value, timezone: $('wTz').value }); VERSION = 0; d.version = 0; CONFIG = d; Store.data = CONFIG; await persist(L('Created')); location.reload(); });
+      $('startImport').addEventListener('change', async e => { const d = JSON.parse(await e.target.files[0].text()); VERSION = 0; CONFIG = d; Store.data = CONFIG; await persist(L('Imported')); location.reload(); });
       return;
     }
     CONFIG = config;

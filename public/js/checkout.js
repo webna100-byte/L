@@ -95,7 +95,7 @@ boot('checkout', async (data) => {
     if (!q) { box.innerHTML = `<p class="form-error">${escapeHtml(errorText(error && error.code, error))}</p>`; return; }
     const line = (label, value, cls = '') => `<div class="checkout-line ${cls}"><span>${escapeHtml(label)}</span><span>${value}</span></div>`;
     let html = q.lines.map(l => `
-      <div class="summary-item"><div><strong>${l.qty}× ${tx(l.name)}</strong>${l.options[getLang()] || l.notes ? `<div class="mini-note">${escapeHtml([l.options[getLang()], l.notes].filter(Boolean).join(' • '))}</div>` : ''}</div><span>${fmtMoney(l.lineTotal)}</span></div>`).join('');
+      <div class="summary-item"><div><strong>${l.qty}× ${tx(l.name)}</strong>${tField(l.options) || l.notes ? `<div class="mini-note">${escapeHtml([tField(l.options), l.notes].filter(Boolean).join(' • '))}</div>` : ''}</div><span>${fmtMoney(l.lineTotal)}</span></div>`).join('');
     html += q.gifts.map(g => `
       <div class="summary-item gift"><div><strong>${g.qty}× ${tx(g.name)}</strong><div class="mini-note"><i data-lucide="gift"></i> ${fmtNumber(g.points)} ${t('pts')}</div></div><span>${t('free')}</span></div>`).join('');
     html += line(t('subtotal'), fmtMoney(q.subtotal));
@@ -140,7 +140,7 @@ boot('checkout', async (data) => {
     const showErr = msg => { errBox.textContent = msg; errBox.classList.remove('hidden'); errBox.scrollIntoView({ behavior: 'smooth', block: 'center' }); };
     if (busy) return showErr(t('restaurant_busy'));
     if (!name) return showErr(t('name_required'));
-    if (!/^\+?[0-9\s-]{6,20}$/.test(phone)) return showErr(t('phone_invalid'));
+    if (!/^\+?[0-9\s().-]{6,24}$/.test(phone)) return showErr(t('phone_invalid'));
     if (orderType === 'delivery') {
       if (!zoneSelect.value) return showErr(t('zone_required'));
       if (address.length < 3) return showErr(t('address_required'));
@@ -155,7 +155,7 @@ boot('checkout', async (data) => {
       const res = await api('/api/orders/create', {
         method: 'POST',
         token: await Auth.token(),
-        body: { ...input(), customer: { name, phone, address, notes }, lang: getLang() }
+        body: { ...input(), customer: { name, phone, address, notes } }
       });
       Store.saveCart([]);
       Store.clearGiftCart();

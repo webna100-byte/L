@@ -1,11 +1,12 @@
 /* POST /api/admin/upload (raw image body, Content-Type image/*) -> {url}.
    Images are compressed in the browser before upload. */
 import { json, fail, handle, authUser, isAdmin } from '../../_lib/http.js';
+import { siteOf } from '../../_lib/site.js';
 
 const TYPES = ['image/webp', 'image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'];
 
 export const onRequestPost = handle(async ({ request, env }) => {
-  if (!isAdmin(await authUser(request, env))) return fail(401, 'unauthorized');
+  if (!isAdmin(await authUser(request, env), siteOf(request))) return fail(401, 'unauthorized');
   const type = (request.headers.get('Content-Type') || '').split(';')[0].trim();
   if (!TYPES.includes(type)) return fail(400, 'unsupported_type');
   const buf = await request.arrayBuffer();

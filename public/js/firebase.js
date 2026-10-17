@@ -20,6 +20,9 @@ const FB = {
   },
   async app(name) {
     const { initializeApp, getApps } = await this.load('app');
+    // Staff sessions are per site, so an admin signed in to one demo is
+    // never treated as signed in to another one in the same browser.
+    if (name === 'staff' && SITE) name = 'staff_' + SITE;
     const appName = name || '[DEFAULT]';
     return getApps().find(a => a.name === appName) || initializeApp(this.webConfig(), name || undefined);
   },
@@ -39,6 +42,11 @@ const FB = {
     return { m, db };
   }
 };
+
+/* Orders of this site: /orders for the main site, /sites/<slug>/orders for a demo. */
+function ordersCollection(m, db) {
+  return SITE ? m.collection(db, 'sites', SITE, 'orders') : m.collection(db, 'orders');
+}
 
 async function api(path, { method = 'GET', body, token, raw, headers = {} } = {}) {
   const h = { ...headers };
@@ -64,8 +72,8 @@ const Auth = {
   _readyResolve: null,
   ready: null,
 
-  hint() { try { return localStorage.getItem('auth_hint') === '1'; } catch (e) { return false; } },
-  _setHint(v) { try { v ? localStorage.setItem('auth_hint', '1') : localStorage.removeItem('auth_hint'); } catch (e) { /* ignore */ } },
+  hint() { try { return localStorage.getItem(skey('auth_hint')) === '1'; } catch (e) { return false; } },
+  _setHint(v) { try { v ? localStorage.setItem(skey('auth_hint'), '1') : localStorage.removeItem(skey('auth_hint')); } catch (e) { /* ignore */ } },
 
   init() {
     if (this.ready) return this.ready;
@@ -161,7 +169,9 @@ const StaffAuth = {
     this.user = null; this.claims = null;
   },
   async token() { return this.user ? this.user.getIdToken() : null; },
-  role() { return this.claims && this.claims.role; }
+  /* A staff token only counts on the site it was issued for. */
+  role() { return this.claims && (this.claims.site || '') === SITE ? this.claims.role : null; },
+  isSuper() { return !!(this.claims && this.claims.super); }
 };
 
 /* ---------- Push notifications (FCM) ---------- */
@@ -175,7 +185,7 @@ const Push = {
     if (Notification.permission === 'granted' && this._saved()) return 'enabled';
     return 'default';
   },
-  _saved() { try { return localStorage.getItem('push_token'); } catch (e) { return null; } },
+  _saved() { try { return localStorage.getItem(skey('push_token')); } catch (e) { return null; } },
 
   async _token() {
     const c = FB.webConfig();
@@ -188,13 +198,12 @@ const Push = {
   },
 
   async _register(token) {
-    let prev = null, prevUid = null;
-    try { prev = localStorage.getItem('push_lang'); prevUid = localStorage.getItem('push_uid'); } catch (e) { /* ignore */ }
-    await api('/api/push/register', { method: 'POST', token: Auth.user ? await Auth.token() : null, body: { token, lang: getLang(), previousLang: prev } });
+    let prevUid = null;
+    try { prevUid = localStorage.getItem(skey('push_uid')); } catch (e) { /* ignore */ }
+    await api('/api/push/register', { method: 'POST', token: Auth.user ? await Auth.token() : null, body: { token } });
     try {
-      localStorage.setItem('push_token', token);
-      localStorage.setItem('push_lang', getLang());
-      localStorage.setItem('push_uid', Auth.user ? Auth.user.uid : '');
+      localStorage.setItem(skey('push_token'), token);
+      localStorage.setItem(skey('push_uid'), Auth.user ? Auth.user.uid : '');
     } catch (e) { /* ignore */ }
     return prevUid;
   },
@@ -206,15 +215,14 @@ const Push = {
     return 'enabled';
   },
 
-  /* Quietly keeps the subscription in sync when the language changes or the
-     visitor signs in (so order-status pushes reach them). */
+  /* Quietly links the device to the customer after they sign in, so
+     order-status pushes reach them. */
   async sync() {
     try {
       if (this.state() !== 'enabled') return;
-      const lang = localStorage.getItem('push_lang');
-      const pUid = localStorage.getItem('push_uid') || '';
+      const pUid = localStorage.getItem(skey('push_uid')) || '';
       const nowUid = Auth.user ? Auth.user.uid : '';
-      if (lang === getLang() && (pUid === nowUid || !nowUid)) return;
+      if (pUid === nowUid || !nowUid) return;
       await this._register(await this._token());
     } catch (e) { console.warn('push sync', e); }
   }

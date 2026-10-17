@@ -3,8 +3,8 @@
    accepted or rejected. No delete, no admin access. */
 (async function () {
   const $ = id => document.getElementById(id);
-  applyDocDir();
   try { await Store.load({ fresh: true }); } catch (e) { /* handled below */ }
+  applyDocDir();
   if (!Store.firebase) { showFatal(t('load_error')); return; }
   try { await StaffAuth.init(); } catch (e) { console.error(e); }
   if (StaffAuth.role() !== 'cashier') { location.replace('/cashier/login'); return; }
@@ -19,8 +19,6 @@
   $('branchName').textContent = `${tField(data.settings.restaurantName)} · ${branch ? tField(branch.name) : ''}`;
   $('cashierName').textContent = t('cashier_panel');
   $('logoutBtn').textContent = t('logout');
-  $('langBtn').textContent = t('lang_switch_full');
-  $('langBtn').addEventListener('click', () => { setLang(getLang() === 'ar' ? 'en' : 'ar'); location.reload(); });
   $('logoutBtn').addEventListener('click', async () => { await StaffAuth.signOut(); location.href = '/cashier/login'; });
   $('shiftNote').textContent = t('start_shift_note');
   $('shiftBtn').querySelector('span').textContent = t('start_shift');
@@ -163,7 +161,7 @@
   let currentDay = dayKey(Date.now());
   try {
     const { m, db } = await FB.firestore('staff');
-    const col = m.collection(db, 'orders');
+    const col = ordersCollection(m, db);
     const listen = (key, q) => unsubs[key] = m.onSnapshot(q, { includeMetadataChanges: true }, snap => {
       setConn(!snap.metadata.fromCache);
       sources[key] = new Map(snap.docs.map(d => [d.id, { id: d.id, ...d.data() }]));

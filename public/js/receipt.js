@@ -7,21 +7,30 @@ function printReceipt(order, config) {
   if (!order) return;
   const s = config.settings || {};
   const opts = s.receipt || {};
-  const lang = opts.lang === 'en' ? 'en' : 'ar';
+  // The receipt is printed in the site's language.
+  const lang = contentLang();
   const width = opts.paperWidth === 'a4' ? null : (Number(opts.paperWidth) || 80);
   const tf = f => tField(f, lang);
-  const L = lang === 'ar'
-    ? { order: 'طلب', date: 'التاريخ', branch: 'الفرع', type: 'النوع', pickup: 'استلام', delivery: 'توصيل', customer: 'الزبون', phone: 'الجوال', address: 'العنوان', zone: 'المنطقة', notes: 'ملاحظات', subtotal: 'المجموع', inv: 'خصم الفاتورة', level: 'خصم المستوى', fee: 'التوصيل', feeDisc: 'خصم التوصيل', tax: 'الضريبة', total: 'الإجمالي', gift: 'هدية', free: 'مجاني', thanks: 'شكراً لطلبكم', pts: 'نقطة' }
-    : { order: 'Order', date: 'Date', branch: 'Branch', type: 'Type', pickup: 'Pickup', delivery: 'Delivery', customer: 'Customer', phone: 'Phone', address: 'Address', zone: 'Zone', notes: 'Notes', subtotal: 'Subtotal', inv: 'Order discount', level: 'Level discount', fee: 'Delivery', feeDisc: 'Delivery discount', tax: 'Tax', total: 'TOTAL', gift: 'Gift', free: 'Free', thanks: 'Thank you for your order', pts: 'pts' };
-  const dec = Pricing.currencyDecimals(order.currency || s.currency || 'USD');
+  const T = (k, v) => translate(lang, k, v);
+  const L = {
+    order: T('receipt_order'), date: T('receipt_date'), branch: T('branch'), type: T('order_type'), pickup: T('type_pickup'), delivery: T('type_delivery'),
+    customer: T('customer'), phone: T('rc_phone'), address: T('rc_address'), zone: T('rc_zone'), notes: T('notes'), subtotal: T('subtotal'),
+    inv: T('invoice_discount'), level: T('rc_level_discount'), fee: T('delivery_fee'), feeDisc: T('delivery_discount'), tax: T('tax'),
+    total: T('total').toUpperCase(), gift: T('gift'), free: T('free'), thanks: T('receipt_thanks'), pts: T('pts')
+  };
+  const dec = Pricing.currencyDecimals(order.currency || s.currency || 'EUR');
   const cur = (CURRENCIES.find(c => c.code === (order.currency || s.currency)) || {});
-  const money = n => `${Number(Pricing.round(n, dec)).toFixed(dec)} ${lang === 'ar' ? (cur.symbol || '') : (cur.symbolEn || '')}`;
+  const money = n => {
+    if (lang === 'ar') return `${Number(Pricing.round(n, dec)).toFixed(dec)} ${cur.symbol || ''}`;
+    try { return new Intl.NumberFormat(langLocale(lang), { style: 'currency', currency: cur.code || 'EUR', minimumFractionDigits: dec, maximumFractionDigits: dec }).format(n); }
+    catch (e) { return `${Number(Pricing.round(n, dec)).toFixed(dec)} ${cur.symbolEn || ''}`; }
+  };
   const esc = escapeHtml;
-  const date = new Intl.DateTimeFormat(lang === 'ar' ? 'ar-u-nu-latn' : 'en-GB', { dateStyle: 'short', timeStyle: 'short', timeZone: s.timezone || undefined }).format(new Date(order.createdAtMs));
+  const date = new Intl.DateTimeFormat(langLocale(lang), { dateStyle: 'short', timeStyle: 'short', timeZone: s.timezone || undefined }).format(new Date(order.createdAtMs));
   const row = (a, b, cls = '') => `<tr class="${cls}"><td>${a}</td><td class="r">${b}</td></tr>`;
   const items = (order.items || []).map(i => `<tr><td>${i.qty}× ${esc(tf(i.name))}${tf(i.options) || i.notes ? `<div class="sub">${esc([tf(i.options), i.notes].filter(Boolean).join(' • '))}</div>` : ''}</td><td class="r">${money(i.lineTotal)}</td></tr>`).join('')
     + (order.gifts || []).map(g => `<tr><td>${g.qty}× ${esc(tf(g.name))}<div class="sub">${L.gift} · ${g.points} ${L.pts}</div></td><td class="r">${L.free}</td></tr>`).join('');
-  const html = `<!DOCTYPE html><html lang="${lang}" dir="${lang === 'ar' ? 'rtl' : 'ltr'}"><head><meta charset="utf-8"><title>#${order.number}</title><style>
+  const html = `<!DOCTYPE html><html lang="${lang}" dir="${SITE_LANGS[lang].rtl ? 'rtl' : 'ltr'}"><head><meta charset="utf-8"><title>#${order.number}</title><style>
     @page { size: ${width ? width + 'mm auto' : 'A4'}; margin: ${width ? '2mm' : '12mm'}; }
     * { box-sizing: border-box; }
     body { margin: 0; font-family: Tahoma, Arial, sans-serif; color: #000; font-size: ${width === 58 ? 11 : 12.5}px; width: ${width ? (width - 4) + 'mm' : 'auto'}; }

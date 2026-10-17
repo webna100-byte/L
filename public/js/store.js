@@ -6,6 +6,17 @@
    displaying another restaurant's name or menu.
 ========================================================= */
 
+/* ---- Which site is this? ----
+   One deployment can host several restaurants (demos for prospects):
+   /s/<slug> sets the rs_site cookie and every page, API call and browser
+   storage key then belongs to that restaurant. No cookie = the main site. */
+const SITE = (function () {
+  try { const m = document.cookie.match(/(?:^|;\s*)rs_site=([a-z0-9-]{1,40})/); return m ? m[1] : ''; } catch (e) { return ''; }
+})();
+/* Browser storage key for this site, so two demos opened in the same
+   browser never share a cart, a cached menu or a login hint. */
+function skey(k) { return SITE ? SITE + ':' + k : k; }
+
 function uid(prefix) {
   return (prefix ? prefix + '_' : '') + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }
@@ -25,13 +36,21 @@ const CURRENCIES = [
   { code: 'USD', symbol: '$', symbolEn: '$', name: 'US Dollar' },
   { code: 'EUR', symbol: '€', symbolEn: '€', name: 'Euro' },
   { code: 'GBP', symbol: '£', symbolEn: '£', name: 'British Pound' },
+  { code: 'CHF', symbol: 'CHF', symbolEn: 'CHF', name: 'Swiss Franc' },
+  { code: 'SEK', symbol: 'kr', symbolEn: 'kr', name: 'Swedish Krona' },
+  { code: 'NOK', symbol: 'kr', symbolEn: 'kr', name: 'Norwegian Krone' },
+  { code: 'DKK', symbol: 'kr', symbolEn: 'kr', name: 'Danish Krone' },
+  { code: 'PLN', symbol: 'zł', symbolEn: 'zł', name: 'Polish Zloty' },
+  { code: 'CZK', symbol: 'Kč', symbolEn: 'Kč', name: 'Czech Koruna' },
+  { code: 'HUF', symbol: 'Ft', symbolEn: 'Ft', name: 'Hungarian Forint' },
+  { code: 'RON', symbol: 'lei', symbolEn: 'lei', name: 'Romanian Leu' },
   { code: 'CAD', symbol: 'C$', symbolEn: 'C$', name: 'Canadian Dollar' },
   { code: 'AUD', symbol: 'A$', symbolEn: 'A$', name: 'Australian Dollar' },
   { code: 'INR', symbol: '₹', symbolEn: '₹', name: 'Indian Rupee' }
 ];
 
 function getCurrency() {
-  const code = (Store.data && Store.data.settings.currency) || 'USD';
+  const code = (Store.data && Store.data.settings.currency) || 'EUR';
   return CURRENCIES.find(c => c.code === code) || CURRENCIES.find(c => c.code === 'USD');
 }
 
@@ -39,7 +58,7 @@ function sortByOrder(list) {
   return [...(list || [])].sort((a, b) => (a.order || 0) - (b.order || 0));
 }
 
-const CACHE_KEY = 'site_cache_v2';
+const CACHE_KEY = skey('site_cache_v3');
 
 function readCache() {
   try { return JSON.parse(localStorage.getItem(CACHE_KEY) || 'null'); } catch (e) { return null; }
@@ -47,7 +66,7 @@ function readCache() {
 function writeCache(payload) {
   try {
     localStorage.setItem(CACHE_KEY, JSON.stringify(payload));
-    if (payload.config && payload.config.settings) localStorage.setItem('site_logo', payload.config.settings.logo || '');
+    if (payload.config && payload.config.settings) localStorage.setItem(skey('site_logo'), payload.config.settings.logo || '');
   } catch (e) { /* quota or blocked storage: the site still works */ }
 }
 
@@ -56,7 +75,7 @@ async function fetchSite(timeoutMs) {
   const timer = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
     const res = await fetch('/api/site', { signal: ctrl.signal, cache: 'no-store' });
-    if (!res.ok) throw new Error('site ' + res.status);
+    if (!res.ok) throw Object.assign(new Error('site ' + res.status), { status: res.status });
     return await res.json();
   } finally {
     clearTimeout(timer);
@@ -88,6 +107,7 @@ const Store = {
         this._apply(payload);
         return this.data;
       } catch (e) {
+        if (e.status === 404) throw e; // unknown demo link: never show cached data of another site
         if (cached && cached.config && !fresh) {
           this._apply(cached);
           // keep refreshing quietly so the next page view is current
@@ -101,7 +121,7 @@ const Store = {
   },
 
   // ---- Cart (per branch, survives reloads) ----
-  _cartKey() { return 'cart_' + (this.getSelectedBranch() || 'default'); },
+  _cartKey() { return skey('cart_') + (this.getSelectedBranch() || 'default'); },
   getCart() {
     try { return JSON.parse(localStorage.getItem(this._cartKey()) || '[]'); } catch (e) { return []; }
   },
@@ -116,13 +136,13 @@ const Store = {
      browsing session ends, and nothing is deducted until the server
      accepts the order, so abandoned gifts never cost or "freeze" points. */
   getGiftCart() {
-    try { return JSON.parse(sessionStorage.getItem('gift_cart') || '[]'); } catch (e) { return []; }
+    try { return JSON.parse(sessionStorage.getItem(skey('gift_cart')) || '[]'); } catch (e) { return []; }
   },
   saveGiftCart(list) {
-    try { sessionStorage.setItem('gift_cart', JSON.stringify(list.filter(g => g.qty > 0))); } catch (e) { /* ignore */ }
+    try { sessionStorage.setItem(skey('gift_cart'), JSON.stringify(list.filter(g => g.qty > 0))); } catch (e) { /* ignore */ }
   },
   clearGiftCart() {
-    try { sessionStorage.removeItem('gift_cart'); } catch (e) { /* ignore */ }
+    try { sessionStorage.removeItem(skey('gift_cart')); } catch (e) { /* ignore */ }
   },
   giftCartPoints() {
     const loyalty = (this.data && this.data.loyalty) || {};
@@ -135,13 +155,13 @@ const Store = {
   // ---- Selected branch ----
   getSelectedBranch() {
     try {
-      const id = localStorage.getItem('selected_branch');
+      const id = localStorage.getItem(skey('selected_branch'));
       if (id && this.data && !this.data.branches.some(b => b.id === id)) return null;
       return id;
     } catch (e) { return null; }
   },
   setSelectedBranch(id) {
-    try { localStorage.setItem('selected_branch', id); } catch (e) { /* ignore */ }
+    try { localStorage.setItem(skey('selected_branch'), id); } catch (e) { /* ignore */ }
   },
   /* For single-branch restaurants the branch is implicit. */
   ensureBranch() {

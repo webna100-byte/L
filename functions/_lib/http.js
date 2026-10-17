@@ -1,5 +1,6 @@
 import { verifyIdToken } from './google.js';
 import { Firestore } from './firestore.js';
+import { kvKey } from './site.js';
 
 export function json(data, status = 200, headers = {}) {
   return new Response(JSON.stringify(data), {
@@ -22,13 +23,21 @@ export async function authUser(request, env) {
   return verifyIdToken(env, token);
 }
 
-export function isAdmin(user) { return !!user && user.role === 'admin'; }
+/* Staff tokens carry the site they were issued for; they never work on
+   another site of the same deployment. */
+const sameSite = (user, site) => (user.site || '') === (site || '');
+
+export function isAdmin(user, site = '') { return !!user && user.role === 'admin' && sameSite(user, site); }
+
+/* The owner's master password (ADMIN_PASSWORD) gives a "super" token that
+   can also create and delete demo sites. */
+export function isSuper(user) { return !!user && user.role === 'admin' && user.super === true; }
 
 /* Cashier accounts can be disabled/deleted at any time by the admin, so a
    still-valid token is not enough: the account must still be active. */
-export async function activeCashier(user, env) {
-  if (!user || user.role !== 'cashier' || !user.cid) return null;
-  const doc = await new Firestore(env).get(`cashiers/${user.cid}`);
+export async function activeCashier(user, env, site = '') {
+  if (!user || user.role !== 'cashier' || !user.cid || !sameSite(user, site)) return null;
+  const doc = await new Firestore(env, site).get(`cashiers/${user.cid}`);
   if (!doc || !doc.data.active || doc.data.branchId !== user.branchId) return null;
   return doc.data;
 }
@@ -38,17 +47,18 @@ export function isGoogleCustomer(user) {
 }
 
 /* ---- Site config lives in Cloudflare KV (binding: STORE) ---- */
-export async function loadConfig(env) {
+export async function loadConfig(env, site = '') {
   if (!env.STORE) throw new Error('KV binding STORE is not configured');
-  return env.STORE.get('config', 'json');
+  return env.STORE.get(kvKey(site, 'config'), 'json');
 }
 
-export const SITE_CACHE_URL = 'https://site-cache.internal/api/site';
+export const siteCacheUrl = (site = '') => `https://site-cache.internal/api/site/${site || '_main'}`;
+export const metaCacheUrl = (site = '') => `https://site-cache.internal/meta-config/${site || '_main'}`;
 
-export async function purgeSiteCache() {
+export async function purgeSiteCache(site = '') {
   try {
-    await caches.default.delete(new Request(SITE_CACHE_URL));
-    await caches.default.delete(new Request('https://site-cache.internal/meta-config'));
+    await caches.default.delete(new Request(siteCacheUrl(site)));
+    await caches.default.delete(new Request(metaCacheUrl(site)));
   } catch (e) { /* ignore */ }
 }
 

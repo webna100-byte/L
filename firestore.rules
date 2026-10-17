@@ -3,20 +3,39 @@ rules_version = '2';
 // screen and the admin panel). Every write goes through the Cloudflare
 // functions with the service account, which is where prices, points and
 // gifts are validated.
+//
+// The main site keeps its data at the root (/orders, /cashiers ...).
+// Demo sites created from Admin > Demo sites live under /sites/{site}/...
+// Staff tokens carry the site they were issued for (claim "site"), so a
+// demo's admin or cashier can never read another site's orders.
 service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() { return request.auth != null; }
-    function isAdmin() { return signedIn() && request.auth.token.role == 'admin'; }
-    function isCashierFor(branchId) {
+    function tokenSite() { return request.auth.token.get('site', ''); }
+    function isAdmin(site) { return signedIn() && request.auth.token.role == 'admin' && tokenSite() == site; }
+    function cashierActive(site) {
+      return site == ''
+        ? get(/databases/$(database)/documents/cashiers/$(request.auth.token.cid)).data.active == true
+        : get(/databases/$(database)/documents/sites/$(site)/cashiers/$(request.auth.token.cid)).data.active == true;
+    }
+    function isCashierFor(site, branchId) {
       return signedIn()
         && request.auth.token.role == 'cashier'
+        && tokenSite() == site
         && request.auth.token.branchId == branchId
-        && get(/databases/$(database)/documents/cashiers/$(request.auth.token.cid)).data.active == true;
+        && cashierActive(site);
     }
 
     match /orders/{orderId} {
-      allow read: if isAdmin()
-        || isCashierFor(resource.data.branchId)
+      allow read: if isAdmin('')
+        || isCashierFor('', resource.data.branchId)
+        || (signedIn() && resource.data.uid == request.auth.uid);
+      allow write: if false;
+    }
+
+    match /sites/{site}/orders/{orderId} {
+      allow read: if isAdmin(site)
+        || isCashierFor(site, resource.data.branchId)
         || (signedIn() && resource.data.uid == request.auth.uid);
       allow write: if false;
     }

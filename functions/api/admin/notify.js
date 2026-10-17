@@ -1,52 +1,54 @@
-/* POST /api/admin/notify {title:{ar,en}, body:{ar,en}, link?, image?}
+/* POST /api/admin/notify {title, body, link?, image?}
    Saves the notification for the in-site list and pushes it to every
-   subscribed device in its language.
+   device subscribed to this site.
    DELETE {id} removes one from the in-site list. */
 import { json, fail, handle, readJson, authUser, isAdmin, loadConfig, purgeSiteCache } from '../../_lib/http.js';
-import { sendToTopic, LANG_TOPICS } from '../../_lib/push.js';
+import { sendToTopic } from '../../_lib/push.js';
+import { siteOf, siteTopic, kvKey } from '../../_lib/site.js';
 
 const clean = (v, n) => String(v || '').trim().slice(0, n);
+// Older admin panels sent { ar, en } objects: keep accepting them.
+const text = (v, n) => clean(v && typeof v === 'object' ? Object.values(v).find(x => x) : v, n);
 
 export const onRequestPost = handle(async ({ request, env }) => {
-  if (!isAdmin(await authUser(request, env))) return fail(401, 'unauthorized');
+  const site = siteOf(request);
+  if (!isAdmin(await authUser(request, env), site)) return fail(401, 'unauthorized');
   const b = await readJson(request, 10000);
-  const title = { ar: clean(b.title && b.title.ar, 120), en: clean(b.title && b.title.en, 120) };
-  const body = { ar: clean(b.body && b.body.ar, 500), en: clean(b.body && b.body.en, 500) };
-  if (!title.ar && !title.en) return fail(400, 'title_required');
+  const title = text(b.title, 120);
+  const body = text(b.body, 500);
+  if (!title) return fail(400, 'title_required');
   const origin = new URL(request.url).origin;
   let link = clean(b.link, 300);
   if (link && link.startsWith('/')) link = origin + link;
   if (link && !/^https:\/\//.test(link)) link = '';
   const image = clean(b.image, 300);
   const item = { id: 'n' + Date.now().toString(36), title, body, link, image, at: Date.now() };
-  const list = (await env.STORE.get('notifications', 'json')) || [];
+  const key = kvKey(site, 'notifications');
+  const list = (await env.STORE.get(key, 'json')) || [];
   list.unshift(item);
-  await env.STORE.put('notifications', JSON.stringify(list.slice(0, 30)));
-  await purgeSiteCache();
+  await env.STORE.put(key, JSON.stringify(list.slice(0, 30)));
+  await purgeSiteCache(site);
 
-  const config = await loadConfig(env);
+  const config = await loadConfig(env, site);
   const logo = config && config.settings && config.settings.logo;
-  const icon = logo ? (logo.startsWith('/') ? origin + logo : logo) : undefined;
-  const results = {};
-  for (const lang of ['ar', 'en']) {
-    const t = title[lang] || title.ar || title.en;
-    const m = body[lang] || body.ar || body.en;
-    try {
-      await sendToTopic(env, LANG_TOPICS[lang], { title: t, body: m, link: link || origin + '/notifications', icon, image: image ? (image.startsWith('/') ? origin + image : image) : undefined });
-      results[lang] = 'sent';
-    } catch (e) {
-      console.error(e);
-      results[lang] = 'failed';
-    }
+  const abs = u => (u && u.startsWith('/') ? origin + u : u) || undefined;
+  let push = 'sent';
+  try {
+    await sendToTopic(env, siteTopic(site), { title, body, link: link || origin + '/notifications', icon: abs(logo), image: abs(image) });
+  } catch (e) {
+    console.error(e);
+    push = 'failed';
   }
-  return json({ ok: true, item, push: results });
+  return json({ ok: true, item, push });
 });
 
 export const onRequestDelete = handle(async ({ request, env }) => {
-  if (!isAdmin(await authUser(request, env))) return fail(401, 'unauthorized');
+  const site = siteOf(request);
+  if (!isAdmin(await authUser(request, env), site)) return fail(401, 'unauthorized');
   const { id } = await readJson(request, 2000);
-  const list = (await env.STORE.get('notifications', 'json')) || [];
-  await env.STORE.put('notifications', JSON.stringify(list.filter(n => n.id !== id)));
-  await purgeSiteCache();
+  const key = kvKey(site, 'notifications');
+  const list = (await env.STORE.get(key, 'json')) || [];
+  await env.STORE.put(key, JSON.stringify(list.filter(n => n.id !== id)));
+  await purgeSiteCache(site);
   return json({ ok: true });
 });

@@ -8,8 +8,9 @@ const SITE = process.env.SITE || 'http://127.0.0.1:8788';
 const AUTH = 'http://127.0.0.1:9099/identitytoolkit.googleapis.com/v1';
 const FS = 'http://127.0.0.1:8080/v1/projects/demo-test/databases/(default)/documents';
 
-async function call(path, { method = 'GET', body, token } = {}) {
-  const res = await fetch(SITE + path, { method, headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) }, body: body ? JSON.stringify(body) : undefined });
+async function call(path, { method = 'GET', body, token, site } = {}) {
+  const headers = { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}), ...(site ? { Cookie: 'rs_site=' + site } : {}) };
+  const res = await fetch(SITE + path, { method, headers, body: body ? JSON.stringify(body) : undefined });
   let json = {};
   try { json = await res.json(); } catch (e) { /* empty */ }
   return { ...json, status: res.status };
@@ -33,8 +34,8 @@ async function exchange(customToken) {
 }
 
 /* Raw Firestore REST as a given user, so the security rules are enforced. */
-async function fsQuery(token, filters) {
-  const res = await fetch(`${FS}:runQuery`, {
+async function fsQuery(token, filters, parent = '') {
+  const res = await fetch(`${FS}${parent}:runQuery`, {
     method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
     body: JSON.stringify({ structuredQuery: { from: [{ collectionId: 'orders' }], where: filters.length === 1 ? filters[0] : { compositeFilter: { op: 'AND', filters } } } })
   });
@@ -92,7 +93,7 @@ const c1 = await googleUser('cust1', 'c1@example.com');
 const c2 = await googleUser('cust2', 'c2@example.com');
 cust = c1.token; cust2 = c2.token;
 
-const baseOrder = { branchId: branch.id, type: 'pickup', items: [{ productId: burger.id, qty: 6, selections: {} }], customer: { name: 'Ali', phone: '+96550000000' }, lang: 'ar' };
+const baseOrder = { branchId: branch.id, type: 'pickup', items: [{ productId: burger.id, qty: 6, selections: {} }], customer: { name: 'Ana', phone: '+34 600 000 000' } };
 
 await step('new customer cannot redeem gifts without points', async () => {
   const r = await call('/api/orders/create', { method: 'POST', token: cust, body: { ...baseOrder, gifts: [{ giftId: 'gift_cola', qty: 1 }] } });
@@ -104,8 +105,8 @@ await step('server recomputes prices (client prices ignored) and creates order',
   const r = await call('/api/orders/create', { method: 'POST', token: cust, body: { ...baseOrder, items: [{ productId: burger.id, qty: 6, selections: {}, unitPrice: 0.01 }] } });
   assert.equal(r.status, 200, JSON.stringify(r));
   order1 = r;
-  // 6 x 9.5 = 57 -> 5% invoice discount (50–99.99) = 2.85 -> 54.15, tax 2% = 1.08 -> 55.23
-  assert.equal(r.total, 55.23);
+  // 6 x 9.5 = 57 -> 5% invoice discount (50–99.99) = 2.85 -> 54.15 (prices include VAT)
+  assert.equal(r.total, 54.15);
   assert.equal(r.pointsEarned, 54); // floor(54.15 / 1)
   assert.equal(r.number, 1001);
 });
@@ -204,9 +205,9 @@ await step('level discount applies once lifetime points reach a level', async ()
   await call('/api/orders/status', { method: 'POST', token: admin, body: { orderId: r.id, status: 'delivered' } });
   me = await call('/api/me', { token: cust });
   assert.equal(me.lifetimePoints, 315);
-  // next order: 2 x 9.5 = 19, no invoice rule, silver 5% = 0.95 -> 18.05 + 2% tax 0.36 = 18.41
+  // next order: 2 x 9.5 = 19, no invoice rule, silver 5% = 0.95 -> 18.05
   const r2 = await call('/api/orders/create', { method: 'POST', token: cust, body: { ...baseOrder, items: [{ productId: burger.id, qty: 2, selections: {} }] } });
-  assert.equal(r2.total, 18.41);
+  assert.equal(r2.total, 18.05);
   // spending points on gifts must not lower the level
   const g = await call('/api/orders/create', { method: 'POST', token: cust, body: { ...baseOrder, items: [], gifts: [{ giftId: 'gift_brownie', qty: 1 }] } });
   assert.equal(g.status, 200);
@@ -242,6 +243,100 @@ await step('invalid input is rejected', async () => {
   assert.equal(r.error, 'product_unavailable');
   r = await call('/api/orders/create', { method: 'POST', token: cust, body: { ...baseOrder, type: 'delivery', zoneId: '', customer: { ...baseOrder.customer, address: 'Street 1' } } });
   assert.equal(r.error, 'zone_required');
+});
+
+/* ---------------- demo sites ---------------- */
+const DEMO = 'casa-pepe';
+let superTok, demoAdmin, demoOrder;
+const demoConfig = { ...JSON.parse(JSON.stringify(config)), settings: { ...config.settings, restaurantName: 'Casa Pepe' } };
+
+await step('only the master password can create demo sites', async () => {
+  const r = await call('/api/auth/admin', { method: 'POST', body: { password: 'test1234' } });
+  superTok = await exchange(r.token);
+  const body = { slug: DEMO, name: 'Casa Pepe', lang: 'es', password: 'pepe123', config: demoConfig };
+  assert.equal((await call('/api/admin/sites', { method: 'POST', token: cust, body })).status, 401);
+  assert.equal((await call('/api/admin/sites', { method: 'POST', token: superTok, body })).status, 200);
+  assert.equal((await call('/api/admin/sites', { method: 'POST', token: superTok, body })).status, 409);
+  const { sites } = await call('/api/admin/sites', { token: superTok });
+  assert.equal(sites[0].slug, DEMO);
+  assert.equal(sites[0].hasPassword, true);
+  assert.ok(!('pwHash' in sites[0]));
+});
+
+await step('/s/<slug> opens the demo with its own name and language', async () => {
+  const res = await fetch(SITE + '/s/' + DEMO + '/menu', { redirect: 'manual' });
+  assert.match(res.headers.get('set-cookie') || '', /rs_site=casa-pepe/);
+  const html = await res.text();
+  assert.match(html, /og:title" content="Casa Pepe"/);
+  assert.match(html, /location\.replace\("\/menu"\)/);
+  assert.equal((await fetch(SITE + '/s/nope-nope', { redirect: 'manual' })).status, 404);
+  const demo = await call('/api/site', { site: DEMO });
+  assert.equal(demo.config.settings.restaurantName, 'Casa Pepe');
+  assert.equal(demo.config.settings.lang, 'es');
+  assert.equal((await call('/api/site', { site: 'nope-nope' })).status, 404);
+  assert.notEqual((await call('/api/site')).config.settings.restaurantName, 'Casa Pepe');
+});
+
+await step('staff tokens only work on their own site', async () => {
+  // main-site admin token is not an admin of the demo
+  assert.equal((await call('/api/admin/config', { token: admin, site: DEMO })).status, 401);
+  // the demo's own password gives a demo admin, without super rights
+  let r = await call('/api/auth/admin', { method: 'POST', site: DEMO, body: { password: 'pepe123' } });
+  assert.equal(r.status, 200);
+  demoAdmin = await exchange(r.token);
+  assert.equal((await call('/api/admin/config', { token: demoAdmin, site: DEMO })).status, 200);
+  assert.equal((await call('/api/admin/config', { token: demoAdmin })).status, 401);
+  assert.equal((await call('/api/admin/sites', { token: demoAdmin })).status, 401);
+  // the demo password does not open the main site
+  r = await call('/api/auth/admin', { method: 'POST', body: { password: 'pepe123' } });
+  assert.equal(r.status, 401);
+});
+
+await step('demo orders, points and counters are separate from the main site', async () => {
+  const before = await call('/api/me', { token: cust });
+  const r = await call('/api/orders/create', { method: 'POST', token: cust, site: DEMO, body: baseOrder });
+  assert.equal(r.status, 200);
+  assert.equal(r.number, 1001); // the demo has its own order counter
+  demoOrder = r;
+  const doc = await fsGet(`sites/${DEMO}/orders/${r.id}`);
+  assert.equal(doc.status, 200);
+  assert.equal(doc.body.fields.lang.stringValue, 'es');
+  assert.equal((await fsGet(`orders/${r.id}`)).status, 404);
+  await call('/api/orders/status', { method: 'POST', token: demoAdmin, site: DEMO, body: { orderId: r.id, status: 'delivered' } });
+  const demoMe = await call('/api/me', { token: cust, site: DEMO });
+  assert.equal(demoMe.lifetimePoints, r.pointsEarned);
+  assert.equal((await call('/api/me', { token: cust })).lifetimePoints, before.lifetimePoints);
+  // the main admin cannot change demo orders
+  const x = await call('/api/orders/status', { method: 'POST', token: admin, site: DEMO, body: { orderId: r.id, status: 'cancelled' } });
+  assert.equal(x.status, 401);
+});
+
+await step('security rules: demo orders readable by their customer and the demo admin only', async () => {
+  const parent = `/sites/${DEMO}`;
+  const mine = await fsQuery(cust, [eq('uid', (await call('/api/me', { token: cust })).uid)], parent);
+  assert.equal(mine.status, 200);
+  assert.ok(mine.body.some(x => x.document));
+  assert.equal((await fsQuery(demoAdmin, [eq('branchId', branch.id)], parent)).status, 200);
+  assert.equal((await fsQuery(admin, [eq('branchId', branch.id)], parent)).status, 403);
+  assert.equal((await fsQuery(demoAdmin, [eq('branchId', branch.id)])).status, 403);
+});
+
+await step('demo cashiers are per site', async () => {
+  let r = await call('/api/admin/cashiers', { method: 'POST', token: demoAdmin, site: DEMO, body: { name: 'Caja', username: 'caja1', password: 'secret1', branchId: branch.id } });
+  assert.equal(r.status, 200);
+  assert.equal((await call('/api/auth/cashier', { method: 'POST', body: { username: 'caja1', password: 'secret1' } })).status, 401);
+  r = await call('/api/auth/cashier', { method: 'POST', site: DEMO, body: { username: 'caja1', password: 'secret1' } });
+  assert.equal(r.status, 200);
+  const tok = await exchange(r.token);
+  const q = await fsQuery(tok, [eq('branchId', branch.id)], `/sites/${DEMO}`);
+  assert.equal(q.status, 200);
+  assert.equal((await fsQuery(tok, [eq('branchId', branch.id)])).status, 403);
+});
+
+await step('deleting a demo site makes its link stop working', async () => {
+  assert.equal((await call('/api/admin/sites', { method: 'DELETE', token: superTok, body: { slug: DEMO } })).status, 200);
+  assert.equal((await call('/api/site', { site: DEMO })).status, 404);
+  assert.equal((await fetch(SITE + '/s/' + DEMO, { redirect: 'manual' })).status, 404);
 });
 
 console.log(`\n${passed} checks passed`);

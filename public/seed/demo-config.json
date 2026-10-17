@@ -1,23 +1,34 @@
 {
- "schemaVersion": 7,
+ "schemaVersion": 8,
  "version": 1,
  "settings": {
   "restaurantName": {
-   "ar": "K",
-   "en": "K"
+   "en": "Your Restaurant",
+   "es": "Tu Restaurante",
+   "fr": "Votre Restaurant",
+   "de": "Dein Restaurant",
+   "it": "Il Tuo Ristorante",
+   "pt": "O Seu Restaurante",
+   "nl": "Jouw Restaurant",
+   "ar": "مطعمك"
   },
-  "logo": "/demo/logo.webp",
-  "currency": "USD",
-  "timezone": "Asia/Kuwait",
-  "defaultLang": "ar",
-  "minimumOrder": 0,
-  "taxRate": 2,
+  "logo": "/demo/logo.svg",
+  "currency": "EUR",
+  "timezone": "Europe/Madrid",
+  "minimumOrder": 12,
+  "taxRate": 0,
   "multiBranch": true,
-  "phone": "+123456789",
-  "footerEmail": "k@gmail.com",
+  "phone": "+00 000 000 000",
+  "footerEmail": "hello@example.com",
   "address": {
-   "ar": "وسط المدينة",
-   "en": "Downtown"
+   "en": "Main Street 1, City Centre",
+   "es": "Calle Mayor 1, Centro",
+   "fr": "1 rue Principale, Centre-ville",
+   "de": "Hauptstraße 1, Innenstadt",
+   "it": "Via Roma 1, Centro",
+   "pt": "Rua Principal 1, Centro",
+   "nl": "Hoofdstraat 1, Centrum",
+   "ar": "وسط المدينة"
   },
   "socialLinks": {
    "facebook": "facebook.com",
@@ -78,45 +89,99 @@
   "homepage": {
    "hero": {
     "eyebrow": {
-     "ar": "طازج. سريع. محضّر لك.",
-     "en": "Fresh. Fast. Made for you."
+     "en": "Fresh. Fast. Made for you.",
+     "es": "Fresco. Rápido. Hecho para ti.",
+     "fr": "Frais. Rapide. Fait pour vous.",
+     "de": "Frisch. Schnell. Für dich gemacht.",
+     "it": "Fresco. Veloce. Fatto per te.",
+     "pt": "Fresco. Rápido. Feito para si.",
+     "nl": "Vers. Snel. Voor jou gemaakt.",
+     "ar": "طازج. سريع. محضّر لك."
     },
     "title": {
-     "ar": "K",
-     "en": "K"
+     "en": "Your Restaurant",
+     "es": "Tu Restaurante",
+     "fr": "Votre Restaurant",
+     "de": "Dein Restaurant",
+     "it": "Il Tuo Ristorante",
+     "pt": "O Seu Restaurante",
+     "nl": "Jouw Restaurant",
+     "ar": "مطعمك"
     },
     "text": {
-     "ar": "اطلب أطباقك المفضلة أونلاين للاستلام أو التوصيل.",
-     "en": "Order your favorites online for pickup or delivery."
+     "en": "Order your favorites online for pickup or delivery.",
+     "es": "Pide tus platos favoritos online para recoger o a domicilio.",
+     "fr": "Commandez vos plats préférés en ligne, à emporter ou en livraison.",
+     "de": "Bestelle deine Lieblingsgerichte online zum Abholen oder Liefern.",
+     "it": "Ordina online i tuoi piatti preferiti da asporto o a domicilio.",
+     "pt": "Peça os seus pratos favoritos online para levantar ou entregar.",
+     "nl": "Bestel je favoriete gerechten online om af te halen of te laten bezorgen.",
+     "ar": "اطلب أطباقك المفضلة أونلاين للاستلام أو التوصيل."
     },
     "button": {
-     "ar": "تصفّح القائمة",
-     "en": "View Menu"
+     "en": "View Menu",
+     "es": "Ver la carta",
+     "fr": "Voir la carte",
+     "de": "Zur Speisekarte",
+     "it": "Vedi il menu",
+     "pt": "Ver o menu",
+     "nl": "Bekijk het menu",
+     "ar": "تصفّح القائمة"
     },
     "image": "/demo/hero.webp"
    },
    "login": {
     "title": {
-     "ar": "سجّل دخولك واجمع النقاط",
-     "en": "Sign in and earn points"
+     "en": "Sign in and earn points",
+     "es": "Inicia sesión y gana puntos",
+     "fr": "Connectez-vous et gagnez des points",
+     "de": "Melde dich an und sammle Punkte",
+     "it": "Accedi e accumula punti",
+     "pt": "Inicie sessão e ganhe pontos",
+     "nl": "Log in en spaar punten",
+     "ar": "سجّل دخولك واجمع النقاط"
     },
     "text": {
-     "ar": "كل طلب يقرّبك من هدية مجانية ومستوى أعلى.",
-     "en": "Every order brings you closer to free gifts and a higher level."
+     "en": "Every order brings you closer to free gifts and a higher level.",
+     "es": "Cada pedido te acerca a regalos gratis y a un nivel más alto.",
+     "fr": "Chaque commande vous rapproche de cadeaux offerts et d’un niveau supérieur.",
+     "de": "Jede Bestellung bringt dich Gratis-Prämien und einer höheren Stufe näher.",
+     "it": "Ogni ordine ti avvicina a premi gratuiti e a un livello più alto.",
+     "pt": "Cada pedido aproxima-o de ofertas grátis e de um nível mais alto.",
+     "nl": "Elke bestelling brengt je dichter bij gratis cadeaus en een hoger niveau.",
+     "ar": "كل طلب يقرّبك من هدية مجانية ومستوى أعلى."
     },
     "button": {
-     "ar": "تسجيل الدخول باستخدام Google",
-     "en": "Sign in with Google"
+     "en": "Sign in with Google",
+     "es": "Iniciar sesión con Google",
+     "fr": "Se connecter avec Google",
+     "de": "Mit Google anmelden",
+     "it": "Accedi con Google",
+     "pt": "Iniciar sessão com o Google",
+     "nl": "Inloggen met Google",
+     "ar": "تسجيل الدخول باستخدام Google"
     }
    },
    "categories": {
     "eyebrow": {
-     "ar": "ماذا نقدّم",
-     "en": "What we serve"
+     "en": "What we serve",
+     "es": "Lo que servimos",
+     "fr": "Ce que nous servons",
+     "de": "Was wir servieren",
+     "it": "Cosa serviamo",
+     "pt": "O que servimos",
+     "nl": "Wat we serveren",
+     "ar": "ماذا نقدّم"
     },
     "title": {
-     "ar": "أطباق تشتهيها",
-     "en": "Made to crave"
+     "en": "Made to crave",
+     "es": "Para chuparse los dedos",
+     "fr": "Faits pour régaler",
+     "de": "Zum Reinbeißen",
+     "it": "Da leccarsi i baffi",
+     "pt": "De comer e chorar por mais",
+     "nl": "Om van te smullen",
+     "ar": "أطباق تشتهيها"
     },
     "selectedIds": [
      "cat_burgers",
@@ -127,16 +192,34 @@
    },
    "featured": {
     "eyebrow": {
-     "ar": "المفضّلة لدى زبائننا",
-     "en": "Customer favorites"
+     "en": "Customer favorites",
+     "es": "Los favoritos de nuestros clientes",
+     "fr": "Les préférés de nos clients",
+     "de": "Lieblinge unserer Gäste",
+     "it": "I preferiti dei clienti",
+     "pt": "Os favoritos dos clientes",
+     "nl": "Favorieten van onze klanten",
+     "ar": "المفضّلة لدى زبائننا"
     },
     "title": {
-     "ar": "الأكثر طلباً",
-     "en": "Popular picks"
+     "en": "Popular picks",
+     "es": "Los más pedidos",
+     "fr": "Les plus commandés",
+     "de": "Am beliebtesten",
+     "it": "I più ordinati",
+     "pt": "Os mais pedidos",
+     "nl": "Meest besteld",
+     "ar": "الأكثر طلباً"
     },
     "button": {
-     "ar": "اطلب الآن",
-     "en": "Order Now"
+     "en": "Order Now",
+     "es": "Pedir ahora",
+     "fr": "Commander",
+     "de": "Jetzt bestellen",
+     "it": "Ordina ora",
+     "pt": "Pedir agora",
+     "nl": "Nu bestellen",
+     "ar": "اطلب الآن"
     },
     "selectedIds": [
      "prod_classic_burger",
@@ -149,136 +232,299 @@
    },
    "cta": {
     "eyebrow": {
-     "ar": "جوعان؟",
-     "en": "Hungry?"
+     "en": "Hungry?",
+     "es": "¿Tienes hambre?",
+     "fr": "Une petite faim ?",
+     "de": "Hunger?",
+     "it": "Hai fame?",
+     "pt": "Com fome?",
+     "nl": "Trek?",
+     "ar": "جوعان؟"
     },
     "title": {
-     "ar": "وجبتك المفضلة على بُعد نقرة.",
-     "en": "Your next favorite meal is one click away."
+     "en": "Your next favorite meal is one click away.",
+     "es": "Tu próxima comida favorita está a un clic.",
+     "fr": "Votre prochain plat préféré est à un clic.",
+     "de": "Dein nächstes Lieblingsessen ist nur einen Klick entfernt.",
+     "it": "Il tuo prossimo piatto preferito è a un clic.",
+     "pt": "A sua próxima refeição favorita está a um clique.",
+     "nl": "Je volgende favoriete maaltijd is één klik verwijderd.",
+     "ar": "وجبتك المفضلة على بُعد نقرة."
     },
     "button": {
-     "ar": "ابدأ طلبك",
-     "en": "Start Your Order"
+     "en": "Start Your Order",
+     "es": "Empieza tu pedido",
+     "fr": "Commencer ma commande",
+     "de": "Bestellung starten",
+     "it": "Inizia il tuo ordine",
+     "pt": "Começar o pedido",
+     "nl": "Begin je bestelling",
+     "ar": "ابدأ طلبك"
     }
    }
-  }
+  },
+  "lang": "en"
  },
  "pages": {
   "login": {
    "image": "/demo/page-login.webp",
    "title": {
-    "ar": "تسجيل الدخول",
-    "en": "Sign in"
+    "en": "Sign in",
+    "es": "Iniciar sesión",
+    "fr": "Connexion",
+    "de": "Anmelden",
+    "it": "Accedi",
+    "pt": "Iniciar sessão",
+    "nl": "Inloggen",
+    "ar": "تسجيل الدخول"
    },
    "text": {
-    "ar": "سجّل دخولك بحساب Google لتطلب وتجمع النقاط وتتابع طلباتك.",
-    "en": "Sign in with your Google account to order, earn points and track your orders."
+    "en": "Sign in with your Google account to order, earn points and track your orders.",
+    "es": "Inicia sesión con tu cuenta de Google para pedir, ganar puntos y seguir tus pedidos.",
+    "fr": "Connectez-vous avec votre compte Google pour commander, gagner des points et suivre vos commandes.",
+    "de": "Melde dich mit deinem Google-Konto an, um zu bestellen, Punkte zu sammeln und deine Bestellungen zu verfolgen.",
+    "it": "Accedi con il tuo account Google per ordinare, accumulare punti e seguire i tuoi ordini.",
+    "pt": "Inicie sessão com a sua conta Google para pedir, ganhar pontos e acompanhar os seus pedidos.",
+    "nl": "Log in met je Google-account om te bestellen, punten te sparen en je bestellingen te volgen.",
+    "ar": "سجّل دخولك بحساب Google لتطلب وتجمع النقاط وتتابع طلباتك."
    },
    "button": {
-    "ar": "المتابعة باستخدام Google",
-    "en": "Continue with Google"
+    "en": "Continue with Google",
+    "es": "Continuar con Google",
+    "fr": "Continuer avec Google",
+    "de": "Weiter mit Google",
+    "it": "Continua con Google",
+    "pt": "Continuar com o Google",
+    "nl": "Doorgaan met Google",
+    "ar": "المتابعة باستخدام Google"
    }
   },
   "levels": {
    "image": "/demo/page-levels.webp",
    "title": {
-    "ar": "المستويات",
-    "en": "Levels"
+    "en": "Levels",
+    "es": "Niveles",
+    "fr": "Niveaux",
+    "de": "Stufen",
+    "it": "Livelli",
+    "pt": "Níveis",
+    "nl": "Niveaus",
+    "ar": "المستويات"
    },
    "text": {
-    "ar": "كلما طلبت أكثر ارتفع مستواك وزاد خصمك الدائم.",
-    "en": "The more you order, the higher your level and your permanent discount."
+    "en": "The more you order, the higher your level and your permanent discount.",
+    "es": "Cuanto más pides, más alto es tu nivel y tu descuento permanente.",
+    "fr": "Plus vous commandez, plus votre niveau et votre remise permanente augmentent.",
+    "de": "Je mehr du bestellst, desto höher deine Stufe und dein Dauerrabatt.",
+    "it": "Più ordini, più sale il tuo livello e il tuo sconto permanente.",
+    "pt": "Quanto mais pede, mais alto é o seu nível e o seu desconto permanente.",
+    "nl": "Hoe meer je bestelt, hoe hoger je niveau en je vaste korting.",
+    "ar": "كلما طلبت أكثر ارتفع مستواك وزاد خصمك الدائم."
    },
    "lockedText": {
-    "ar": "سجّل الدخول لتستطيع رؤية مستواك",
-    "en": "Sign in to see your level"
+    "en": "Sign in to see your level",
+    "es": "Inicia sesión para ver tu nivel",
+    "fr": "Connectez-vous pour voir votre niveau",
+    "de": "Melde dich an, um deine Stufe zu sehen",
+    "it": "Accedi per vedere il tuo livello",
+    "pt": "Inicie sessão para ver o seu nível",
+    "nl": "Log in om je niveau te zien",
+    "ar": "سجّل الدخول لتستطيع رؤية مستواك"
    },
    "button": {
-    "ar": "تسجيل الدخول",
-    "en": "Sign in"
+    "en": "Sign in",
+    "es": "Iniciar sesión",
+    "fr": "Se connecter",
+    "de": "Anmelden",
+    "it": "Accedi",
+    "pt": "Iniciar sessão",
+    "nl": "Inloggen",
+    "ar": "تسجيل الدخول"
    }
   },
   "gifts": {
    "image": "/demo/page-gifts.webp",
    "title": {
-    "ar": "الهدايا",
-    "en": "Gifts"
+    "en": "Gifts",
+    "es": "Regalos",
+    "fr": "Cadeaux",
+    "de": "Prämien",
+    "it": "Premi",
+    "pt": "Ofertas",
+    "nl": "Cadeaus",
+    "ar": "الهدايا"
    },
    "text": {
-    "ar": "استبدل نقاطك بهدايا مجانية مع طلبك.",
-    "en": "Redeem your points for free gifts with your order."
+    "en": "Redeem your points for free gifts with your order.",
+    "es": "Canjea tus puntos por regalos gratis con tu pedido.",
+    "fr": "Échangez vos points contre des cadeaux offerts avec votre commande.",
+    "de": "Löse deine Punkte gegen Gratis-Prämien zu deiner Bestellung ein.",
+    "it": "Riscatta i tuoi punti con premi gratuiti insieme al tuo ordine.",
+    "pt": "Troque os seus pontos por ofertas grátis com o seu pedido.",
+    "nl": "Wissel je punten in voor gratis cadeaus bij je bestelling.",
+    "ar": "استبدل نقاطك بهدايا مجانية مع طلبك."
    },
    "lockedText": {
-    "ar": "سجّل الدخول لتستطيع رؤية الهدايا",
-    "en": "Sign in to see the gifts"
+    "en": "Sign in to see the gifts",
+    "es": "Inicia sesión para ver los regalos",
+    "fr": "Connectez-vous pour voir les cadeaux",
+    "de": "Melde dich an, um die Prämien zu sehen",
+    "it": "Accedi per vedere i premi",
+    "pt": "Inicie sessão para ver as ofertas",
+    "nl": "Log in om de cadeaus te zien",
+    "ar": "سجّل الدخول لتستطيع رؤية الهدايا"
    },
    "button": {
-    "ar": "تسجيل الدخول",
-    "en": "Sign in"
+    "en": "Sign in",
+    "es": "Iniciar sesión",
+    "fr": "Se connecter",
+    "de": "Anmelden",
+    "it": "Accedi",
+    "pt": "Iniciar sessão",
+    "nl": "Inloggen",
+    "ar": "تسجيل الدخول"
    }
   },
   "orders": {
    "image": "/demo/page-orders.webp",
    "title": {
-    "ar": "طلباتي",
-    "en": "My Orders"
+    "en": "My Orders",
+    "es": "Mis pedidos",
+    "fr": "Mes commandes",
+    "de": "Meine Bestellungen",
+    "it": "I miei ordini",
+    "pt": "Os meus pedidos",
+    "nl": "Mijn bestellingen",
+    "ar": "طلباتي"
    },
    "text": {
-    "ar": "تابع حالة طلباتك لحظة بلحظة.",
-    "en": "Track your orders in real time."
+    "en": "Track your orders in real time.",
+    "es": "Sigue tus pedidos en tiempo real.",
+    "fr": "Suivez vos commandes en temps réel.",
+    "de": "Verfolge deine Bestellungen in Echtzeit.",
+    "it": "Segui i tuoi ordini in tempo reale.",
+    "pt": "Acompanhe os seus pedidos em tempo real.",
+    "nl": "Volg je bestellingen live.",
+    "ar": "تابع حالة طلباتك لحظة بلحظة."
    },
    "lockedText": {
-    "ar": "سجّل الدخول لتستطيع رؤية طلباتك",
-    "en": "Sign in to see your orders"
+    "en": "Sign in to see your orders",
+    "es": "Inicia sesión para ver tus pedidos",
+    "fr": "Connectez-vous pour voir vos commandes",
+    "de": "Melde dich an, um deine Bestellungen zu sehen",
+    "it": "Accedi per vedere i tuoi ordini",
+    "pt": "Inicie sessão para ver os seus pedidos",
+    "nl": "Log in om je bestellingen te zien",
+    "ar": "سجّل الدخول لتستطيع رؤية طلباتك"
    },
    "button": {
-    "ar": "تسجيل الدخول",
-    "en": "Sign in"
+    "en": "Sign in",
+    "es": "Iniciar sesión",
+    "fr": "Se connecter",
+    "de": "Anmelden",
+    "it": "Accedi",
+    "pt": "Iniciar sessão",
+    "nl": "Inloggen",
+    "ar": "تسجيل الدخول"
    },
    "emptyText": {
-    "ar": "لا توجد طلبات بعد.",
-    "en": "No orders yet."
+    "en": "No orders yet.",
+    "es": "Aún no tienes pedidos.",
+    "fr": "Aucune commande pour l’instant.",
+    "de": "Noch keine Bestellungen.",
+    "it": "Ancora nessun ordine.",
+    "pt": "Ainda não há pedidos.",
+    "nl": "Nog geen bestellingen.",
+    "ar": "لا توجد طلبات بعد."
    }
   },
   "notifications": {
    "image": "/demo/page-notifications.webp",
    "title": {
-    "ar": "الإشعارات",
-    "en": "Notifications"
+    "en": "Notifications",
+    "es": "Notificaciones",
+    "fr": "Notifications",
+    "de": "Benachrichtigungen",
+    "it": "Notifiche",
+    "pt": "Notificações",
+    "nl": "Meldingen",
+    "ar": "الإشعارات"
    },
    "text": {
-    "ar": "آخر العروض والأخبار من المطعم.",
-    "en": "The latest offers and news from the restaurant."
+    "en": "The latest offers and news from the restaurant.",
+    "es": "Las últimas ofertas y novedades del restaurante.",
+    "fr": "Les dernières offres et nouveautés du restaurant.",
+    "de": "Die neuesten Angebote und News aus dem Restaurant.",
+    "it": "Le ultime offerte e novità del ristorante.",
+    "pt": "As últimas ofertas e novidades do restaurante.",
+    "nl": "De nieuwste aanbiedingen en nieuws van het restaurant.",
+    "ar": "آخر العروض والأخبار من المطعم."
    },
    "emptyText": {
-    "ar": "لا توجد إشعارات حالياً.",
-    "en": "No notifications yet."
+    "en": "No notifications yet.",
+    "es": "Aún no hay notificaciones.",
+    "fr": "Aucune notification pour l’instant.",
+    "de": "Noch keine Benachrichtigungen.",
+    "it": "Ancora nessuna notifica.",
+    "pt": "Ainda não há notificações.",
+    "nl": "Nog geen meldingen.",
+    "ar": "لا توجد إشعارات حالياً."
    },
    "button": {
-    "ar": "تفعيل الإشعارات",
-    "en": "Enable notifications"
+    "en": "Enable notifications",
+    "es": "Activar notificaciones",
+    "fr": "Activer les notifications",
+    "de": "Benachrichtigungen aktivieren",
+    "it": "Attiva le notifiche",
+    "pt": "Ativar notificações",
+    "nl": "Meldingen inschakelen",
+    "ar": "تفعيل الإشعارات"
    }
   },
   "privacy": {
    "image": "/demo/page-privacy.webp",
    "title": {
-    "ar": "سياسة الخصوصية",
-    "en": "Privacy Policy"
+    "en": "Privacy Policy",
+    "es": "Política de privacidad",
+    "fr": "Politique de confidentialité",
+    "de": "Datenschutzerklärung",
+    "it": "Informativa sulla privacy",
+    "pt": "Política de privacidade",
+    "nl": "Privacybeleid",
+    "ar": "سياسة الخصوصية"
    },
    "text": {
-    "ar": "نحترم خصوصيتك. توضّح هذه السياسة البيانات التي نجمعها وكيف نستخدمها.\n\nالبيانات التي نجمعها:\n• الاسم والبريد الإلكتروني من حساب Google عند تسجيل الدخول.\n• رقم الجوال وعنوان التوصيل الذي تُدخله عند الطلب.\n• تفاصيل طلباتك ونقاطك ومستواك.\n\nكيف نستخدمها:\n• لتجهيز طلبك وتوصيله والتواصل معك بخصوصه.\n• لاحتساب نقاط الولاء والهدايا والمستويات.\n• لإرسال إشعارات العروض إذا وافقت عليها.\n\nلا نبيع بياناتك ولا نشاركها مع أي طرف ثالث إلا بالقدر اللازم لتقديم الخدمة. يمكنك طلب حذف بياناتك في أي وقت بالتواصل معنا.",
-    "en": "We respect your privacy. This policy explains what data we collect and how we use it.\n\nData we collect:\n• Your name and email from your Google account when you sign in.\n• The phone number and delivery address you enter when ordering.\n• Your order details, points and level.\n\nHow we use it:\n• To prepare and deliver your order and contact you about it.\n• To calculate loyalty points, gifts and levels.\n• To send offer notifications if you allow them.\n\nWe never sell your data or share it with third parties except as needed to provide the service. You can ask us to delete your data at any time by contacting us."
+    "en": "We respect your privacy. This policy explains what data we collect and how we use it.\n\nData we collect:\n• Your name and email from your Google account when you sign in.\n• The phone number and delivery address you enter when ordering.\n• Your order details, points and level.\n\nHow we use it:\n• To prepare and deliver your order and contact you about it.\n• To calculate loyalty points, gifts and levels.\n• To send offer notifications if you allow them.\n\nWe never sell your data or share it with third parties except as needed to provide the service. You can ask us to access, correct or delete your data at any time by contacting us.",
+    "es": "Respetamos tu privacidad. Esta política explica qué datos recogemos y cómo los usamos.\n\nDatos que recogemos:\n• Tu nombre y correo electrónico de tu cuenta de Google al iniciar sesión.\n• El teléfono y la dirección de entrega que introduces al hacer un pedido.\n• Los datos de tus pedidos, tus puntos y tu nivel.\n\nCómo los usamos:\n• Para preparar y entregar tu pedido y contactarte sobre él.\n• Para calcular puntos de fidelidad, regalos y niveles.\n• Para enviarte notificaciones de ofertas si lo permites.\n\nNunca vendemos tus datos ni los compartimos con terceros salvo lo necesario para prestar el servicio. Puedes pedirnos acceder a tus datos, corregirlos o eliminarlos en cualquier momento contactando con nosotros.",
+    "fr": "Nous respectons votre vie privée. Cette politique explique quelles données nous collectons et comment nous les utilisons.\n\nDonnées collectées :\n• Votre nom et votre e-mail issus de votre compte Google lors de la connexion.\n• Le numéro de téléphone et l’adresse de livraison saisis lors de la commande.\n• Le détail de vos commandes, vos points et votre niveau.\n\nUtilisation :\n• Préparer et livrer votre commande et vous contacter à son sujet.\n• Calculer les points de fidélité, les cadeaux et les niveaux.\n• Vous envoyer des notifications d’offres si vous l’acceptez.\n\nNous ne vendons jamais vos données et ne les partageons avec des tiers que dans la mesure nécessaire au service. Vous pouvez à tout moment nous demander d’accéder à vos données, de les rectifier ou de les supprimer en nous contactant.",
+    "de": "Wir respektieren deine Privatsphäre. Diese Erklärung beschreibt, welche Daten wir erheben und wie wir sie nutzen.\n\nErhobene Daten:\n• Name und E-Mail-Adresse aus deinem Google-Konto bei der Anmeldung.\n• Telefonnummer und Lieferadresse, die du bei der Bestellung angibst.\n• Deine Bestelldaten, Punkte und Stufe.\n\nVerwendung:\n• Um deine Bestellung zuzubereiten, zu liefern und dich dazu zu kontaktieren.\n• Um Treuepunkte, Prämien und Stufen zu berechnen.\n• Um dir Angebots-Benachrichtigungen zu senden, wenn du zustimmst.\n\nWir verkaufen deine Daten niemals und geben sie nur an Dritte weiter, soweit es für den Service nötig ist. Du kannst jederzeit Auskunft, Berichtigung oder Löschung deiner Daten verlangen, indem du uns kontaktierst.",
+    "it": "Rispettiamo la tua privacy. Questa informativa spiega quali dati raccogliamo e come li usiamo.\n\nDati raccolti:\n• Nome ed email del tuo account Google quando accedi.\n• Il numero di telefono e l’indirizzo di consegna che inserisci quando ordini.\n• I dettagli dei tuoi ordini, i punti e il livello.\n\nCome li usiamo:\n• Per preparare e consegnare il tuo ordine e contattarti al riguardo.\n• Per calcolare punti fedeltà, premi e livelli.\n• Per inviarti notifiche sulle offerte, se lo consenti.\n\nNon vendiamo mai i tuoi dati e non li condividiamo con terzi, salvo quanto necessario per fornire il servizio. Puoi chiederci in qualsiasi momento di accedere ai tuoi dati, correggerli o cancellarli contattandoci.",
+    "pt": "Respeitamos a sua privacidade. Esta política explica que dados recolhemos e como os usamos.\n\nDados recolhidos:\n• O seu nome e e-mail da conta Google quando inicia sessão.\n• O número de telefone e a morada de entrega que indica ao fazer o pedido.\n• Os detalhes dos seus pedidos, pontos e nível.\n\nComo os usamos:\n• Para preparar e entregar o seu pedido e contactá-lo sobre ele.\n• Para calcular pontos de fidelização, ofertas e níveis.\n• Para enviar notificações de ofertas, se o permitir.\n\nNunca vendemos os seus dados nem os partilhamos com terceiros, exceto o necessário para prestar o serviço. Pode pedir-nos a qualquer momento para aceder, corrigir ou apagar os seus dados contactando-nos.",
+    "nl": "We respecteren je privacy. Dit beleid legt uit welke gegevens we verzamelen en hoe we die gebruiken.\n\nGegevens die we verzamelen:\n• Je naam en e-mailadres van je Google-account wanneer je inlogt.\n• Het telefoonnummer en bezorgadres dat je invult bij het bestellen.\n• Je bestelgegevens, punten en niveau.\n\nHoe we ze gebruiken:\n• Om je bestelling te bereiden en te bezorgen en je daarover te contacteren.\n• Om spaarpunten, cadeaus en niveaus te berekenen.\n• Om je meldingen over aanbiedingen te sturen als je dat toestaat.\n\nWe verkopen je gegevens nooit en delen ze alleen met derden voor zover nodig om de dienst te leveren. Je kunt ons op elk moment vragen je gegevens in te zien, te corrigeren of te verwijderen door contact met ons op te nemen.",
+    "ar": "نحترم خصوصيتك. توضّح هذه السياسة البيانات التي نجمعها وكيف نستخدمها.\n\nالبيانات التي نجمعها:\n• الاسم والبريد الإلكتروني من حساب Google عند تسجيل الدخول.\n• رقم الجوال وعنوان التوصيل الذي تُدخله عند الطلب.\n• تفاصيل طلباتك ونقاطك ومستواك.\n\nكيف نستخدمها:\n• لتجهيز طلبك وتوصيله والتواصل معك بخصوصه.\n• لاحتساب نقاط الولاء والهدايا والمستويات.\n• لإرسال إشعارات العروض إذا وافقت عليها.\n\nلا نبيع بياناتك ولا نشاركها مع أي طرف ثالث إلا بالقدر اللازم لتقديم الخدمة. يمكنك طلب حذف بياناتك في أي وقت بالتواصل معنا."
    }
   },
   "returns": {
    "image": "/demo/page-returns.webp",
    "title": {
-    "ar": "سياسة الإرجاع والاستبدال",
-    "en": "Return & Exchange Policy"
+    "en": "Return & Refund Policy",
+    "es": "Política de devoluciones",
+    "fr": "Politique de remboursement",
+    "de": "Widerrufs- & Erstattungsrichtlinie",
+    "it": "Politica di rimborso",
+    "pt": "Política de reembolso",
+    "nl": "Retour- en terugbetalingsbeleid",
+    "ar": "سياسة الإرجاع والاستبدال"
    },
    "text": {
-    "ar": "رضاك يهمّنا. إذا وصلك طلب غير صحيح أو فيه مشكلة:\n\n• تواصل معنا خلال ساعة من استلام الطلب مع صورة للمشكلة.\n• نستبدل الصنف غير الصحيح أو التالف مجاناً، أو نعيد قيمته.\n• لا يمكن إرجاع الأطعمة بعد استهلاكها أو تغيير الطلب بعد بدء التحضير.\n• إذا رفض المطعم طلبك، تعود نقاط الهدايا إلى حسابك تلقائياً.",
-    "en": "Your satisfaction matters to us. If your order arrives incorrect or with a problem:\n\n• Contact us within one hour of receiving the order with a photo of the issue.\n• We will replace the wrong or damaged item free of charge, or refund its value.\n• Food cannot be returned once consumed, and orders cannot be changed once preparation starts.\n• If the restaurant rejects your order, your gift points return to your account automatically."
+    "en": "Your satisfaction matters to us. If your order arrives incorrect or with a problem:\n\n• Contact us within one hour of receiving the order with a photo of the issue.\n• We will replace the wrong or damaged item free of charge, or refund its value.\n• Food cannot be returned once consumed, and orders cannot be changed once preparation starts.\n• If the restaurant rejects your order, your gift points return to your account automatically.",
+    "es": "Tu satisfacción nos importa. Si tu pedido llega incorrecto o con algún problema:\n\n• Contáctanos en la hora siguiente a recibirlo con una foto del problema.\n• Repondremos gratis el producto equivocado o dañado, o te devolveremos su importe.\n• La comida no se puede devolver una vez consumida, y los pedidos no se pueden modificar una vez empezada su preparación.\n• Si el restaurante rechaza tu pedido, tus puntos de regalo vuelven a tu cuenta automáticamente.",
+    "fr": "Votre satisfaction compte pour nous. Si votre commande arrive incorrecte ou avec un problème :\n\n• Contactez-nous dans l’heure qui suit la réception, avec une photo du problème.\n• Nous remplacerons gratuitement l’article erroné ou abîmé, ou nous vous rembourserons sa valeur.\n• La nourriture ne peut pas être retournée une fois consommée, et une commande ne peut plus être modifiée une fois sa préparation commencée.\n• Si le restaurant refuse votre commande, vos points cadeaux sont recrédités automatiquement.",
+    "de": "Deine Zufriedenheit ist uns wichtig. Wenn deine Bestellung falsch oder mit einem Problem ankommt:\n\n• Kontaktiere uns innerhalb einer Stunde nach Erhalt mit einem Foto des Problems.\n• Wir ersetzen den falschen oder beschädigten Artikel kostenlos oder erstatten den Betrag.\n• Bereits verzehrte Speisen können nicht zurückgegeben werden, und Bestellungen können nach Beginn der Zubereitung nicht mehr geändert werden.\n• Lehnt das Restaurant deine Bestellung ab, werden deine Prämienpunkte automatisch zurückgebucht.",
+    "it": "La tua soddisfazione è importante per noi. Se il tuo ordine arriva sbagliato o con un problema:\n\n• Contattaci entro un’ora dalla consegna con una foto del problema.\n• Sostituiremo gratuitamente il prodotto sbagliato o danneggiato, oppure ti rimborseremo il suo valore.\n• Il cibo non può essere restituito una volta consumato e gli ordini non possono essere modificati dopo l’inizio della preparazione.\n• Se il ristorante rifiuta il tuo ordine, i punti dei premi tornano automaticamente sul tuo account.",
+    "pt": "A sua satisfação é importante para nós. Se o seu pedido chegar errado ou com algum problema:\n\n• Contacte-nos até uma hora depois de o receber, com uma foto do problema.\n• Substituímos gratuitamente o artigo errado ou danificado, ou devolvemos o seu valor.\n• A comida não pode ser devolvida depois de consumida, e os pedidos não podem ser alterados depois de a preparação começar.\n• Se o restaurante recusar o seu pedido, os seus pontos de ofertas voltam automaticamente para a sua conta.",
+    "nl": "Jouw tevredenheid is belangrijk voor ons. Komt je bestelling verkeerd of met een probleem aan?\n\n• Neem binnen een uur na ontvangst contact met ons op, met een foto van het probleem.\n• We vervangen het verkeerde of beschadigde product gratis of betalen de waarde terug.\n• Eten kan niet worden teruggebracht nadat het is gegeten, en bestellingen kunnen niet meer worden gewijzigd zodra de bereiding is begonnen.\n• Als het restaurant je bestelling weigert, worden je cadeaupunten automatisch teruggestort.",
+    "ar": "رضاك يهمّنا. إذا وصلك طلب غير صحيح أو فيه مشكلة:\n\n• تواصل معنا خلال ساعة من استلام الطلب مع صورة للمشكلة.\n• نستبدل الصنف غير الصحيح أو التالف مجاناً، أو نعيد قيمته.\n• لا يمكن إرجاع الأطعمة بعد استهلاكها أو تغيير الطلب بعد بدء التحضير.\n• إذا رفض المطعم طلبك، تعود نقاط الهدايا إلى حسابك تلقائياً."
    }
   }
  },
@@ -293,24 +539,42 @@
      {
       "id": "gift_cola",
       "name": {
-       "ar": "كولا مجانية",
-       "en": "Free Cola"
+       "en": "Free Cola",
+       "es": "Cola gratis",
+       "fr": "Cola offert",
+       "de": "Gratis Cola",
+       "it": "Cola in omaggio",
+       "pt": "Cola grátis",
+       "nl": "Gratis cola",
+       "ar": "كولا مجانية"
       },
       "image": "/demo/prod_cola.webp"
      },
      {
       "id": "gift_water",
       "name": {
-       "ar": "مياه مجانية",
-       "en": "Free Water"
+       "en": "Free Water",
+       "es": "Agua gratis",
+       "fr": "Eau offerte",
+       "de": "Gratis Wasser",
+       "it": "Acqua in omaggio",
+       "pt": "Água grátis",
+       "nl": "Gratis water",
+       "ar": "مياه مجانية"
       },
       "image": "/demo/prod_water.webp"
      },
      {
       "id": "gift_lemonade",
       "name": {
-       "ar": "ليموناضة مجانية",
-       "en": "Free Lemonade"
+       "en": "Free Lemonade",
+       "es": "Limonada gratis",
+       "fr": "Citronnade offerte",
+       "de": "Gratis Limonade",
+       "it": "Limonata in omaggio",
+       "pt": "Limonada grátis",
+       "nl": "Gratis limonade",
+       "ar": "ليموناضة مجانية"
       },
       "image": "/demo/prod_lemonade.webp"
      }
@@ -323,24 +587,42 @@
      {
       "id": "gift_brownie",
       "name": {
-       "ar": "براونيز مجاني",
-       "en": "Free Brownie"
+       "en": "Free Brownie",
+       "es": "Brownie gratis",
+       "fr": "Brownie offert",
+       "de": "Gratis Brownie",
+       "it": "Brownie in omaggio",
+       "pt": "Brownie grátis",
+       "nl": "Gratis brownie",
+       "ar": "براونيز مجاني"
       },
       "image": "/demo/prod_brownie.webp"
      },
      {
       "id": "gift_cheesecake",
       "name": {
-       "ar": "تشيز كيك مجاني",
-       "en": "Free Cheesecake"
+       "en": "Free Cheesecake",
+       "es": "Tarta de queso gratis",
+       "fr": "Cheesecake offert",
+       "de": "Gratis Käsekuchen",
+       "it": "Cheesecake in omaggio",
+       "pt": "Cheesecake grátis",
+       "nl": "Gratis cheesecake",
+       "ar": "تشيز كيك مجاني"
       },
       "image": "/demo/prod_cheesecake.webp"
      },
      {
       "id": "gift_salad",
       "name": {
-       "ar": "سلطة مجانية",
-       "en": "Free Salad"
+       "en": "Free Salad",
+       "es": "Ensalada gratis",
+       "fr": "Salade offerte",
+       "de": "Gratis Salat",
+       "it": "Insalata in omaggio",
+       "pt": "Salada grátis",
+       "nl": "Gratis salade",
+       "ar": "سلطة مجانية"
       },
       "image": "/demo/prod_house_salad.webp"
      }
@@ -353,24 +635,42 @@
      {
       "id": "gift_burger",
       "name": {
-       "ar": "برجر كلاسيك مجاني",
-       "en": "Free Classic Burger"
+       "en": "Free Classic Burger",
+       "es": "Hamburguesa clásica gratis",
+       "fr": "Burger classique offert",
+       "de": "Gratis Classic Burger",
+       "it": "Burger classico in omaggio",
+       "pt": "Hambúrguer clássico grátis",
+       "nl": "Gratis klassieke burger",
+       "ar": "برجر كلاسيك مجاني"
       },
       "image": "/demo/prod_classic_burger.webp"
      },
      {
       "id": "gift_pizza",
       "name": {
-       "ar": "بيتزا مارغريتا مجانية",
-       "en": "Free Margherita Pizza"
+       "en": "Free Margherita Pizza",
+       "es": "Pizza margarita gratis",
+       "fr": "Pizza margherita offerte",
+       "de": "Gratis Pizza Margherita",
+       "it": "Pizza margherita in omaggio",
+       "pt": "Pizza margherita grátis",
+       "nl": "Gratis pizza margherita",
+       "ar": "بيتزا مارغريتا مجانية"
       },
       "image": "/demo/prod_margherita.webp"
      },
      {
       "id": "gift_chicken",
       "name": {
-       "ar": "برجر دجاج مجاني",
-       "en": "Free Chicken Burger"
+       "en": "Free Chicken Burger",
+       "es": "Hamburguesa de pollo gratis",
+       "fr": "Burger au poulet offert",
+       "de": "Gratis Chicken Burger",
+       "it": "Burger di pollo in omaggio",
+       "pt": "Hambúrguer de frango grátis",
+       "nl": "Gratis kipburger",
+       "ar": "برجر دجاج مجاني"
       },
       "image": "/demo/prod_crispy_chicken.webp"
      }
@@ -381,8 +681,14 @@
    {
     "id": "silver",
     "name": {
-     "ar": "المستوى الفضي",
-     "en": "Silver"
+     "en": "Silver",
+     "es": "Plata",
+     "fr": "Argent",
+     "de": "Silber",
+     "it": "Argento",
+     "pt": "Prata",
+     "nl": "Zilver",
+     "ar": "المستوى الفضي"
     },
     "points": 300,
     "discountPercent": 5,
@@ -391,8 +697,14 @@
    {
     "id": "gold",
     "name": {
-     "ar": "المستوى الذهبي",
-     "en": "Gold"
+     "en": "Gold",
+     "es": "Oro",
+     "fr": "Or",
+     "de": "Gold",
+     "it": "Oro",
+     "pt": "Ouro",
+     "nl": "Goud",
+     "ar": "المستوى الذهبي"
     },
     "points": 1000,
     "discountPercent": 10,
@@ -401,8 +713,14 @@
    {
     "id": "diamond",
     "name": {
-     "ar": "المستوى الماسي",
-     "en": "Diamond"
+     "en": "Diamond",
+     "es": "Diamante",
+     "fr": "Diamant",
+     "de": "Diamant",
+     "it": "Diamante",
+     "pt": "Diamante",
+     "nl": "Diamant",
+     "ar": "المستوى الماسي"
     },
     "points": 2500,
     "discountPercent": 15,
@@ -448,8 +766,14 @@
   {
    "id": "branch_downtown",
    "name": {
-    "ar": "وسط المدينة",
-    "en": "Downtown"
+    "en": "City Centre",
+    "es": "Centro",
+    "fr": "Centre-ville",
+    "de": "Innenstadt",
+    "it": "Centro",
+    "pt": "Centro",
+    "nl": "Centrum",
+    "ar": "وسط المدينة"
    },
    "image": "/demo/branch_downtown.webp",
    "pickupEnabled": true,
@@ -458,16 +782,28 @@
     {
      "id": "zone_branch_downtown_standard",
      "name": {
-      "ar": "توصيل عادي",
-      "en": "Standard Delivery"
+      "en": "Standard Delivery",
+      "es": "Entrega estándar",
+      "fr": "Livraison standard",
+      "de": "Standardlieferung",
+      "it": "Consegna standard",
+      "pt": "Entrega normal",
+      "nl": "Standaardbezorging",
+      "ar": "توصيل عادي"
      },
      "price": 4.5
     },
     {
      "id": "zone_branch_downtown_extended",
      "name": {
-      "ar": "منطقة ممتدة",
-      "en": "Extended Area"
+      "en": "Extended Area",
+      "es": "Zona ampliada",
+      "fr": "Zone étendue",
+      "de": "Erweitertes Gebiet",
+      "it": "Zona estesa",
+      "pt": "Zona alargada",
+      "nl": "Uitgebreid gebied",
+      "ar": "منطقة ممتدة"
      },
      "price": 7.5
     }
@@ -476,8 +812,14 @@
   {
    "id": "branch_westside",
    "name": {
-    "ar": "الفرع الغربي",
-    "en": "Westside"
+    "en": "Westside",
+    "es": "Zona Oeste",
+    "fr": "Quartier Ouest",
+    "de": "Weststadt",
+    "it": "Zona Ovest",
+    "pt": "Zona Oeste",
+    "nl": "West",
+    "ar": "الفرع الغربي"
    },
    "image": "/demo/branch_westside.webp",
    "pickupEnabled": true,
@@ -486,8 +828,14 @@
     {
      "id": "zone_mu0kg8zacf69b5",
      "name": {
-      "ar": "المنطقة الغربية",
-      "en": "West"
+      "en": "West",
+      "es": "Oeste",
+      "fr": "Ouest",
+      "de": "West",
+      "it": "Ovest",
+      "pt": "Oeste",
+      "nl": "West",
+      "ar": "المنطقة الغربية"
      },
      "price": 6
     }
@@ -498,8 +846,14 @@
   {
    "id": "cat_burgers",
    "name": {
-    "ar": "برجر",
-    "en": "Burgers"
+    "en": "Burgers",
+    "es": "Hamburguesas",
+    "fr": "Burgers",
+    "de": "Burger",
+    "it": "Burger",
+    "pt": "Hambúrgueres",
+    "nl": "Burgers",
+    "ar": "برجر"
    },
    "image": "/demo/cat_burgers.webp",
    "branchIds": [],
@@ -508,8 +862,14 @@
   {
    "id": "cat_pizza",
    "name": {
-    "ar": "بيتزا",
-    "en": "Pizza"
+    "en": "Pizza",
+    "es": "Pizzas",
+    "fr": "Pizzas",
+    "de": "Pizza",
+    "it": "Pizze",
+    "pt": "Pizzas",
+    "nl": "Pizza",
+    "ar": "بيتزا"
    },
    "image": "/demo/cat_pizza.webp",
    "branchIds": [],
@@ -518,8 +878,14 @@
   {
    "id": "cat_drinks",
    "name": {
-    "ar": "مشروبات",
-    "en": "Drinks"
+    "en": "Drinks",
+    "es": "Bebidas",
+    "fr": "Boissons",
+    "de": "Getränke",
+    "it": "Bevande",
+    "pt": "Bebidas",
+    "nl": "Dranken",
+    "ar": "مشروبات"
    },
    "image": "/demo/cat_drinks.webp",
    "branchIds": [],
@@ -528,8 +894,14 @@
   {
    "id": "cat_desserts",
    "name": {
-    "ar": "حلويات",
-    "en": "Desserts"
+    "en": "Desserts",
+    "es": "Postres",
+    "fr": "Desserts",
+    "de": "Desserts",
+    "it": "Dolci",
+    "pt": "Sobremesas",
+    "nl": "Desserts",
+    "ar": "حلويات"
    },
    "image": "/demo/cat_desserts.webp",
    "branchIds": [],
@@ -538,8 +910,14 @@
   {
    "id": "cat_salads",
    "name": {
-    "ar": "سلطات",
-    "en": "Salads"
+    "en": "Salads",
+    "es": "Ensaladas",
+    "fr": "Salades",
+    "de": "Salate",
+    "it": "Insalate",
+    "pt": "Saladas",
+    "nl": "Salades",
+    "ar": "سلطات"
    },
    "image": "/demo/cat_salads.webp",
    "branchIds": [],
@@ -556,14 +934,184 @@
    "branchIds": [],
    "order": 0,
    "name": {
-    "ar": "برجر كلاسيك",
-    "en": "Classic Burger"
+    "en": "Classic Burger",
+    "es": "Hamburguesa clásica",
+    "fr": "Burger classique",
+    "de": "Classic Burger",
+    "it": "Burger classico",
+    "pt": "Hambúrguer clássico",
+    "nl": "Klassieke burger",
+    "ar": "برجر كلاسيك"
    },
    "description": {
-    "ar": "قطعة لحم مشوية مع خس وطماطم وصوص البيت",
-    "en": "Grilled beef patty, lettuce, tomato and house sauce"
+    "en": "Grilled beef patty, lettuce, tomato and house sauce",
+    "es": "Carne de ternera a la parrilla, lechuga, tomate y salsa de la casa",
+    "fr": "Steak de bœuf grillé, salade, tomate et sauce maison",
+    "de": "Gegrilltes Rindfleisch-Patty, Salat, Tomate und Haussauce",
+    "it": "Hamburger di manzo alla griglia, lattuga, pomodoro e salsa della casa",
+    "pt": "Hambúrguer de novilho grelhado, alface, tomate e molho da casa",
+    "nl": "Gegrilde runderburger, sla, tomaat en huissaus",
+    "ar": "قطعة لحم مشوية مع خس وطماطم وصوص البيت"
    },
-   "optionGroups": []
+   "optionGroups": [
+    {
+     "id": "grp_burger_sauce",
+     "type": "single_flat",
+     "name": {
+      "en": "Sauce",
+      "es": "Salsa",
+      "fr": "Sauce",
+      "de": "Soße",
+      "it": "Salsa",
+      "pt": "Molho",
+      "nl": "Saus",
+      "ar": "الصوص"
+     },
+     "options": [
+      {
+       "id": "opt_sauce_house",
+       "name": {
+        "en": "House sauce",
+        "es": "Salsa de la casa",
+        "fr": "Sauce maison",
+        "de": "Haussauce",
+        "it": "Salsa della casa",
+        "pt": "Molho da casa",
+        "nl": "Huissaus",
+        "ar": "صوص البيت"
+       }
+      },
+      {
+       "id": "opt_sauce_bbq",
+       "name": {
+        "en": "BBQ",
+        "es": "Barbacoa",
+        "fr": "Barbecue",
+        "de": "BBQ",
+        "it": "Barbecue",
+        "pt": "Barbecue",
+        "nl": "Barbecue",
+        "ar": "باربكيو"
+       }
+      },
+      {
+       "id": "opt_sauce_garlic",
+       "name": {
+        "en": "Garlic mayo",
+        "es": "Alioli",
+        "fr": "Mayonnaise à l’ail",
+        "de": "Knoblauch-Mayo",
+        "it": "Maionese all’aglio",
+        "pt": "Maionese de alho",
+        "nl": "Knoflookmayo",
+        "ar": "مايونيز بالثوم"
+       }
+      }
+     ]
+    },
+    {
+     "id": "grp_burger_side",
+     "type": "multi_priced",
+     "name": {
+      "en": "Add a side",
+      "es": "Añade un acompañamiento",
+      "fr": "Ajouter un accompagnement",
+      "de": "Beilage dazu",
+      "it": "Aggiungi un contorno",
+      "pt": "Adicionar acompanhamento",
+      "nl": "Bijgerecht erbij",
+      "ar": "أضف طبقاً جانبياً"
+     },
+     "options": [
+      {
+       "id": "opt_fries",
+       "priceDelta": 2.5,
+       "name": {
+        "en": "Fries",
+        "es": "Patatas fritas",
+        "fr": "Frites",
+        "de": "Pommes frites",
+        "it": "Patatine fritte",
+        "pt": "Batatas fritas",
+        "nl": "Friet",
+        "ar": "بطاطس مقلية"
+       }
+      },
+      {
+       "id": "opt_sweet_fries",
+       "priceDelta": 3,
+       "name": {
+        "en": "Sweet potato fries",
+        "es": "Boniato frito",
+        "fr": "Frites de patate douce",
+        "de": "Süßkartoffel-Pommes",
+        "it": "Patate dolci fritte",
+        "pt": "Batata-doce frita",
+        "nl": "Zoete-aardappelfriet",
+        "ar": "بطاطا حلوة مقلية"
+       }
+      }
+     ]
+    },
+    {
+     "id": "grp_burger_extras",
+     "type": "multi_priced",
+     "name": {
+      "en": "Extras",
+      "es": "Extras",
+      "fr": "Suppléments",
+      "de": "Extras",
+      "it": "Extra",
+      "pt": "Extras",
+      "nl": "Extra’s",
+      "ar": "إضافات"
+     },
+     "options": [
+      {
+       "id": "opt_cheese",
+       "priceDelta": 1,
+       "name": {
+        "en": "Extra cheese",
+        "es": "Queso extra",
+        "fr": "Fromage en plus",
+        "de": "Extra Käse",
+        "it": "Formaggio extra",
+        "pt": "Queijo extra",
+        "nl": "Extra kaas",
+        "ar": "جبنة إضافية"
+       }
+      },
+      {
+       "id": "opt_bacon",
+       "priceDelta": 1.5,
+       "name": {
+        "en": "Bacon",
+        "es": "Beicon",
+        "fr": "Bacon",
+        "de": "Bacon",
+        "it": "Bacon",
+        "pt": "Bacon",
+        "nl": "Bacon",
+        "ar": "لحم مقدد"
+       }
+      },
+      {
+       "id": "opt_jalapeno",
+       "priceDelta": 0.5,
+       "name": {
+        "en": "Jalapeños",
+        "es": "Jalapeños",
+        "fr": "Jalapeños",
+        "de": "Jalapeños",
+        "it": "Jalapeños",
+        "pt": "Jalapeños",
+        "nl": "Jalapeños",
+        "ar": "هالبينو"
+       }
+      }
+     ]
+    }
+   ]
   },
   {
    "id": "prod_crispy_chicken",
@@ -574,14 +1122,184 @@
    "branchIds": [],
    "order": 1,
    "name": {
-    "ar": "برجر دجاج كرسبي",
-    "en": "Crispy Chicken Burger"
+    "en": "Crispy Chicken Burger",
+    "es": "Hamburguesa de pollo crujiente",
+    "fr": "Burger au poulet croustillant",
+    "de": "Crispy Chicken Burger",
+    "it": "Burger di pollo croccante",
+    "pt": "Hambúrguer de frango crocante",
+    "nl": "Krokante kipburger",
+    "ar": "برجر دجاج كرسبي"
    },
    "description": {
-    "ar": "دجاج مقرمش مع خس ومخلل وصوص خاص",
-    "en": "Crispy chicken, lettuce, pickles and signature sauce"
+    "en": "Crispy chicken, lettuce, pickles and signature sauce",
+    "es": "Pollo crujiente, lechuga, pepinillos y salsa especial",
+    "fr": "Poulet croustillant, salade, cornichons et sauce signature",
+    "de": "Knuspriges Hähnchen, Salat, Gurken und Spezialsauce",
+    "it": "Pollo croccante, lattuga, cetriolini e salsa speciale",
+    "pt": "Frango crocante, alface, pickles e molho especial",
+    "nl": "Krokante kip, sla, augurk en huissaus",
+    "ar": "دجاج مقرمش مع خس ومخلل وصوص خاص"
    },
-   "optionGroups": []
+   "optionGroups": [
+    {
+     "id": "grp_burger_sauce",
+     "type": "single_flat",
+     "name": {
+      "en": "Sauce",
+      "es": "Salsa",
+      "fr": "Sauce",
+      "de": "Soße",
+      "it": "Salsa",
+      "pt": "Molho",
+      "nl": "Saus",
+      "ar": "الصوص"
+     },
+     "options": [
+      {
+       "id": "opt_sauce_house",
+       "name": {
+        "en": "House sauce",
+        "es": "Salsa de la casa",
+        "fr": "Sauce maison",
+        "de": "Haussauce",
+        "it": "Salsa della casa",
+        "pt": "Molho da casa",
+        "nl": "Huissaus",
+        "ar": "صوص البيت"
+       }
+      },
+      {
+       "id": "opt_sauce_bbq",
+       "name": {
+        "en": "BBQ",
+        "es": "Barbacoa",
+        "fr": "Barbecue",
+        "de": "BBQ",
+        "it": "Barbecue",
+        "pt": "Barbecue",
+        "nl": "Barbecue",
+        "ar": "باربكيو"
+       }
+      },
+      {
+       "id": "opt_sauce_garlic",
+       "name": {
+        "en": "Garlic mayo",
+        "es": "Alioli",
+        "fr": "Mayonnaise à l’ail",
+        "de": "Knoblauch-Mayo",
+        "it": "Maionese all’aglio",
+        "pt": "Maionese de alho",
+        "nl": "Knoflookmayo",
+        "ar": "مايونيز بالثوم"
+       }
+      }
+     ]
+    },
+    {
+     "id": "grp_burger_side",
+     "type": "multi_priced",
+     "name": {
+      "en": "Add a side",
+      "es": "Añade un acompañamiento",
+      "fr": "Ajouter un accompagnement",
+      "de": "Beilage dazu",
+      "it": "Aggiungi un contorno",
+      "pt": "Adicionar acompanhamento",
+      "nl": "Bijgerecht erbij",
+      "ar": "أضف طبقاً جانبياً"
+     },
+     "options": [
+      {
+       "id": "opt_fries",
+       "priceDelta": 2.5,
+       "name": {
+        "en": "Fries",
+        "es": "Patatas fritas",
+        "fr": "Frites",
+        "de": "Pommes frites",
+        "it": "Patatine fritte",
+        "pt": "Batatas fritas",
+        "nl": "Friet",
+        "ar": "بطاطس مقلية"
+       }
+      },
+      {
+       "id": "opt_sweet_fries",
+       "priceDelta": 3,
+       "name": {
+        "en": "Sweet potato fries",
+        "es": "Boniato frito",
+        "fr": "Frites de patate douce",
+        "de": "Süßkartoffel-Pommes",
+        "it": "Patate dolci fritte",
+        "pt": "Batata-doce frita",
+        "nl": "Zoete-aardappelfriet",
+        "ar": "بطاطا حلوة مقلية"
+       }
+      }
+     ]
+    },
+    {
+     "id": "grp_burger_extras",
+     "type": "multi_priced",
+     "name": {
+      "en": "Extras",
+      "es": "Extras",
+      "fr": "Suppléments",
+      "de": "Extras",
+      "it": "Extra",
+      "pt": "Extras",
+      "nl": "Extra’s",
+      "ar": "إضافات"
+     },
+     "options": [
+      {
+       "id": "opt_cheese",
+       "priceDelta": 1,
+       "name": {
+        "en": "Extra cheese",
+        "es": "Queso extra",
+        "fr": "Fromage en plus",
+        "de": "Extra Käse",
+        "it": "Formaggio extra",
+        "pt": "Queijo extra",
+        "nl": "Extra kaas",
+        "ar": "جبنة إضافية"
+       }
+      },
+      {
+       "id": "opt_bacon",
+       "priceDelta": 1.5,
+       "name": {
+        "en": "Bacon",
+        "es": "Beicon",
+        "fr": "Bacon",
+        "de": "Bacon",
+        "it": "Bacon",
+        "pt": "Bacon",
+        "nl": "Bacon",
+        "ar": "لحم مقدد"
+       }
+      },
+      {
+       "id": "opt_jalapeno",
+       "priceDelta": 0.5,
+       "name": {
+        "en": "Jalapeños",
+        "es": "Jalapeños",
+        "fr": "Jalapeños",
+        "de": "Jalapeños",
+        "it": "Jalapeños",
+        "pt": "Jalapeños",
+        "nl": "Jalapeños",
+        "ar": "هالبينو"
+       }
+      }
+     ]
+    }
+   ]
   },
   {
    "id": "prod_double_cheese",
@@ -592,14 +1310,184 @@
    "branchIds": [],
    "order": 2,
    "name": {
-    "ar": "دبل تشيز برجر",
-    "en": "Double Cheese Burger"
+    "en": "Double Cheese Burger",
+    "es": "Hamburguesa doble con queso",
+    "fr": "Double cheeseburger",
+    "de": "Double Cheeseburger",
+    "it": "Doppio cheeseburger",
+    "pt": "Hambúrguer duplo com queijo",
+    "nl": "Dubbele cheeseburger",
+    "ar": "دبل تشيز برجر"
    },
    "description": {
-    "ar": "قطعتا لحم مع جبنة شيدر وصوص البيت",
-    "en": "Two beef patties with cheddar and house sauce"
+    "en": "Two beef patties with cheddar and house sauce",
+    "es": "Dos carnes de ternera con cheddar y salsa de la casa",
+    "fr": "Deux steaks de bœuf, cheddar et sauce maison",
+    "de": "Zwei Rindfleisch-Patties mit Cheddar und Haussauce",
+    "it": "Due hamburger di manzo con cheddar e salsa della casa",
+    "pt": "Dois hambúrgueres de novilho com cheddar e molho da casa",
+    "nl": "Twee runderburgers met cheddar en huissaus",
+    "ar": "قطعتا لحم مع جبنة شيدر وصوص البيت"
    },
-   "optionGroups": []
+   "optionGroups": [
+    {
+     "id": "grp_burger_sauce",
+     "type": "single_flat",
+     "name": {
+      "en": "Sauce",
+      "es": "Salsa",
+      "fr": "Sauce",
+      "de": "Soße",
+      "it": "Salsa",
+      "pt": "Molho",
+      "nl": "Saus",
+      "ar": "الصوص"
+     },
+     "options": [
+      {
+       "id": "opt_sauce_house",
+       "name": {
+        "en": "House sauce",
+        "es": "Salsa de la casa",
+        "fr": "Sauce maison",
+        "de": "Haussauce",
+        "it": "Salsa della casa",
+        "pt": "Molho da casa",
+        "nl": "Huissaus",
+        "ar": "صوص البيت"
+       }
+      },
+      {
+       "id": "opt_sauce_bbq",
+       "name": {
+        "en": "BBQ",
+        "es": "Barbacoa",
+        "fr": "Barbecue",
+        "de": "BBQ",
+        "it": "Barbecue",
+        "pt": "Barbecue",
+        "nl": "Barbecue",
+        "ar": "باربكيو"
+       }
+      },
+      {
+       "id": "opt_sauce_garlic",
+       "name": {
+        "en": "Garlic mayo",
+        "es": "Alioli",
+        "fr": "Mayonnaise à l’ail",
+        "de": "Knoblauch-Mayo",
+        "it": "Maionese all’aglio",
+        "pt": "Maionese de alho",
+        "nl": "Knoflookmayo",
+        "ar": "مايونيز بالثوم"
+       }
+      }
+     ]
+    },
+    {
+     "id": "grp_burger_side",
+     "type": "multi_priced",
+     "name": {
+      "en": "Add a side",
+      "es": "Añade un acompañamiento",
+      "fr": "Ajouter un accompagnement",
+      "de": "Beilage dazu",
+      "it": "Aggiungi un contorno",
+      "pt": "Adicionar acompanhamento",
+      "nl": "Bijgerecht erbij",
+      "ar": "أضف طبقاً جانبياً"
+     },
+     "options": [
+      {
+       "id": "opt_fries",
+       "priceDelta": 2.5,
+       "name": {
+        "en": "Fries",
+        "es": "Patatas fritas",
+        "fr": "Frites",
+        "de": "Pommes frites",
+        "it": "Patatine fritte",
+        "pt": "Batatas fritas",
+        "nl": "Friet",
+        "ar": "بطاطس مقلية"
+       }
+      },
+      {
+       "id": "opt_sweet_fries",
+       "priceDelta": 3,
+       "name": {
+        "en": "Sweet potato fries",
+        "es": "Boniato frito",
+        "fr": "Frites de patate douce",
+        "de": "Süßkartoffel-Pommes",
+        "it": "Patate dolci fritte",
+        "pt": "Batata-doce frita",
+        "nl": "Zoete-aardappelfriet",
+        "ar": "بطاطا حلوة مقلية"
+       }
+      }
+     ]
+    },
+    {
+     "id": "grp_burger_extras",
+     "type": "multi_priced",
+     "name": {
+      "en": "Extras",
+      "es": "Extras",
+      "fr": "Suppléments",
+      "de": "Extras",
+      "it": "Extra",
+      "pt": "Extras",
+      "nl": "Extra’s",
+      "ar": "إضافات"
+     },
+     "options": [
+      {
+       "id": "opt_cheese",
+       "priceDelta": 1,
+       "name": {
+        "en": "Extra cheese",
+        "es": "Queso extra",
+        "fr": "Fromage en plus",
+        "de": "Extra Käse",
+        "it": "Formaggio extra",
+        "pt": "Queijo extra",
+        "nl": "Extra kaas",
+        "ar": "جبنة إضافية"
+       }
+      },
+      {
+       "id": "opt_bacon",
+       "priceDelta": 1.5,
+       "name": {
+        "en": "Bacon",
+        "es": "Beicon",
+        "fr": "Bacon",
+        "de": "Bacon",
+        "it": "Bacon",
+        "pt": "Bacon",
+        "nl": "Bacon",
+        "ar": "لحم مقدد"
+       }
+      },
+      {
+       "id": "opt_jalapeno",
+       "priceDelta": 0.5,
+       "name": {
+        "en": "Jalapeños",
+        "es": "Jalapeños",
+        "fr": "Jalapeños",
+        "de": "Jalapeños",
+        "it": "Jalapeños",
+        "pt": "Jalapeños",
+        "nl": "Jalapeños",
+        "ar": "هالبينو"
+       }
+      }
+     ]
+    }
+   ]
   },
   {
    "id": "prod_margherita",
@@ -610,14 +1498,71 @@
    "branchIds": [],
    "order": 3,
    "name": {
-    "ar": "بيتزا مارغريتا",
-    "en": "Margherita Pizza"
+    "en": "Margherita Pizza",
+    "es": "Pizza margarita",
+    "fr": "Pizza margherita",
+    "de": "Pizza Margherita",
+    "it": "Pizza margherita",
+    "pt": "Pizza margherita",
+    "nl": "Pizza margherita",
+    "ar": "بيتزا مارغريتا"
    },
    "description": {
-    "ar": "صلصة طماطم وموزاريلا وريحان طازج",
-    "en": "Tomato sauce, mozzarella and fresh basil"
+    "en": "Tomato sauce, mozzarella and fresh basil",
+    "es": "Salsa de tomate, mozzarella y albahaca fresca",
+    "fr": "Sauce tomate, mozzarella et basilic frais",
+    "de": "Tomatensauce, Mozzarella und frisches Basilikum",
+    "it": "Salsa di pomodoro, mozzarella e basilico fresco",
+    "pt": "Molho de tomate, mozzarella e manjericão fresco",
+    "nl": "Tomatensaus, mozzarella en verse basilicum",
+    "ar": "صلصة طماطم وموزاريلا وريحان طازج"
    },
-   "optionGroups": []
+   "optionGroups": [
+    {
+     "id": "grp_pizza_size",
+     "type": "single_price",
+     "name": {
+      "en": "Size",
+      "es": "Tamaño",
+      "fr": "Taille",
+      "de": "Größe",
+      "it": "Formato",
+      "pt": "Tamanho",
+      "nl": "Formaat",
+      "ar": "الحجم"
+     },
+     "options": [
+      {
+       "id": "opt_size_m",
+       "priceDelta": 11,
+       "name": {
+        "en": "Medium (30 cm)",
+        "es": "Mediana (30 cm)",
+        "fr": "Moyenne (30 cm)",
+        "de": "Mittel (30 cm)",
+        "it": "Media (30 cm)",
+        "pt": "Média (30 cm)",
+        "nl": "Medium (30 cm)",
+        "ar": "وسط (30 سم)"
+       }
+      },
+      {
+       "id": "opt_size_l",
+       "priceDelta": 15,
+       "name": {
+        "en": "Large (40 cm)",
+        "es": "Grande (40 cm)",
+        "fr": "Grande (40 cm)",
+        "de": "Groß (40 cm)",
+        "it": "Grande (40 cm)",
+        "pt": "Grande (40 cm)",
+        "nl": "Groot (40 cm)",
+        "ar": "كبير (40 سم)"
+       }
+      }
+     ]
+    }
+   ]
   },
   {
    "id": "prod_pepperoni",
@@ -628,14 +1573,71 @@
    "branchIds": [],
    "order": 4,
    "name": {
-    "ar": "بيتزا ببروني",
-    "en": "Pepperoni Pizza"
+    "en": "Pepperoni Pizza",
+    "es": "Pizza pepperoni",
+    "fr": "Pizza pepperoni",
+    "de": "Pizza Pepperoni",
+    "it": "Pizza al salamino piccante",
+    "pt": "Pizza pepperoni",
+    "nl": "Pizza pepperoni",
+    "ar": "بيتزا ببروني"
    },
    "description": {
-    "ar": "موزاريلا وصلصة طماطم وببروني",
-    "en": "Mozzarella, tomato sauce and pepperoni"
+    "en": "Mozzarella, tomato sauce and pepperoni",
+    "es": "Mozzarella, salsa de tomate y pepperoni",
+    "fr": "Mozzarella, sauce tomate et pepperoni",
+    "de": "Mozzarella, Tomatensauce und Peperoni-Salami",
+    "it": "Mozzarella, salsa di pomodoro e salamino piccante",
+    "pt": "Mozzarella, molho de tomate e pepperoni",
+    "nl": "Mozzarella, tomatensaus en pepperoni",
+    "ar": "موزاريلا وصلصة طماطم وببروني"
    },
-   "optionGroups": []
+   "optionGroups": [
+    {
+     "id": "grp_pizza_size",
+     "type": "single_price",
+     "name": {
+      "en": "Size",
+      "es": "Tamaño",
+      "fr": "Taille",
+      "de": "Größe",
+      "it": "Formato",
+      "pt": "Tamanho",
+      "nl": "Formaat",
+      "ar": "الحجم"
+     },
+     "options": [
+      {
+       "id": "opt_size_m",
+       "priceDelta": 13,
+       "name": {
+        "en": "Medium (30 cm)",
+        "es": "Mediana (30 cm)",
+        "fr": "Moyenne (30 cm)",
+        "de": "Mittel (30 cm)",
+        "it": "Media (30 cm)",
+        "pt": "Média (30 cm)",
+        "nl": "Medium (30 cm)",
+        "ar": "وسط (30 سم)"
+       }
+      },
+      {
+       "id": "opt_size_l",
+       "priceDelta": 17,
+       "name": {
+        "en": "Large (40 cm)",
+        "es": "Grande (40 cm)",
+        "fr": "Grande (40 cm)",
+        "de": "Groß (40 cm)",
+        "it": "Grande (40 cm)",
+        "pt": "Grande (40 cm)",
+        "nl": "Groot (40 cm)",
+        "ar": "كبير (40 سم)"
+       }
+      }
+     ]
+    }
+   ]
   },
   {
    "id": "prod_veggie",
@@ -646,14 +1648,71 @@
    "branchIds": [],
    "order": 5,
    "name": {
-    "ar": "بيتزا الخضار",
-    "en": "Garden Veggie Pizza"
+    "en": "Garden Veggie Pizza",
+    "es": "Pizza vegetal",
+    "fr": "Pizza aux légumes",
+    "de": "Gemüsepizza",
+    "it": "Pizza alle verdure",
+    "pt": "Pizza vegetariana",
+    "nl": "Groentepizza",
+    "ar": "بيتزا الخضار"
    },
    "description": {
-    "ar": "خضار طازجة وموزاريلا وصلصة طماطم",
-    "en": "Fresh vegetables, mozzarella and tomato sauce"
+    "en": "Fresh vegetables, mozzarella and tomato sauce",
+    "es": "Verduras frescas, mozzarella y salsa de tomate",
+    "fr": "Légumes frais, mozzarella et sauce tomate",
+    "de": "Frisches Gemüse, Mozzarella und Tomatensauce",
+    "it": "Verdure fresche, mozzarella e salsa di pomodoro",
+    "pt": "Legumes frescos, mozzarella e molho de tomate",
+    "nl": "Verse groenten, mozzarella en tomatensaus",
+    "ar": "خضار طازجة وموزاريلا وصلصة طماطم"
    },
-   "optionGroups": []
+   "optionGroups": [
+    {
+     "id": "grp_pizza_size",
+     "type": "single_price",
+     "name": {
+      "en": "Size",
+      "es": "Tamaño",
+      "fr": "Taille",
+      "de": "Größe",
+      "it": "Formato",
+      "pt": "Tamanho",
+      "nl": "Formaat",
+      "ar": "الحجم"
+     },
+     "options": [
+      {
+       "id": "opt_size_m",
+       "priceDelta": 12.5,
+       "name": {
+        "en": "Medium (30 cm)",
+        "es": "Mediana (30 cm)",
+        "fr": "Moyenne (30 cm)",
+        "de": "Mittel (30 cm)",
+        "it": "Media (30 cm)",
+        "pt": "Média (30 cm)",
+        "nl": "Medium (30 cm)",
+        "ar": "وسط (30 سم)"
+       }
+      },
+      {
+       "id": "opt_size_l",
+       "priceDelta": 16.5,
+       "name": {
+        "en": "Large (40 cm)",
+        "es": "Grande (40 cm)",
+        "fr": "Grande (40 cm)",
+        "de": "Groß (40 cm)",
+        "it": "Grande (40 cm)",
+        "pt": "Grande (40 cm)",
+        "nl": "Groot (40 cm)",
+        "ar": "كبير (40 سم)"
+       }
+      }
+     ]
+    }
+   ]
   },
   {
    "id": "prod_cola",
@@ -664,12 +1723,24 @@
    "branchIds": [],
    "order": 6,
    "name": {
-    "ar": "كولا",
-    "en": "Cola"
+    "en": "Cola",
+    "es": "Refresco de cola",
+    "fr": "Cola",
+    "de": "Cola",
+    "it": "Cola",
+    "pt": "Cola",
+    "nl": "Cola",
+    "ar": "كولا"
    },
    "description": {
-    "ar": "مشروب غازي بارد",
-    "en": "Chilled soft drink"
+    "en": "Chilled soft drink",
+    "es": "Refresco bien frío",
+    "fr": "Soda bien fraîche",
+    "de": "Gekühltes Erfrischungsgetränk",
+    "it": "Bibita fresca",
+    "pt": "Refrigerante fresco",
+    "nl": "Gekoelde frisdrank",
+    "ar": "مشروب غازي بارد"
    },
    "optionGroups": []
   },
@@ -682,12 +1753,24 @@
    "branchIds": [],
    "order": 7,
    "name": {
-    "ar": "ليموناضة طازجة",
-    "en": "Fresh Lemonade"
+    "en": "Fresh Lemonade",
+    "es": "Limonada natural",
+    "fr": "Citronnade maison",
+    "de": "Frische Limonade",
+    "it": "Limonata fresca",
+    "pt": "Limonada natural",
+    "nl": "Verse limonade",
+    "ar": "ليموناضة طازجة"
    },
    "description": {
-    "ar": "ليمون معصور طازج",
-    "en": "Freshly squeezed lemonade"
+    "en": "Freshly squeezed lemonade",
+    "es": "Limonada recién exprimida",
+    "fr": "Citronnade fraîchement pressée",
+    "de": "Frisch gepresste Limonade",
+    "it": "Limonata appena spremuta",
+    "pt": "Limonada acabada de espremer",
+    "nl": "Vers geperste limonade",
+    "ar": "ليمون معصور طازج"
    },
    "optionGroups": []
   },
@@ -700,12 +1783,24 @@
    "branchIds": [],
    "order": 8,
    "name": {
-    "ar": "مياه معدنية",
-    "en": "Bottled Water"
+    "en": "Bottled Water",
+    "es": "Agua mineral",
+    "fr": "Eau minérale",
+    "de": "Mineralwasser",
+    "it": "Acqua minerale",
+    "pt": "Água engarrafada",
+    "nl": "Flessenwater",
+    "ar": "مياه معدنية"
    },
    "description": {
-    "ar": "مياه باردة معبأة",
-    "en": "Cold bottled water"
+    "en": "Cold bottled water",
+    "es": "Agua mineral fría",
+    "fr": "Eau minérale bien fraîche",
+    "de": "Kaltes Mineralwasser",
+    "it": "Acqua minerale fresca",
+    "pt": "Água engarrafada fresca",
+    "nl": "Koud flessenwater",
+    "ar": "مياه باردة معبأة"
    },
    "optionGroups": []
   },
@@ -718,12 +1813,24 @@
    "branchIds": [],
    "order": 9,
    "name": {
-    "ar": "تشيز كيك",
-    "en": "Cheesecake"
+    "en": "Cheesecake",
+    "es": "Tarta de queso",
+    "fr": "Cheesecake",
+    "de": "Käsekuchen",
+    "it": "Cheesecake",
+    "pt": "Cheesecake",
+    "nl": "Cheesecake",
+    "ar": "تشيز كيك"
    },
    "description": {
-    "ar": "تشيز كيك كريمي بقاعدة زبدة مقرمشة",
-    "en": "Creamy cheesecake with a buttery crust"
+    "en": "Creamy cheesecake with a buttery crust",
+    "es": "Tarta de queso cremosa con base de galleta",
+    "fr": "Cheesecake crémeux sur une base sablée",
+    "de": "Cremiger Käsekuchen mit Butterkeksboden",
+    "it": "Cheesecake cremosa con base friabile",
+    "pt": "Cheesecake cremoso com base amanteigada",
+    "nl": "Romige cheesecake met een boterige bodem",
+    "ar": "تشيز كيك كريمي بقاعدة زبدة مقرمشة"
    },
    "optionGroups": []
   },
@@ -736,12 +1843,24 @@
    "branchIds": [],
    "order": 10,
    "name": {
-    "ar": "براونيز شوكولاتة",
-    "en": "Chocolate Brownie"
+    "en": "Chocolate Brownie",
+    "es": "Brownie de chocolate",
+    "fr": "Brownie au chocolat",
+    "de": "Schoko-Brownie",
+    "it": "Brownie al cioccolato",
+    "pt": "Brownie de chocolate",
+    "nl": "Chocoladebrownie",
+    "ar": "براونيز شوكولاتة"
    },
    "description": {
-    "ar": "براونيز شوكولاتة دافئ",
-    "en": "Warm chocolate brownie"
+    "en": "Warm chocolate brownie",
+    "es": "Brownie de chocolate caliente",
+    "fr": "Brownie au chocolat servi tiède",
+    "de": "Warmer Schokoladen-Brownie",
+    "it": "Brownie al cioccolato caldo",
+    "pt": "Brownie de chocolate quente",
+    "nl": "Warme chocoladebrownie",
+    "ar": "براونيز شوكولاتة دافئ"
    },
    "optionGroups": []
   },
@@ -754,12 +1873,24 @@
    "branchIds": [],
    "order": 11,
    "name": {
-    "ar": "سلطة البيت",
-    "en": "House Salad"
+    "en": "House Salad",
+    "es": "Ensalada de la casa",
+    "fr": "Salade maison",
+    "de": "Hausalat",
+    "it": "Insalata della casa",
+    "pt": "Salada da casa",
+    "nl": "Huissalade",
+    "ar": "سلطة البيت"
    },
    "description": {
-    "ar": "خضار ورقية مقرمشة مع طماطم وخيار وصلصة البيت",
-    "en": "Crisp greens, tomato, cucumber and house dressing"
+    "en": "Crisp greens, tomato, cucumber and house dressing",
+    "es": "Lechugas frescas, tomate, pepino y aliño de la casa",
+    "fr": "Salade croquante, tomate, concombre et vinaigrette maison",
+    "de": "Knackiger Blattsalat, Tomate, Gurke und Hausdressing",
+    "it": "Insalata croccante, pomodoro, cetriolo e condimento della casa",
+    "pt": "Alface fresca, tomate, pepino e molho da casa",
+    "nl": "Frisse sla, tomaat, komkommer en huisdressing",
+    "ar": "خضار ورقية مقرمشة مع طماطم وخيار وصلصة البيت"
    },
    "optionGroups": []
   }

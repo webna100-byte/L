@@ -13,7 +13,7 @@ boot('cart', async (data) => {
     if (!product || !Pricing.availableForBranch(product, Store.getSelectedBranch())) return null;
     try {
       const { price, selections } = Pricing.unitPrice(product, item.selections, dec);
-      return { product, price, options: Pricing.optionSummary(product, selections, getLang()) };
+      return { product, price, options: Pricing.optionSummary(product, selections, contentLang()) };
     } catch (e) { return null; }
   }
 

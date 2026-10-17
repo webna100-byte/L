@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,17 +19,15 @@
       <div class="form-group" style="text-align:start"><label for="password" id="pLabel"></label><input type="password" id="password" required autocomplete="current-password" dir="ltr"></div>
       <button type="submit" class="btn-primary" id="loginBtn"></button>
       <p id="errorMsg" class="form-error hidden" style="margin-top:12px"></p>
-      <button type="button" class="lang-toggle" id="langBtn" style="margin-top:16px"></button>
     </form>
   </div>
   <script src="/js/pricing.js"></script><script src="/js/i18n.js"></script><script src="/js/store.js"></script><script src="/js/firebase.js"></script><script src="/js/ui.js"></script>
   <script>
   (async () => {
-    applyDocDir();
     const $ = id => document.getElementById(id);
-    $('title').textContent = t('cashier_login'); $('uLabel').textContent = t('username'); $('pLabel').textContent = t('password'); $('loginBtn').textContent = t('login'); $('langBtn').textContent = t('lang_switch_full');
-    $('langBtn').addEventListener('click', () => { setLang(getLang() === 'ar' ? 'en' : 'ar'); location.reload(); });
-    try { await Store.load({ fresh: true }); applyTheme(); if (Store.data && Store.data.settings.logo) { $('logo').src = Store.data.settings.logo; $('logo').style.display = 'block'; } await StaffAuth.init(); if (StaffAuth.role() === 'cashier') location.replace('/cashier/'); } catch (e) { console.error(e); }
+    const label = () => { applyDocDir(); $('title').textContent = t('cashier_login'); $('uLabel').textContent = t('username'); $('pLabel').textContent = t('password'); $('loginBtn').textContent = t('login'); };
+    label();
+    try { await Store.load({ fresh: true }); label(); applyTheme(); if (Store.data && Store.data.settings.logo) { $('logo').src = Store.data.settings.logo; $('logo').style.display = 'block'; } await StaffAuth.init(); if (StaffAuth.role() === 'cashier') location.replace('/cashier/'); } catch (e) { console.error(e); }
     $('loginForm').addEventListener('submit', async e => {
       e.preventDefault();
       const err = $('errorMsg'), btn = $('loginBtn');

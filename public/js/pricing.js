@@ -79,15 +79,23 @@
     return { price: round(total, dec), selections: normalized };
   }
 
+  /* Content is plain text in the site's language; { en, es, ... } objects
+     from older configs are still read (site language first). */
+  function textOf(f, lang) {
+    if (f == null) return '';
+    if (typeof f !== 'object') return String(f);
+    return f[lang] || f.en || Object.values(f).find(v => typeof v === 'string' && v) || '';
+  }
+
   function optionSummary(product, selections, lang) {
-    const tf = f => (f && typeof f === 'object') ? (f[lang] || f.en || f.ar || '') : (f || '');
+    const tf = f => textOf(f, lang);
     const parts = [];
     (product.optionGroups || []).forEach(g => {
       const sel = selections[g.id];
       if (sel == null) return;
       const ids = Array.isArray(sel) ? sel : [sel];
       const names = ids.map(id => (g.options || []).find(o => o.id === id)).filter(Boolean).map(o => tf(o.name));
-      if (names.length) parts.push(`${tf(g.name)}: ${names.join('، ')}`);
+      if (names.length) parts.push(`${tf(g.name)}: ${names.join(lang === 'ar' ? '، ' : ', ')}`);
     });
     return parts.join(' • ');
   }
@@ -123,7 +131,8 @@
      Throws Error with .code on anything invalid. */
   function computeOrder(config, input, customer) {
     const settings = config.settings || {};
-    const dec = currencyDecimals(settings.currency || 'USD');
+    const dec = currencyDecimals(settings.currency || 'EUR');
+    const lang = settings.lang || settings.defaultLang || 'en';
     const loyalty = config.loyalty || {};
     const loyaltyOn = loyalty.enabled !== false;
     const branch = (config.branches || []).find(b => b.id === input.branchId);
@@ -151,7 +160,7 @@
         image: product.image || '',
         qty,
         selections,
-        options: { ar: optionSummary(product, selections, 'ar'), en: optionSummary(product, selections, 'en') },
+        options: optionSummary(product, selections, lang),
         notes: String(it.notes || '').slice(0, 300),
         unitPrice: price,
         lineTotal: round(price * qty, dec)
@@ -225,10 +234,10 @@
       tax,
       total,
       pointsEarned,
-      currency: settings.currency || 'USD',
+      currency: settings.currency || 'EUR',
       decimals: dec
     };
   }
 
-  root.Pricing = { currencyDecimals, round, pricingGroup, rawBasePrice, productBasePrice, availableForBranch, unitPrice, optionSummary, matchRule, sortedLevels, levelFor, findGift, computeOrder };
+  root.Pricing = { textOf, currencyDecimals, round, pricingGroup, rawBasePrice, productBasePrice, availableForBranch, unitPrice, optionSummary, matchRule, sortedLevels, levelFor, findGift, computeOrder };
 })(typeof globalThis !== 'undefined' ? globalThis : this);

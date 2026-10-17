@@ -14,7 +14,7 @@ function renderIcons() {
   else window.addEventListener('load', () => { if (window.lucide) lucide.createIcons(); }, { once: true });
 }
 
-function decimals() { return Pricing.currencyDecimals((Store.data && Store.data.settings.currency) || 'USD'); }
+function decimals() { return Pricing.currencyDecimals((Store.data && Store.data.settings.currency) || 'EUR'); }
 
 function fmtPrice(n) {
   const dec = decimals();
@@ -22,19 +22,30 @@ function fmtPrice(n) {
   return Number.isInteger(n) ? String(n) : n.toFixed(dec);
 }
 
+/* Prices follow the site's locale: "12,50 €" in Spain/France/Germany,
+   "€12.50" in English, whole amounts without decimals ("9 €"). */
 function fmtMoney(n) {
   const c = getCurrency();
-  const sym = getLang() === 'ar' ? c.symbol : c.symbolEn;
-  return getLang() === 'ar' ? `${fmtPrice(n)} ${sym}` : `${sym} ${fmtPrice(n)}`.replace(/^(\$|€|£|₪|₺|₹|C\$|A\$) /, '$1');
+  const dec = decimals();
+  n = Pricing.round(n, dec);
+  if (getLang() === 'ar') return `${fmtPrice(n)} ${c.symbol}`;
+  try {
+    const digits = Number.isInteger(n) ? 0 : dec;
+    return new Intl.NumberFormat(langLocale(), { style: 'currency', currency: c.code, minimumFractionDigits: digits, maximumFractionDigits: digits }).format(n);
+  } catch (e) {
+    return `${fmtPrice(n)} ${c.symbolEn}`;
+  }
 }
 
 function fmtDate(ms) {
   try {
-    return new Intl.DateTimeFormat(getLang() === 'ar' ? 'ar-u-nu-latn' : 'en-GB', { dateStyle: 'medium', timeStyle: 'short', timeZone: (Store.data && Store.data.settings.timezone) || undefined }).format(new Date(ms));
+    return new Intl.DateTimeFormat(langLocale(), { dateStyle: 'medium', timeStyle: 'short', timeZone: (Store.data && Store.data.settings.timezone) || undefined }).format(new Date(ms));
   } catch (e) { return new Date(ms).toLocaleString(); }
 }
 
-function fmtNumber(n) { return new Intl.NumberFormat('en-US').format(n); }
+function fmtNumber(n) {
+  try { return new Intl.NumberFormat(getLang() === 'ar' ? 'en-US' : langLocale()).format(n); } catch (e) { return String(n); }
+}
 
 function colorValue(c) {
   if (!c) return '';
@@ -94,14 +105,9 @@ function renderHeader() {
       </div>
       <a class="header-logo" href="/">${logo}</a>
       <div class="header-side header-end">
-        <button class="lang-toggle" id="langBtn" aria-label="${t('lang_switch_full')}">${t('lang_switch')}</button>
         <a href="/cart" class="icon-btn cart-btn" aria-label="${t('cart')}"><i data-lucide="shopping-bag"></i><span id="cartCount" class="cart-count"></span></a>
       </div>
     </div>`;
-  document.getElementById('langBtn').addEventListener('click', () => {
-    setLang(getLang() === 'ar' ? 'en' : 'ar');
-    location.reload();
-  });
   document.getElementById('menuBtn').addEventListener('click', openDrawer);
   updateCartCount();
 }
@@ -171,7 +177,7 @@ function closeDrawer() {
 /* ---------- Bottom navigation (5 tabs, home in the middle) ---------- */
 function unreadNotifications() {
   let seen = 0;
-  try { seen = Number(localStorage.getItem('notif_seen') || 0); } catch (e) { /* ignore */ }
+  try { seen = Number(localStorage.getItem(skey('notif_seen')) || 0); } catch (e) { /* ignore */ }
   return (Store.notifications || []).filter(n => n.at > seen).length;
 }
 
@@ -291,7 +297,8 @@ async function boot(pageKey, render, { colors, needsAuth = false } = {}) {
   } catch (e) {
     console.error(e);
     applyDocDir();
-    showFatal(t('load_error'));
+    if (e.status === 404) showFatal(t('site_not_found'), false);
+    else showFatal(t('load_error'));
     return;
   }
   applyDocDir();

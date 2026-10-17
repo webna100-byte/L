@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -15,7 +15,7 @@ html,body{margin:0;background:#fff}
 @keyframes pulse{50%{opacity:.55}}
 </style>
 <script>
-(function(){try{var l=localStorage.getItem('site_lang');if(!l){var c=JSON.parse(localStorage.getItem('site_cache_v2')||'null');l=c&&c.config&&c.config.settings.defaultLang==='en'?'en':'ar'}document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr'}catch(e){}})();
+(function(){try{var m=document.cookie.match(/(?:^|;\s*)rs_site=([a-z0-9-]{1,40})/);window.RS_PFX=m?m[1]+':':'';var c=JSON.parse(localStorage.getItem(RS_PFX+'site_cache_v3')||'null'),s=c&&c.config&&c.config.settings||{},l=s.lang||s.defaultLang||'en';document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr'}catch(e){window.RS_PFX=''}})();
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -24,7 +24,7 @@ html,body{margin:0;background:#fff}
 </head>
 <body data-page="returns" class="member">
 <div class="app-splash" id="appSplash"><img id="splashLogo" alt=""></div>
-<script>(function(){try{var s=localStorage.getItem('site_logo');var i=document.getElementById('splashLogo');if(s)i.src=s;else i.remove()}catch(e){}})();</script>
+<script>(function(){try{var s=localStorage.getItem((window.RS_PFX||'')+'site_logo');var i=document.getElementById('splashLogo');if(s)i.src=s;else i.remove()}catch(e){}})();</script>
 <header id="site-header"></header>
 <main id="main" class="member-page"></main>
 <footer id="site-footer"></footer>

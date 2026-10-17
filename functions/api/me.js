@@ -1,11 +1,12 @@
 /* GET /api/me -> the signed-in customer's points, level and saved details. */
 import { json, fail, handle, authUser, isGoogleCustomer } from '../_lib/http.js';
 import { Firestore } from '../_lib/firestore.js';
+import { siteOf } from '../_lib/site.js';
 
 export const onRequestGet = handle(async ({ request, env }) => {
   const user = await authUser(request, env);
   if (!isGoogleCustomer(user)) return fail(401, 'login_required');
-  const doc = await new Firestore(env).get(`users/${user.uid}`);
+  const doc = await new Firestore(env, siteOf(request)).get(`users/${user.uid}`);
   const d = doc ? doc.data : {};
   return json({
     uid: user.uid,
