@@ -27,6 +27,12 @@ export const onRequestPost = handle(async ({ request, env }) => {
     }
   }
   if (!claims) { await guard.fail(); return fail(401, 'invalid_login'); }
-  const token = await createCustomToken(env, `staff_admin${site ? '_' + site : ''}${claims.super ? '' : '_demo'}`, claims);
+  let token;
+  try {
+    token = await createCustomToken(env, `staff_admin${site ? '_' + site : ''}${claims.super ? '' : '_demo'}`, claims);
+  } catch (e) {
+    // Only reachable with a correct password: says what is wrong with the Firebase service account settings.
+    return fail(500, 'token_failed: ' + String(e && e.message || e).slice(0, 160));
+  }
   return json({ token });
 });
