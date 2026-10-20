@@ -32,7 +32,10 @@ export const onRequestPost = handle(async ({ request, env }) => {
     token = await createCustomToken(env, `staff_admin${site ? '_' + site : ''}${claims.super ? '' : '_demo'}`, claims);
   } catch (e) {
     // Only reachable with a correct password: says what is wrong with the Firebase service account settings.
-    return fail(500, 'token_failed: ' + String(e && e.message || e).slice(0, 160));
+    const raw = String(env.FIREBASE_PRIVATE_KEY || '');
+    const body = raw.replace(/\\n/g, '\n').replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\s+/g, '');
+    const odd = [...new Set(body.replace(/[A-Za-z0-9+/=]/g, ''))].map(c => c.charCodeAt(0)).slice(0, 10);
+    return fail(500, `token_failed: ${String(e && e.message || e).slice(0, 60)} | key length ${raw.length}, starts "${raw.slice(0, 12)}", ends "${raw.slice(-12).replace(/\n/g, '<LF>')}", body ${body.length}, odd chars ${JSON.stringify(odd)}`);
   }
   return json({ token });
 });
