@@ -3,8 +3,12 @@
    (or A4) and prints it from a hidden iframe. Works with any printer the
    device can reach, including Bluetooth/USB thermal printers set up in the
    OS print dialog. */
+let printBusy = false;
 function printReceipt(order, config) {
-  if (!order) return;
+  // One click = one receipt: ignore repeat clicks while a print is in flight.
+  if (!order || printBusy) return;
+  printBusy = true;
+  setTimeout(() => { printBusy = false; }, 4000);
   const s = config.settings || {};
   const opts = s.receipt || {};
   // The receipt is printed in the site's language.
@@ -40,6 +44,7 @@ function printReceipt(order, config) {
     .sub { font-size: .85em; color: #333; } hr { border: 0; border-top: 1px dashed #000; margin: 6px 0; }
     .total td { font-weight: 700; font-size: 1.2em; padding-top: 4px; } .notes { border: 1px solid #000; padding: 4px; margin: 4px 0; font-weight: 700; }
     .big { font-weight: 700; }
+    html, body { height: auto; overflow: visible; } tr, .notes { break-inside: avoid; }
   </style></head><body>
     ${s.logo ? `<div class="c"><img src="${esc(s.logo)}" style="max-height:48px;max-width:60%;filter:grayscale(1)"></div>` : ''}
     <h1>${esc(tf(s.restaurantName))}</h1>
@@ -76,7 +81,7 @@ function printReceipt(order, config) {
   const doc = frame.contentWindow.document;
   doc.open(); doc.write(html); doc.close();
   let printed = false;
-  const go = () => { if (printed) return; printed = true; frame.contentWindow.focus(); frame.contentWindow.print(); };
+  const go = () => { if (printed) return; printed = true; frame.contentWindow.focus(); frame.contentWindow.print(); setTimeout(() => { printBusy = false; }, 800); };
   const img = doc.querySelector('img');
   if (img && !img.complete) { img.onload = go; img.onerror = go; setTimeout(go, 1500); } else setTimeout(go, 150);
 }

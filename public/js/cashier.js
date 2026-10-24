@@ -23,6 +23,7 @@
   $('shiftNote').textContent = t('start_shift_note');
   $('shiftBtn').querySelector('span').textContent = t('start_shift');
   $('alarm').querySelector('span').textContent = t('new_order_alert');
+  $('alarm').dataset.tap = t('alarm_tap');
 
   /* ---------- Busy mode: pauses new orders for this branch ---------- */
   $('busyLabel').textContent = t('busy');
@@ -56,16 +57,35 @@
     });
     if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
   }
+  // Browsers suspend the audio context after long idle periods or when the
+  // tab is hidden; every beep re-checks and resumes it. If the browser still
+  // refuses (it needs a tap), the banner asks for one.
+  function ringNow() {
+    if (!audio) return;
+    if (audio.state !== 'running') { try { audio.resume(); } catch (e) { /* retried on the next beep */ } }
+    $('alarm').classList.toggle('need-tap', audio.state !== 'running');
+    beep();
+  }
+  let pendingNow = false;
   function setAlarm(on) {
+    pendingNow = on;
     $('alarm').classList.toggle('show', on);
     document.title = on ? `🔔 ${t('new_order_alert')}` : t('cashier_panel');
-    if (on && !alarmTimer) { beep(); alarmTimer = setInterval(beep, 1800); }
+    if (on && !alarmTimer) { ringNow(); alarmTimer = setInterval(ringNow, 1800); }
     if (!on && alarmTimer) { clearInterval(alarmTimer); alarmTimer = null; }
   }
+  $('alarm').addEventListener('click', () => { if (audio) { audio.resume(); ringNow(); } });
+  // Safety net: the "pending" state is re-evaluated every few seconds so the
+  // alarm restarts by itself even if a timer was throttled while idle.
+  setInterval(() => {
+    const has = [...orders.values()].some(o => o.status === 'pending');
+    if (!!audio && has !== pendingNow) draw();
+    else if (has && audio && !alarmTimer) setAlarm(true);
+  }, 5000);
   async function keepAwake() {
     try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch (e) { /* not critical */ }
   }
-  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && audio) { audio.resume(); keepAwake(); } });
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && audio) { audio.resume(); keepAwake(); if (pendingNow) ringNow(); } });
   $('shiftBtn').addEventListener('click', () => {
     audio = new (window.AudioContext || window.webkitAudioContext)();
     audio.resume();
@@ -76,9 +96,18 @@
 
   /* ---------- Live data ---------- */
   const orders = new Map();
-  const sources = { active: new Map(), today: new Map() };
+  const sources = { active: new Map(), recent: new Map() };
   let tab = 'new';
-  const TABS = [['new', 'tab_new', o => o.status === 'pending'], ['preparing', 'tab_preparing', o => o.status === 'preparing'], ['done', 'tab_done', o => o.status === 'delivered' && o.day === dayKey(Date.now())], ['cancelled', 'tab_cancelled', o => o.status === 'cancelled' && o.day === dayKey(Date.now())]];
+  // Time filter for the finished tabs. New / preparing orders always show,
+  // whatever their age, so a forgotten order can never hide.
+  let rangeDays = 7;
+  try { const r = Number(localStorage.getItem('cashierRange')); if ([1, 7, 30].includes(r)) rangeDays = r; } catch (e) { /* optional */ }
+  const rangeDayKeys = () => [...new Set(Array.from({ length: rangeDays + 1 }, (_, i) => dayKey(Date.now() - i * 86400000)))].slice(0, 30);
+  const inRange = o => rangeDayKeys().includes(o.day);
+  const TABS = [['new', 'tab_new', o => o.status === 'pending'], ['preparing', 'tab_preparing', o => o.status === 'preparing'], ['done', 'tab_done', o => o.status === 'delivered' && inRange(o)], ['cancelled', 'tab_cancelled', o => o.status === 'cancelled' && inRange(o)]];
+  $('rangeLabel').textContent = t('range_label');
+  $('rangeSel').innerHTML = [1, 7, 30].map(n => `<option value="${n}">${t('range_' + n)}</option>`).join('');
+  $('rangeSel').value = String(rangeDays);
 
   function merge() {
     orders.clear();
@@ -172,12 +201,19 @@
       if (err.code === 'permission-denied') { toast(t('account_disabled')); setTimeout(async () => { await StaffAuth.signOut(); location.href = '/cashier/login'; }, 2000); }
     });
     listen('active', m.query(col, m.where('branchId', '==', branchId), m.where('status', 'in', ['pending', 'preparing'])));
-    const listenToday = () => listen('today', m.query(col, m.where('branchId', '==', branchId), m.where('day', '==', currentDay)));
-    listenToday();
+    const listenRecent = () => listen('recent', m.query(col, m.where('branchId', '==', branchId), m.where('day', 'in', rangeDayKeys())));
+    listenRecent();
+    const relisten = () => { if (unsubs.recent) unsubs.recent(); sources.recent = new Map(); listenRecent(); merge(); };
+    $('rangeSel').addEventListener('change', () => {
+      rangeDays = Number($('rangeSel').value) || 7;
+      try { localStorage.setItem('cashierRange', String(rangeDays)); } catch (e) { /* optional */ }
+      currentDay = dayKey(Date.now());
+      relisten();
+    });
     // Day rollover (in the restaurant's time zone): follow the new day.
     setInterval(() => {
       const d = dayKey(Date.now());
-      if (d !== currentDay) { currentDay = d; if (unsubs.today) unsubs.today(); sources.today = new Map(); listenToday(); }
+      if (d !== currentDay) { currentDay = d; relisten(); }
     }, 60000);
   } catch (e) {
     console.error(e);
