@@ -96,8 +96,7 @@ boot('cart', async (data) => {
   document.getElementById('checkoutBtn').addEventListener('click', async () => {
     if (Store.isMultiBranch() && !Store.getSelectedBranch()) { location.href = '/branches'; return; }
     const user = await Auth.ready;
-    // Phone sites sign the customer in on the checkout page itself.
-    if (!user && Auth.mode() !== 'phone') { toast(t('login_required_to_order')); setTimeout(() => { location.href = loginUrl('/checkout'); }, 700); return; }
+    // The customer signs in on the checkout page itself (number + Confirm).
     location.href = '/checkout';
   });
 

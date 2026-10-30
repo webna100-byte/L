@@ -157,24 +157,23 @@ test('checkout: name and address are saved on the number and refilled next time;
   } finally { await t.close(); }
 });
 
-test('Google tokens are refused on phone sites; phone tokens on Google sites; other sites too', async () => {
+test('only phone customers of this site can act: Google tokens and other sites are refused', async () => {
   const t = await setup();
   try {
     assert.equal((await order(t, googleToken('g1'), { customer: { name: 'x' } })).status, 401);
     assert.equal((await call(me, t.ctx, req('/api/me', { token: googleToken('g1') }))).status, 401);
+    assert.equal((await call(wheelStatus, t.ctx, req('/api/wheel/status', { token: googleToken('g1') }))).status, 401);
     const c = await signUp(t, '0593334444');
     assert.equal((await order(t, c.token, { customer: { name: 'x' } })).status, 200);
     // the same token on a demo site is refused (different site claim)
     await t.env.STORE.put('site:demo1:config', JSON.stringify(baseConfig()));
     const other = await call(create, t.ctx, req('/api/orders/create', { method: 'POST', token: c.token, site: 'demo1', body: { branchId: 'branch_downtown', type: 'pickup', items: [{ productId: 'prod_cola', qty: 1 }], customer: { name: 'x' } } }));
     assert.equal(other.status, 401);
-    // a Google-mode site keeps working with Google, and rejects phone tokens
-    const g = baseConfig({}, { mode: 'google' });
-    await t.env.STORE.put('config', JSON.stringify(g));
-    assert.equal((await order(t, googleToken('g2'), { customer: { name: 'Ann', phone: '+34600111222' } })).status, 200);
-    assert.equal((await order(t, c.token, { customer: { name: 'x' } })).status, 401);
-    const l = await call(lookup, t.ctx, req('/api/auth/phone/lookup', { method: 'POST', body: { phone: '0593334444' } }));
-    assert.equal(l.error, 'phone_login_disabled');
+    // there is no sign-in setting to switch: a site config with or without settings.auth behaves the same
+    const bare = baseConfig(); delete bare.settings.auth;
+    await t.env.STORE.put('config', JSON.stringify(bare));
+    assert.equal((await call(lookup, t.ctx, req('/api/auth/phone/lookup', { method: 'POST', body: { phone: '0593335555' } }))).state, 'otp_sent');
+    assert.equal((await order(t, c.token, { customer: { name: 'x' } })).status, 200);
   } finally { await t.close(); }
 });
 
@@ -339,7 +338,7 @@ test('public site data hides the chances of the wheel', async () => {
   } finally { await t.close(); }
 });
 
-test('demo sites can show the code on screen; the main site never does', async () => {
+test('demo sites show the code on screen by default; the main site never does', async () => {
   const t = await setup(baseConfig({}, { demoShowCode: true }));
   try {
     t.env.OTP_DEV_ECHO = '';
@@ -350,8 +349,34 @@ test('demo sites can show the code on screen; the main site never does', async (
     assert.match(demo.devCode, /^\d{5}$/);
     const ok = await call(verify, t.ctx, req('/api/auth/phone/verify', { method: 'POST', body: { phone: '0591212121', code: demo.devCode }, site: 'shop1' }));
     assert.equal(ok.state, 'verified');
+    // a demo shows the code by default (prospects can try it), and demoShowCode:false turns that off
     await t.env.STORE.put('site:shop2:config', JSON.stringify(baseConfig({}, {})));
-    const plain = await call(lookup, t.ctx, req('/api/auth/phone/lookup', { method: 'POST', body: { phone: '0591212121' }, site: 'shop2' }));
-    assert.equal(plain.devCode, undefined, 'a demo without the flag behaves like a normal site');
+    const byDefault = await call(lookup, t.ctx, req('/api/auth/phone/lookup', { method: 'POST', body: { phone: '0591212121' }, site: 'shop2' }));
+    assert.match(byDefault.devCode, /^\d{5}$/);
+    await t.env.STORE.put('site:shop3:config', JSON.stringify(baseConfig({}, { demoShowCode: false })));
+    const off = await call(lookup, t.ctx, req('/api/auth/phone/lookup', { method: 'POST', body: { phone: '0591212121' }, site: 'shop3' }));
+    assert.equal(off.devCode, undefined);
+  } finally { await t.close(); }
+});
+
+test('prizes have no code to type and, by default, no expiry; a set validity expires them', async () => {
+  const one = [{ id: 'cola', label: 'مشروب', type: 'product', productId: 'prod_cola', weight: 1, goldWeight: 1, big: false }];
+  const t = await setup(baseConfig({ validHours: 0, prizes: one }));
+  try {
+    const c = await signUp(t, '0591515151');
+    const s = await call(wheelSpin, t.ctx, req('/api/wheel/spin', { method: 'POST', token: c.token, body: { kind: 'free' } }));
+    const doc = t.store.get('prizes/' + s.prize.code);
+    assert.equal(doc.expiresAt, 0, 'no expiry');
+    assert.equal(s.prize.expiresAt, 0);
+    // long after the day it was won, the prize is still there and still usable
+    t.store.set('prizes/' + s.prize.code, { ...doc, issuedAt: Date.now() - 400 * 86400000 });
+    const st = await call(wheelStatus, t.ctx, req('/api/wheel/status', { token: c.token }));
+    assert.equal(st.prizes.length, 1);
+    assert.equal((await order(t, c.token, { items: [{ productId: 'prod_classic_burger', qty: 3 }], prizeCode: s.prize.code, customer: { name: 'س' } })).status, 200);
+    // with a validity set, the prize carries an end time
+    await t.env.STORE.put('config', JSON.stringify(baseConfig({ validHours: 24, prizes: one })));
+    const d = await signUp(t, '0591616161');
+    const s2 = await call(wheelSpin, t.ctx, req('/api/wheel/spin', { method: 'POST', token: d.token, body: { kind: 'free' } }));
+    assert.ok(Math.abs(s2.prize.expiresAt - (Date.now() + 24 * 3600 * 1000)) < 5000);
   } finally { await t.close(); }
 });

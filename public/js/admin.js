@@ -583,7 +583,7 @@ function renderHomepage(el) {
     ${bi('hEye', L('Small line above title'), hp.hero.eyebrow)}${bi('hTitle', L('Title'), hp.hero.title)}${bi('hText', L('Text'), hp.hero.text)}${bi('hBtn', L('Button'), hp.hero.button)}
     ${imgField('hImg', L('Background image'), hp.hero.image, { wide: true })}
     <h4>${L('Sign-in card')}</h4>
-    ${bi('lTitle', L('Title'), hp.login.title)}${bi('lText', L('Text'), hp.login.text)}${bi('lBtn', L('Google button text'), hp.login.button)}
+    ${bi('lTitle', L('Title'), hp.login.title)}${bi('lText', L('Text'), hp.login.text)}${bi('lBtn', L('Sign-in button text'), hp.login.button)}
     <h4>${L('Categories section')}</h4>
     ${bi('cEye', L('Small line'), hp.categories.eyebrow)}${bi('cTitle', L('Title'), hp.categories.title)}
     <div class="selection-grid">${sortByOrder(CONFIG.categories).map(c => `<label class="selection-option"><input type="checkbox" class="hcat" value="${c.id}" ${(hp.categories.selectedIds || []).includes(c.id) ? 'checked' : ''}> ${escapeHtml(nameOf(c.name))}</label>`).join('')}</div>
@@ -748,7 +748,6 @@ const TIMEZONES = ['Europe/Madrid', 'Europe/Paris', 'Europe/Berlin', 'Europe/Rom
 const langOptions = sel => Object.entries(SITE_LANGS).map(([k, v]) => `<option value="${k}" ${k === sel ? 'selected' : ''}>${escapeHtml(v.name)}</option>`).join('');
 const currencyOptions = sel => CURRENCIES.map(c => `<option value="${c.code}" ${c.code === sel ? 'selected' : ''}>${L(c.name)} (${c.code})</option>`).join('');
 const tzOptions = sel => TIMEZONES.map(z => `<option ${z === sel ? 'selected' : ''}>${z}</option>`).join('');
-const authMode = () => (CONFIG.settings.auth && CONFIG.settings.auth.mode) === 'phone' ? 'phone' : 'google';
 function renderGeneral(el) {
   const s = CONFIG.settings;
   const lang = contentLang();
@@ -765,15 +764,14 @@ function renderGeneral(el) {
     ${saveBtn('gSave')}`) +
     card(L('Customer sign-in'), `
       <div class="form-row">
-        <div class="form-group"><label>${L('Sign-in method')}</label><select id="aMode"><option value="google" ${authMode() === 'google' ? 'selected' : ''}>Google</option><option value="phone" ${authMode() === 'phone' ? 'selected' : ''}>${L('Mobile number (one-time code)')}</option></select></div>
         <div class="form-group"><label>${L('Default country for numbers')}</label><select id="aCountry">${[['PS', L('Palestine')], ['SA', L('Saudi Arabia')], ['AE', L('United Arab Emirates')], ['KW', L('Kuwait')], ['JO', L('Jordan')]].map(([k, n]) => `<option value="${k}" ${((s.auth && s.auth.country) || 'PS') === k ? 'selected' : ''}>${n}</option>`).join('')}</select></div>
       </div>
       <label class="check-row"><input type="checkbox" id="aOtpExisting" ${s.auth && s.auth.requireOtpForExisting ? 'checked' : ''}> ${L('Ask for a code even for numbers that signed in before (safer)')}</label>
-      <p class="mini-note">${L('With the mobile number method there is no Google sign-in. A known number signs in without a code and its saved name and address are filled in at checkout; anyone who knows a number could see that name and address, so turn the option above on if that matters to you.')}</p>
+      <p class="mini-note">${L('A known number signs in without a code and its saved name and address are filled in at checkout; anyone who knows a number could see that name and address, so turn the option above on if that matters to you.')}</p>
       ${saveBtn('aSave')}`);
   bindImg('gLogo', 512);
   $('aSave').addEventListener('click', () => {
-    s.auth = { ...(s.auth || {}), mode: $('aMode').value, country: $('aCountry').value, requireOtpForExisting: $('aOtpExisting').checked };
+    s.auth = { ...(s.auth || {}), country: $('aCountry').value, requireOtpForExisting: $('aOtpExisting').checked };
     persist(); toast(L('Saved'));
   });
   $('gSave').addEventListener('click', () => {
@@ -790,7 +788,7 @@ function renderGeneral(el) {
 
 /* ===================== Wheel game ===================== */
 const WHEEL_DEFAULT = {
-  enabled: false, title: '', minOrder: 100, goldenEvery: 150, validHours: 48, weeklyBigCap: 10, prizes: []
+  enabled: false, title: '', minOrder: 100, goldenEvery: 150, validHours: 0, weeklyBigCap: 10, prizes: []
 };
 async function renderWheel(el) {
   CONFIG.wheel = Object.assign({}, WHEEL_DEFAULT, CONFIG.wheel || {});
@@ -815,7 +813,7 @@ async function renderWheel(el) {
         <div class="form-group"><label>${L('Title')}</label><input type="text" id="wTitle" maxlength="40" value="${escapeHtml(w.title || '')}" placeholder="${escapeHtml(t('wheel_title'))}"></div>
         <div class="form-group"><label>${L('Minimum order to use a prize')}</label><input type="number" min="0" step="0.001" id="wMin" value="${w.minOrder}"></div>
         <div class="form-group"><label>${L('Golden spin for every purchases of')}</label><input type="number" min="1" step="0.001" id="wGold" value="${w.goldenEvery}"></div>
-        <div class="form-group"><label>${L('Prize valid for (hours)')}</label><input type="number" min="1" id="wHours" value="${w.validHours}"></div>
+        <div class="form-group"><label>${L('Prize valid for (hours, 0 = never expires)')}</label><input type="number" min="0" id="wHours" value="${w.validHours}"></div>
         <div class="form-group"><label>${L('Big prizes per week (cap)')}</label><input type="number" min="0" id="wCap" value="${w.weeklyBigCap}"></div>
       </div>
       <p class="mini-note">${L('Chances are relative numbers: 35, 30, 20 ... are normalised, so they do not have to add up to 100. The result is drawn on the server only.')}</p>
@@ -866,7 +864,7 @@ async function renderWheel(el) {
       if (prizes.some(p => p.type === 'product' && !p.productId)) return toast(L('Choose a product for every product prize'));
       if (!prizes.some(p => p.weight > 0) || !prizes.some(p => p.goldWeight > 0)) return toast(L('At least one prize needs a chance in each spin type'));
     }
-    Object.assign(CONFIG.wheel, { enabled: $('wEnabled').checked, title: $('wTitle').value.trim(), minOrder: Math.max(0, num2($('wMin').value)), goldenEvery: Math.max(1, num2($('wGold').value) || 150), validHours: Math.max(1, Math.floor(num2($('wHours').value) || 48)), weeklyBigCap: Math.max(0, Math.floor(num2($('wCap').value))), prizes });
+    Object.assign(CONFIG.wheel, { enabled: $('wEnabled').checked, title: $('wTitle').value.trim(), minOrder: Math.max(0, num2($('wMin').value)), goldenEvery: Math.max(1, num2($('wGold').value) || 150), validHours: Math.max(0, Math.floor(num2($('wHours').value))), weeklyBigCap: Math.max(0, Math.floor(num2($('wCap').value))), prizes });
     persist(); toast(L('Saved'));
   });
   sums();

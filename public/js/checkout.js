@@ -1,10 +1,7 @@
 /* ===================== Checkout ===================== */
 boot('checkout', async (data) => {
   const user = Auth.user;
-  // Phone sites sign the customer in right here (number + Confirm), so a
-  // visitor without a session still sees the page; Google sites go to /login.
-  const phoneMode = Auth.mode() === 'phone';
-  if (!user && !phoneMode) { location.replace(loginUrl('/checkout')); return; }
+  // The customer signs in right here (number + Confirm), so a visitor without a session still sees the page.
   if (Store.isMultiBranch() && !Store.getSelectedBranch()) { location.replace('/branches'); return; }
   const branchId = Store.ensureBranch();
   const branch = data.branches.find(b => b.id === branchId);
@@ -18,7 +15,7 @@ boot('checkout', async (data) => {
   let orderType = pickupOn ? 'pickup' : 'delivery';
   let me = { name: (user && user.displayName) || '', phone: '', address: '', lifetimePoints: 0, points: 0 };
   if (user) { try { me = { ...me, ...(await Auth.profile(true)) }; } catch (e) { console.error(e); } }
-  let identified = !phoneMode || !!user;   // phone sites: true once the number is confirmed
+  let identified = !!user;   // true once the number is confirmed
   let prizes = [], activePrize = null, prizeOff = false;
 
   document.getElementById('pageTitle').textContent = t('checkout');
@@ -31,12 +28,11 @@ boot('checkout', async (data) => {
     </div>
     ${pickupOn && deliveryOn ? '' : `<p class="mini-note notice">${pickupOn ? t('only_pickup') : t('only_delivery')}</p>`}
     <div class="busy-banner hidden" id="busyBanner"><i data-lucide="clock"></i><span>${t('restaurant_busy')}</span></div>
-    ${phoneMode ? `<div class="card phone-gate" id="phoneGate"></div>` : ''}
+    <div class="card phone-gate" id="phoneGate"></div>
     <form id="checkoutForm" class="${identified ? '' : 'hidden'}" novalidate>
       <div class="card">
         <h3 id="infoTitle"></h3>
         <div class="form-group"><label for="custName">${t('name')} <span class="req">*</span></label><input type="text" id="custName" maxlength="60" autocomplete="name" value="${escapeHtml(me.name)}" required></div>
-        ${phoneMode ? '' : `<div class="form-group"><label for="custPhone">${t('phone')} <span class="req">*</span></label><input type="tel" id="custPhone" dir="ltr" maxlength="20" autocomplete="tel" inputmode="tel" value="${escapeHtml(me.phone)}" required></div>`}
         <div class="form-group delivery-only"><label for="custZone">${t('zone')} <span class="req">*</span></label>
           <select id="custZone">${zones.length ? `<option value="">${t('select_zone')}</option>` + zones.map(z => `<option value="${escapeHtml(z.id)}">${tx(z.name)} — ${fmtMoney(z.price)}</option>`).join('') : `<option value="">${t('no_zones')}</option>`}</select>
         </div>
@@ -188,7 +184,7 @@ boot('checkout', async (data) => {
       });
     }
   }
-  if (phoneMode) showGate();
+  showGate();
   if (identified) loadPrizes();
 
   /* "Busy" mode set by the branch cashier: no new orders until it is off. */
@@ -210,15 +206,12 @@ boot('checkout', async (data) => {
     e.preventDefault();
     errBox.classList.add('hidden');
     const name = document.getElementById('custName').value.trim();
-    const phoneEl = document.getElementById('custPhone');
-    const phone = phoneEl ? phoneEl.value.trim() : (me.phone || '');
     const address = document.getElementById('custAddress').value.trim();
     const notes = document.getElementById('custNotes').value.trim();
     const showErr = msg => { errBox.textContent = msg; errBox.classList.remove('hidden'); errBox.scrollIntoView({ behavior: 'smooth', block: 'center' }); };
     if (busy) return showErr(t('restaurant_busy'));
     if (!name) return showErr(t('name_required'));
     if (!identified) return showErr(t('confirm_phone_first'));
-    if (!phoneMode && !/^\+?[0-9\s().-]{6,24}$/.test(phone)) return showErr(t('phone_invalid'));
     if (orderType === 'delivery') {
       if (!zoneSelect.value) return showErr(t('zone_required'));
       if (address.length < 3) return showErr(t('address_required'));
@@ -233,7 +226,7 @@ boot('checkout', async (data) => {
       const res = await api('/api/orders/create', {
         method: 'POST',
         token: await Auth.token(),
-        body: { ...input(), customer: { name, phone, address, notes } }
+        body: { ...input(), customer: { name, address, notes } }
       });
       Store.saveCart([]);
       Store.clearGiftCart();
@@ -253,7 +246,7 @@ boot('checkout', async (data) => {
     } catch (err) {
       console.error(err);
       btn.disabled = false; btn.classList.remove('loading');
-      if (err.status === 401) { if (phoneMode) { identified = false; formEl.classList.add('hidden'); showGate(); return showErr(t('login_required_to_order')); } location.href = loginUrl('/checkout'); return; }
+      if (err.status === 401) { identified = false; formEl.classList.add('hidden'); showGate(); return showErr(t('login_required_to_order')); }
       showErr(errorText(err.message, err.data || {}));
       if (err.message === 'restaurant_busy') checkBusy();
       if (err.message === 'insufficient_points') { Auth._profile = null; }

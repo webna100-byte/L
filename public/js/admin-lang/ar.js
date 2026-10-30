@@ -173,7 +173,7 @@ Object.assign(window.ADMIN_TR, {
   "Button": "الزر",
   "Background image": "صورة الخلفية",
   "Sign-in card": "بطاقة تسجيل الدخول",
-  "Google button text": "نص زر Google",
+  "Sign-in button text": "نص زر تسجيل الدخول",
   "Categories section": "قسم الفئات",
   "Small line": "سطر صغير",
   "Featured products": "منتجات مميزة",
@@ -348,7 +348,7 @@ Object.assign(window.ADMIN_TR, {
   "Title": "العنوان",
   "Minimum order to use a prize": "الحد الأدنى للطلب لاستخدام الجائزة",
   "Golden spin for every purchases of": "لفّة ذهبية مقابل كل مشتريات بقيمة",
-  "Prize valid for (hours)": "صلاحية الجائزة (بالساعات)",
+  "Prize valid for (hours, 0 = never expires)": "صلاحية الجائزة (بالساعات، 0 = لا تنتهي)",
   "Big prizes per week (cap)": "سقف الجوائز الكبيرة أسبوعيًا",
   "Chances are relative numbers: 35, 30, 20 ... are normalised, so they do not have to add up to 100. The result is drawn on the server only.": "الاحتمالات أرقام نسبية: 35 و30 و20 ... تُحسب تلقائيًا ولا يلزم أن يكون مجموعها 100. النتيجة تُحسب على السيرفر فقط.",
   "Prizes": "الجوائز",
@@ -381,8 +381,6 @@ Object.assign(window.ADMIN_TR, {
   "Wings": "أجنحة",
   "Classic burger": "كلاسيك برغر",
   "Customer sign-in": "تسجيل دخول الزبائن",
-  "Sign-in method": "طريقة الدخول",
-  "Mobile number (one-time code)": "رقم الجوال (رمز لمرة واحدة)",
   "Default country for numbers": "الدولة الافتراضية للأرقام",
   "Palestine": "فلسطين",
   "Saudi Arabia": "السعودية",
@@ -390,5 +388,5 @@ Object.assign(window.ADMIN_TR, {
   "Kuwait": "الكويت",
   "Jordan": "الأردن",
   "Ask for a code even for numbers that signed in before (safer)": "اطلب رمزًا حتى للأرقام التي سجّلت من قبل (أكثر أمانًا)",
-  "With the mobile number method there is no Google sign-in. A known number signs in without a code and its saved name and address are filled in at checkout; anyone who knows a number could see that name and address, so turn the option above on if that matters to you.": "مع طريقة رقم الجوال لا يوجد تسجيل عبر Google. الرقم المعروف يدخل بلا رمز ويُملأ اسمه وعنوانه المحفوظان عند الطلب؛ أي شخص يعرف الرقم يستطيع رؤية الاسم والعنوان، فإن كان ذلك يهمك فعّل الخيار أعلاه."
+  "A known number signs in without a code and its saved name and address are filled in at checkout; anyone who knows a number could see that name and address, so turn the option above on if that matters to you.": "الرقم المعروف يدخل بلا رمز ويُملأ اسمه وعنوانه المحفوظان عند الطلب؛ أي شخص يعرف الرقم يستطيع رؤية الاسم والعنوان، فإن كان ذلك يهمك فعّل الخيار أعلاه."
 });

@@ -53,10 +53,8 @@ boot('home', async (d) => {
           <h2>${tx(login.title) || t('menu_login')}</h2>
           ${tField(login.text) ? `<p>${tx(login.text)}</p>` : ''}
         </div>
-        ${Auth.mode() === 'phone' ? `<a class="btn-primary btn-inline" href="${loginUrl('/')}">${tField(login.button) || t('menu_login')}</a>` : googleButtonHtml(tField(login.button) || t('menu_login'), 'homeGoogleBtn')}
+        <a class="btn-primary btn-inline" href="${loginUrl('/')}">${tField(login.button) || t('menu_login')}</a>
       </div>`;
-    const gb = document.getElementById('homeGoogleBtn');
-    if (gb) gb.addEventListener('click', e => doGoogleSignIn(e.currentTarget, '/'));
   }
   async function renderSignedIn(user) {
     let first = (user.displayName || '').split(' ')[0];

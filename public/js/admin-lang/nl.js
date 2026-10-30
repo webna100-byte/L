@@ -173,7 +173,7 @@ Object.assign(window.ADMIN_TR, {
   "Button": "Knop",
   "Background image": "Achtergrondafbeelding",
   "Sign-in card": "Inlogkaart",
-  "Google button text": "Tekst van de Google-knop",
+  "Sign-in button text": "Tekst van de inlogknop",
   "Categories section": "Categorieënblok",
   "Small line": "Kleine regel",
   "Featured products": "Uitgelichte producten",
@@ -348,7 +348,7 @@ Object.assign(window.ADMIN_TR, {
   "Title": "Titel",
   "Minimum order to use a prize": "Minimumbestelling om een prijs te gebruiken",
   "Golden spin for every purchases of": "Gouden draai voor elke aankoop van",
-  "Prize valid for (hours)": "Prijs geldig voor (uren)",
+  "Prize valid for (hours, 0 = never expires)": "Prijs geldig voor (uren, 0 = verloopt nooit)",
   "Big prizes per week (cap)": "Grote prijzen per week (limiet)",
   "Chances are relative numbers: 35, 30, 20 ... are normalised, so they do not have to add up to 100. The result is drawn on the server only.": "De kansen zijn relatieve getallen: 35, 30, 20 ... worden genormaliseerd en hoeven dus niet op 100 uit te komen. De uitslag wordt alleen op de server getrokken.",
   "Prizes": "Prijzen",
@@ -381,8 +381,6 @@ Object.assign(window.ADMIN_TR, {
   "Wings": "Wings",
   "Classic burger": "Klassieke burger",
   "Customer sign-in": "Inloggen van klanten",
-  "Sign-in method": "Inlogmethode",
-  "Mobile number (one-time code)": "Mobiel nummer (eenmalige code)",
   "Default country for numbers": "Standaardland voor nummers",
   "Palestine": "Palestina",
   "Saudi Arabia": "Saoedi-Arabië",
@@ -390,5 +388,5 @@ Object.assign(window.ADMIN_TR, {
   "Kuwait": "Koeweit",
   "Jordan": "Jordanië",
   "Ask for a code even for numbers that signed in before (safer)": "Ook een code vragen voor nummers die al eerder inloggen (veiliger)",
-  "With the mobile number method there is no Google sign-in. A known number signs in without a code and its saved name and address are filled in at checkout; anyone who knows a number could see that name and address, so turn the option above on if that matters to you.": "Bij de methode met mobiel nummer is er geen Google-login. Een bekend nummer logt in zonder code en de opgeslagen naam en het adres worden bij het afrekenen ingevuld; iedereen die een nummer kent, kan die naam en dat adres zien. Zet de optie hierboven aan als dat voor jou belangrijk is."
+  "A known number signs in without a code and its saved name and address are filled in at checkout; anyone who knows a number could see that name and address, so turn the option above on if that matters to you.": "Een bekend nummer logt in zonder code en de opgeslagen naam en het adres worden bij het afrekenen ingevuld; iedereen die een nummer kent, kan die naam en dat adres zien. Zet de optie hierboven aan als dat voor jou belangrijk is."
 });

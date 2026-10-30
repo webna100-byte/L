@@ -51,7 +51,7 @@ export const onRequestPost = handle(async ({ request, env, waitUntil }) => {
     if (status === 'cancelled' && order.prize && order.prize.code && !prizeRestored) {
       const pz = await fs.get(`prizes/${order.prize.code}`, tx);
       if (pz && pz.data.used === true && pz.data.orderId === orderId) {
-        if (Number(pz.data.expiresAt) > now) writes.push(fs.merge(`prizes/${order.prize.code}`, { used: false, usedAt: 0, orderId: '', orderNumber: 0, orderTotal: 0 }, { mustExist: true }));
+        if (!Number(pz.data.expiresAt) || Number(pz.data.expiresAt) > now) writes.push(fs.merge(`prizes/${order.prize.code}`, { used: false, usedAt: 0, orderId: '', orderNumber: 0, orderTotal: 0 }, { mustExist: true }));
         prizeRestored = true;
       }
     }

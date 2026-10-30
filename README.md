@@ -9,7 +9,7 @@ It all runs on the **free plans** of Cloudflare and Firebase.
 | Website & pages | Cloudflare Pages | `public/` folder |
 | Server (orders, points, cashiers, notifications) | Cloudflare Pages Functions | `functions/` folder |
 | Menu, settings, images, notifications | Cloudflare KV | binding named `STORE` |
-| Customer sign-in (Google) | Firebase Authentication | |
+| Customer sign-in (mobile number + one-time code) | our functions issue Firebase custom tokens | no Google, no SMS bill until you pick a provider |
 | Orders, customer points, cashiers | Cloud Firestore | browsers read only, the server writes |
 | Push notifications (Android / iPhone / desktop) | Firebase Cloud Messaging | |
 
@@ -22,7 +22,7 @@ It all runs on the **free plans** of Cloudflare and Firebase.
 - **Header:** logo, cart, hamburger menu (sign in/out, privacy policy, refund policy).
 - **Bottom bar:** Levels · Gifts · Home · Notifications · My Orders.
 - **Menu:** categories bar (3 styles), product options (sizes with their own price, paid extras, free choices), product discounts, multiple locations.
-- **Sign-in:** Google (default) or **mobile number + one-time code** per site (*Admin › Restaurant Settings › Customer sign-in*, see [Phone sign-in & wheel](#phone-sign-in--wheel)). Browsing and the cart are open to everyone; placing an order needs sign-in.
+- **Sign-in with the mobile number** (one-time code for new numbers, see [Phone sign-in & wheel](#phone-sign-in--wheel)). Browsing and the cart are open to everyone; placing an order needs sign-in.
 - **Levels (Silver → Gold → Diamond)** by lifetime points, each with a permanent discount.
 - **Gifts** redeemed with points; points are deducted in the same transaction that creates the order, so they can never be spent twice.
 - **Discounts:** by order amount (percentage or fixed), on delivery (percentage, fixed or free), minimum delivery order, optional tax.
@@ -49,7 +49,7 @@ When a restaurant buys, give it its own deployment (below) and move its menu wit
 
 ### 1) Firebase (about 15 minutes)
 1. At [console.firebase.google.com](https://console.firebase.google.com) create a project on the free **Spark** plan.
-2. **Authentication › Sign-in method:** enable **Google** only.
+2. **Authentication:** just click *Get started*; no sign-in provider has to be enabled (customers sign in with custom tokens issued by `/api/auth/phone/*`).
 3. **Authentication › Settings › Authorized domains:** add `your-project.pages.dev` and the restaurant's domain.
 4. **Firestore Database › Create database:** production mode, a nearby region (e.g. `eur3` for Europe). In **Rules**, paste `firestore.rules` and **Publish**.
 5. **Project settings › General › Your apps:** add a Web app and copy `apiKey`, `projectId`, `appId`, `messagingSenderId`.
@@ -73,7 +73,6 @@ When a restaurant buys, give it its own deployment (below) and move its menu wit
 | `FIREBASE_CLIENT_EMAIL` | `client_email` from the JSON file |
 | `FIREBASE_PRIVATE_KEY` (Secret) | `private_key` from the JSON file, as is (with `\n`) |
 | `ADMIN_PASSWORD` (Secret) | master password of the admin panel |
-| `FIREBASE_AUTH_DOMAIN` (optional) | the site's own domain — see "Google sign-in on iPhone" |
 
 6. **Deployments › Retry deployment** so the variables apply.
 
@@ -89,17 +88,12 @@ When a restaurant buys, give it its own deployment (below) and move its menu wit
 
 > Write all texts in the website's language. Changing the language later does not translate texts you already typed.
 
-### Google sign-in on iPhone and the installed app
-Safari blocks third-party storage, which can break sign-in when the site is installed on the home screen. Built-in fix:
-1. Set `FIREBASE_AUTH_DOMAIN` to the site's domain (e.g. `rest-name.pages.dev`); `functions/__/auth/[[path]].js` serves the sign-in pages from the same domain.
-2. In [Google Cloud Console › APIs & Services › Credentials](https://console.cloud.google.com/apis/credentials) open "Web client (auto created by Google Service)" and add to **Authorized redirect URIs**: `https://your-domain/__/auth/handler`
-
 ### iPhone notifications
 iOS 16.4+ delivers web push **only after the site is added to the home screen** (an Apple rule). The Notifications page explains the steps to customers automatically. Android and desktop work right away.
 
 ## Phone sign-in & wheel
 
-Per site, in *Admin › Restaurant Settings › Customer sign-in*: **Mobile number (one-time code)** removes Google sign-in completely and makes the phone number the customer's account (orders, points, wheel spins and prizes all belong to it). The default stays Google, so existing sites do not change.
+There is no Google sign-in anywhere: the customer's **mobile number is the account** (orders, points, wheel spins and prizes all belong to it). Default country and the optional stricter mode are in *Admin › Restaurant Settings › Customer sign-in*.
 
 **Checkout order:** pickup/delivery → mobile number + *Confirm* → name, address, summary.
 - *New number:* a 5-digit code (5 minutes, 3 codes per number per hour, 5 wrong guesses) is sent; after it is entered the name/address fields start empty.
@@ -114,9 +108,9 @@ Per site, in *Admin › Restaurant Settings › Customer sign-in*: **Mobile numb
 | `twilio` | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM`, optional `TWILIO_CHANNEL=whatsapp` | SMS or WhatsApp |
 | `webhook` | `OTP_WEBHOOK_URL`, optional `OTP_WEBHOOK_TOKEN`, `OTP_CHANNEL` | POSTs `{to, code, text, channel}` to any gateway |
 
-Also set `OTP_SECRET` (any long random string; codes are stored only as an HMAC). To add a provider, add one function to `PROVIDERS`. `OTP_DEV_ECHO=1` returns the code in the API response (local tests only). For **demo sites** only, `settings.auth.demoShowCode = true` shows the code on screen so a prospect can try the flow; it is ignored on the main site.
+Also set `OTP_SECRET` (any long random string; codes are stored only as an HMAC). To add a provider, add one function to `PROVIDERS`. `OTP_DEV_ECHO=1` returns the code in the API response (local tests only). On **demo sites** (never the main site) the code is also shown on screen so a prospect can try the flow without an SMS provider; set `settings.auth.demoShowCode = false` on a demo to turn that off.
 
-**Wheel** (*Admin › Wheel game*): banner on the home and menu pages, a floating button, one free spin per day per number, a golden spin for every N spent on delivered orders, one-time 48-hour prize codes bound to the number and applied automatically at checkout when the order reaches the minimum, a weekly cap for big prizes, and results. The draw, the entitlement checks and the cap run only in `functions/api/wheel/spin.js` (one Firestore transaction); chances are never sent to browsers. Firestore collections used: `prizes`, `spins`, `meta/wheel_<week>`, and the customer's `users/<id>` (`lastFreeSpinDay`, `goldSpinsUsed`, `lifetimeSpend`).
+**Wheel** (*Admin › Wheel game*): banner on the home and menu pages, a floating button, one free spin per day per number, a golden spin for every N spent on delivered orders, prizes saved on the customer's number (no code to type, no expiry unless you set hours) that are applied automatically at checkout once the order reaches the minimum, a weekly cap for big prizes, and results. The draw, the entitlement checks and the cap run only in `functions/api/wheel/spin.js` (one Firestore transaction); chances are never sent to browsers. Firestore collections used: `prizes`, `spins`, `meta/wheel_<week>`, and the customer's `users/<id>` (`lastFreeSpinDay`, `goldSpinsUsed`, `lifetimeSpend`).
 
 Tests: `node --test tests/phone-wheel.test.mjs` (API, in memory) and `node tests/e2e-phone-wheel.mjs` (real pages in Chromium, Firebase SDK stubbed).
 
@@ -127,7 +121,7 @@ Tests: `node --test tests/phone-wheel.test.mjs` (API, in memory) and `node tests
 | Cloudflare Pages Functions | 100,000 requests/day | a page view ≈ one `/api/site` request, cached at the edge |
 | Cloudflare KV | 100,000 reads, 1,000 writes/day | writes only when the admin saves, uploads an image or sends a notification |
 | Firestore | 50,000 reads, 20,000 writes/day | an order ≈ 3 writes, a status change ≈ 2 |
-| Firebase Auth (Google) | no practical limit | |
+| Firebase Auth (custom tokens) | no practical limit | |
 | FCM | free | a broadcast = one request per site (topics) |
 
 Images are compressed to WebP in the browser before upload and served with a one-year cache.

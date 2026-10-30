@@ -1,5 +1,4 @@
-/* POST /api/orders/create (signed-in customers only: Google or, on phone
-   sites, a verified phone number)
+/* POST /api/orders/create (signed-in customers only: a verified phone number)
    Body: { branchId, type, zoneId, items:[{productId, qty, selections, notes}],
            gifts:[{giftId, qty}], prizeCode?, customer:{name, phone, address, notes} }
 
@@ -10,8 +9,7 @@
    requests, a gift kept in an old cart...). */
 import '../../../public/js/pricing.js';
 import { json, fail, handle, readJson, authUser, loadConfig } from '../../_lib/http.js';
-import { authSettings, customerAllowed } from '../../_lib/customer.js';
-import { normalizePhone } from '../../_lib/phone.js';
+import { customerAllowed } from '../../_lib/customer.js';
 import { prizeActive } from '../../_lib/wheel.js';
 import { Firestore } from '../../_lib/firestore.js';
 import { dayKey, orderId } from '../../_lib/orders.js';
@@ -26,18 +24,17 @@ export const onRequestPost = handle(async ({ request, env }) => {
   const user = await authUser(request, env);
   const config = await loadConfig(env, site);
   if (!config) return fail(503, 'not_configured');
-  if (!customerAllowed(user, config, site)) return fail(401, 'login_required');
-  const auth = authSettings(config);
+  if (!customerAllowed(user, site)) return fail(401, 'login_required');
 
   const body = await readJson(request, 100000);
   const customer = body.customer || {};
   const name = str(customer.name, 60);
-  // On phone sites the number is the verified account: it cannot be changed here.
-  const phone = auth.mode === 'phone' ? user.ph : (normalizePhone(customer.phone, auth.country) || str(customer.phone, 24));
+  // The number is the verified account: whatever the browser sends here is ignored.
+  const phone = user.ph;
   const address = str(customer.address, 300);
   const notes = str(customer.notes, 500);
   if (!name) return fail(400, 'name_required');
-  if (auth.mode !== 'phone' && !/^\+?[0-9\s().-]{6,24}$/.test(phone)) return fail(400, 'phone_invalid');
+  if (!phone) return fail(401, 'login_required');
   if (body.type === 'delivery' && address.length < 3) return fail(400, 'address_required');
   const prizeCode = /^[A-Z0-9]{6,12}$/.test(String(body.prizeCode || '')) ? String(body.prizeCode) : '';
   const branchKey = str(body.branchId, 80);
@@ -65,7 +62,7 @@ export const onRequestPost = handle(async ({ request, env }) => {
       const order = {
         number,
         uid: user.uid,
-        customer: { name, phone, email: user.email || '' },
+        customer: { name, phone },
         prize: quote.prize ? { code: prizeCode, label: quote.prize.label, type: quote.prize.type, discount: quote.prizeDiscount } : null,
         address: quote.type === 'delivery' ? address : '',
         notes,
@@ -96,8 +93,8 @@ export const onRequestPost = handle(async ({ request, env }) => {
         day: dayKey(now, config.settings.timezone),
         createdAt: new Date(now)
       };
-      // Phone sites keep the latest name/address the customer typed; Google sites keep the first name.
-      const profile = { name: auth.mode === 'phone' ? name : (u.name || name), email: user.email || '', phone, updatedAt: now };
+      // The saved name and address are always the latest ones the customer typed.
+      const profile = { name, phone, updatedAt: now };
       if (quote.type === 'delivery') profile.address = address;
       if (!userDoc) Object.assign(profile, { points: 0, lifetimePoints: 0, createdAt: now });
       const writes = [

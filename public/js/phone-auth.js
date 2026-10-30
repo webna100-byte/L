@@ -1,6 +1,6 @@
 /* ===================== Phone sign-in (customers) =====================
-   Sites with settings.auth.mode = 'phone' have NO Google sign-in: the
-   customer's mobile number is the account. The flow, everywhere it appears:
+   The customer's mobile number is the account (there is no other sign-in).
+   The flow, everywhere it appears:
      1. type the number and press "Confirm"
      2. a number we have seen before signs in at once (no message) and the
         saved name/address are handed back to be pre-filled
@@ -19,7 +19,7 @@ Object.assign(I18N.en, {
   wheel_next_day: 'Your next free spin is tomorrow.', wheel_login: 'Sign in to spin the wheel', wheel_won: 'Congratulations! You won', wheel_code: 'Prize code',
   wheel_valid_until: 'Valid until {date}', wheel_min_order: 'On orders of {amount} or more', wheel_use_now: 'Use it now', wheel_share: 'Share your win',
   wheel_my_prizes: 'My prizes', wheel_none: 'No prizes yet', wheel_golden_hint: 'You earn a golden spin for every {amount} you spend.', wheel_error: 'The spin failed. Please try again.',
-  no_spin_available: 'No spin available right now.', wheel_sound: 'Sound', wheel_spinning: 'Spinning…', wheel_share_failed: 'Could not create the image.'
+  wheel_auto: 'Applied automatically on your next order', wheel_auto_min: 'Applied automatically on orders of {amount} or more', no_spin_available: 'No spin available right now.', wheel_sound: 'Sound', wheel_spinning: 'Spinning…', wheel_share_failed: 'Could not create the image.'
 });
 Object.assign(I18N.ar, {
   phone_label: 'رقم الجوال', phone_ph: '059 123 4567', confirm: 'تأكيد', otp_label: 'رمز التحقق',
@@ -33,11 +33,10 @@ Object.assign(I18N.ar, {
   wheel_next_day: 'لفّتك المجانية القادمة غدًا.', wheel_login: 'سجّل دخولك لتلف العجلة', wheel_won: 'مبروك! ربحت', wheel_code: 'كود الجائزة',
   wheel_valid_until: 'صالحة حتى {date}', wheel_min_order: 'عند طلب بقيمة {amount} أو أكثر', wheel_use_now: 'استخدمها الآن', wheel_share: 'شارك نتيجتك',
   wheel_my_prizes: 'جوائزي', wheel_none: 'لا توجد جوائز حاليًا', wheel_golden_hint: 'تحصل على لفّة ذهبية مقابل كل {amount} مشتريات.', wheel_error: 'تعذّرت اللفّة، حاول مرة أخرى.',
-  no_spin_available: 'لا توجد لفّة متاحة الآن.', wheel_sound: 'الصوت', wheel_spinning: 'تدور العجلة…', wheel_share_failed: 'تعذّر إنشاء الصورة.'
+  wheel_auto: 'تُطبَّق تلقائيًا على طلبك القادم', wheel_auto_min: 'تُطبَّق تلقائيًا عند طلب بقيمة {amount} أو أكثر', no_spin_available: 'لا توجد لفّة متاحة الآن.', wheel_sound: 'الصوت', wheel_spinning: 'تدور العجلة…', wheel_share_failed: 'تعذّر إنشاء الصورة.'
 });
 
 Object.assign(Auth, {
-  mode() { const a = Store.data && Store.data.settings && Store.data.settings.auth; return a && a.mode === 'phone' ? 'phone' : 'google'; },
   phoneLookup(phone) { return api('/api/auth/phone/lookup', { method: 'POST', body: { phone } }); },
   phoneVerify(phone, code) { return api('/api/auth/phone/verify', { method: 'POST', body: { phone, code } }); },
   async signInWithToken(token, phone) {
@@ -145,17 +144,9 @@ const PhoneLogin = {
   }
 };
 
-/* One sign-in block for every page: phone box on phone sites, the Google
-   button elsewhere. `bindSignIn(root, next)` wires it. */
-function signInBlockHtml(label, id = 'googleBtn') {
-  return Auth.mode() === 'phone' ? `<div class="phone-login-host" data-phone-host></div>` : googleButtonHtml(label, id);
-}
-function bindSignIn(root, { next = '/', id = 'googleBtn' } = {}) {
-  if (Auth.mode() === 'phone') {
-    const host = root.querySelector('[data-phone-host]');
-    if (host) PhoneLogin.mount(host, { onDone: () => { toast(t('logged_in')); location.href = next; } });
-  } else {
-    const b = root.querySelector('#' + id);
-    if (b) b.addEventListener('click', e => doGoogleSignIn(e.currentTarget, next));
-  }
+/* The sign-in block used on /login and inside the wheel. */
+function signInBlockHtml() { return `<div class="phone-login-host" data-phone-host></div>`; }
+function bindSignIn(root, { next = '/', compact = false } = {}) {
+  const host = root.querySelector('[data-phone-host]');
+  if (host) PhoneLogin.mount(host, { compact, onDone: () => { toast(t('logged_in')); location.href = next; } });
 }

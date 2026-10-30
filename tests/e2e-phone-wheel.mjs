@@ -16,11 +16,11 @@ const seed = JSON.parse(fs.readFileSync(new URL('../public/seed/demo-config.json
 const config = globalThis.localizeConfig(seed, 'ar');
 config.version = 1;
 config.settings.lang = 'ar'; delete config.settings.defaultLang;
-config.settings.auth = { mode: 'phone', country: 'PS' };
+config.settings.auth = { country: 'PS' };
 config.settings.timezone = 'Asia/Hebron';
 config.settings.currency = 'ILS';
 config.settings.multiBranch = false;
-config.wheel = { enabled: true, title: 'لف العجلة واربح!', minOrder: 20, goldenEvery: 30, validHours: 48, weeklyBigCap: 10, prizes: [
+config.wheel = { enabled: true, title: 'لف العجلة واربح!', minOrder: 20, goldenEvery: 30, validHours: 0, weeklyBigCap: 10, prizes: [
   { id: 'drink', label: 'مشروب', type: 'product', productId: 'prod_cola', weight: 1, goldWeight: 0, big: false },
   { id: 'lemon', label: 'ليموناضة', type: 'product', productId: 'prod_lemonade', weight: 1, goldWeight: 1, big: false },
   { id: 'd10', label: 'خصم 10%', type: 'percent', value: 10, weight: 1, goldWeight: 1, big: false },
@@ -61,7 +61,7 @@ try {
   });
   await step('wheel opens; signed out it asks for the number (no Google button)', async () => {
     await A.page.click('#wheelFab'); await A.page.waitForSelector('#wheelOverlay.open #plPhone');
-    assert.equal(await A.page.locator('.btn-google').count(), 0);
+    assert.equal(await A.page.locator('.btn-google, [id*=oogle]').count(), 0);
     await shot(A.page, '03-wheel-login');
   });
   await step('new number: confirm -> code box -> wrong code rejected -> right code signs in', async () => {
@@ -81,8 +81,8 @@ try {
     await A.page.click('.wheel-spin[data-kind="free"]');
     await A.page.waitForSelector('#wheelResult:not(.hidden) .wheel-won', { timeout: 15000 });
     prizeLabel = await A.page.textContent('.wheel-won strong');
-    const code = (await A.page.textContent('.wheel-code b')).trim();
-    assert.match(code, /^[A-Z2-9]{8}$/);
+    assert.equal(await A.page.locator('.wheel-code').count(), 0, 'no code is shown to the customer');
+    assert.match(await A.page.textContent('.wheel-won'), /تلقائي/);
     await shot(A.page, '06-wheel-won');
     await A.page.waitForSelector('#wheelActions .wheel-wait');
     assert.equal(await A.page.locator('.wheel-spin[data-kind="free"]').count(), 0);
@@ -188,7 +188,7 @@ try {
     assert.equal(await E.page.locator('.wheel-row').count(), 5);
     await E.page.waitForSelector('.stat-grid');
     await shot(E.page, '13-admin-wheel');
-    await E.page.click('[data-key="general"]'); await E.page.waitForSelector('#aMode'); await shot(E.page, '14-admin-signin');
+    await E.page.click('[data-key="general"]'); await E.page.waitForSelector('#aCountry'); await shot(E.page, '14-admin-signin');
   });
   await E.ctx.close();
   assert.deepEqual(errors, [], 'no browser errors: ' + errors.join('\n'));

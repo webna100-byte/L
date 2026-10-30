@@ -15,7 +15,6 @@ export const onRequestPost = handle(async ({ request, env }) => {
   const config = await loadConfig(env, site);
   if (!config) return fail(404, 'site_not_found');
   const auth = authSettings(config);
-  if (auth.mode !== 'phone') return fail(400, 'phone_login_disabled');
   const { phone: raw, code } = await readJson(request, 2000);
   const phone = normalizePhone(raw, auth.country);
   if (!phone) return fail(400, 'phone_invalid');

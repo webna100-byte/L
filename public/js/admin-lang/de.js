@@ -173,7 +173,7 @@ Object.assign(window.ADMIN_TR, {
   "Button": "Button",
   "Background image": "Hintergrundbild",
   "Sign-in card": "Anmeldekarte",
-  "Google button text": "Text des Google-Buttons",
+  "Sign-in button text": "Text des Anmelde-Buttons",
   "Categories section": "Kategorien-Bereich",
   "Small line": "Kleine Zeile",
   "Featured products": "Empfohlene Produkte",
@@ -348,7 +348,7 @@ Object.assign(window.ADMIN_TR, {
   "Title": "Titel",
   "Minimum order to use a prize": "Mindestbestellwert für einen Gewinn",
   "Golden spin for every purchases of": "Goldener Dreh pro Einkauf von",
-  "Prize valid for (hours)": "Gewinn gültig für (Stunden)",
+  "Prize valid for (hours, 0 = never expires)": "Gewinn gültig für (Stunden, 0 = läuft nie ab)",
   "Big prizes per week (cap)": "Große Gewinne pro Woche (Limit)",
   "Chances are relative numbers: 35, 30, 20 ... are normalised, so they do not have to add up to 100. The result is drawn on the server only.": "Die Chancen sind relative Zahlen: 35, 30, 20 ... werden normalisiert und müssen nicht 100 ergeben. Das Ergebnis wird nur auf dem Server gezogen.",
   "Prizes": "Gewinne",
@@ -381,8 +381,6 @@ Object.assign(window.ADMIN_TR, {
   "Wings": "Wings",
   "Classic burger": "Klassischer Burger",
   "Customer sign-in": "Kunden-Anmeldung",
-  "Sign-in method": "Anmeldemethode",
-  "Mobile number (one-time code)": "Handynummer (Einmalcode)",
   "Default country for numbers": "Standardland für Nummern",
   "Palestine": "Palästina",
   "Saudi Arabia": "Saudi-Arabien",
@@ -390,5 +388,5 @@ Object.assign(window.ADMIN_TR, {
   "Kuwait": "Kuwait",
   "Jordan": "Jordanien",
   "Ask for a code even for numbers that signed in before (safer)": "Auch bei bereits angemeldeten Nummern einen Code verlangen (sicherer)",
-  "With the mobile number method there is no Google sign-in. A known number signs in without a code and its saved name and address are filled in at checkout; anyone who knows a number could see that name and address, so turn the option above on if that matters to you.": "Bei der Anmeldung per Handynummer gibt es kein Google-Login. Eine bekannte Nummer meldet sich ohne Code an und ihr gespeicherter Name und ihre Adresse werden beim Bestellen vorausgefüllt; wer eine Nummer kennt, könnte diesen Namen und diese Adresse sehen. Aktiviere die Option oben, wenn dir das wichtig ist."
+  "A known number signs in without a code and its saved name and address are filled in at checkout; anyone who knows a number could see that name and address, so turn the option above on if that matters to you.": "Eine bekannte Nummer meldet sich ohne Code an und ihr gespeicherter Name und ihre Adresse werden beim Bestellen vorausgefüllt; wer eine Nummer kennt, könnte diesen Namen und diese Adresse sehen. Aktiviere die Option oben, wenn dir das wichtig ist."
 });

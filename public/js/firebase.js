@@ -1,7 +1,7 @@
 /* ===================== Firebase (loaded on demand) =====================
    Firebase JS modules are imported from Google's CDN only when needed, so
    simple pages stay light. Two independent app instances:
-     - default: customers (Google sign-in only)
+     - default: customers (signed in by mobile number: custom tokens from our API)
      - 'staff': admin / cashier (custom tokens from our API), so a staff
        login on a shared device never replaces a customer's session.
 ========================================================================= */
@@ -81,7 +81,6 @@ const Auth = {
     (async () => {
       try {
         const { m, auth } = await FB.auth();
-        try { await m.getRedirectResult(auth); } catch (e) { console.warn(e); }
         m.onAuthStateChanged(auth, user => {
           this.user = user;
           this.resolved = true;
@@ -101,23 +100,6 @@ const Auth = {
   },
 
   onChange(fn) { this._listeners.push(fn); },
-
-  async signIn() {
-    const { m, auth } = await FB.auth();
-    const provider = new m.GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: 'select_account' });
-    const standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
-    if (standalone) return m.signInWithRedirect(auth, provider);
-    try {
-      return await m.signInWithPopup(auth, provider);
-    } catch (e) {
-      if (['auth/popup-blocked', 'auth/operation-not-supported-in-this-environment', 'auth/web-storage-unsupported'].includes(e.code)) {
-        return m.signInWithRedirect(auth, provider);
-      }
-      if (e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request') return null;
-      throw e;
-    }
-  },
 
   async signOut() {
     const { m, auth } = await FB.auth();

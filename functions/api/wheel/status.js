@@ -12,14 +12,14 @@ export async function activePrizes(fs, uid, now) {
     where: { compositeFilter: { op: 'AND', filters: [where('uid', 'EQUAL', uid), where('used', 'EQUAL', false)] } },
     limit: 50
   });
-  return rows.map(r => r.data).filter(p => prizeActive(p, now)).sort((a, b) => a.expiresAt - b.expiresAt);
+  return rows.map(r => r.data).filter(p => prizeActive(p, now)).sort((a, b) => a.issuedAt - b.issuedAt);   // oldest first
 }
 
 export const onRequestGet = handle(async ({ request, env }) => {
   const site = siteOf(request);
   const config = await loadConfig(env, site);
   const user = await authUser(request, env);
-  if (!config || !customerAllowed(user, config, site)) return fail(401, 'login_required');
+  if (!config || !customerAllowed(user, site)) return fail(401, 'login_required');
   const wheel = wheelSettings(config);
   if (!wheel.enabled) return json({ enabled: false });
   const fs = new Firestore(env, site);

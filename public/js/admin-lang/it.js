@@ -173,7 +173,7 @@ Object.assign(window.ADMIN_TR, {
   "Button": "Pulsante",
   "Background image": "Immagine di sfondo",
   "Sign-in card": "Scheda di accesso",
-  "Google button text": "Testo del pulsante Google",
+  "Sign-in button text": "Testo del pulsante di accesso",
   "Categories section": "Sezione categorie",
   "Small line": "Riga piccola",
   "Featured products": "Prodotti in evidenza",
@@ -348,7 +348,7 @@ Object.assign(window.ADMIN_TR, {
   "Title": "Titolo",
   "Minimum order to use a prize": "Ordine minimo per usare un premio",
   "Golden spin for every purchases of": "Giro dorato ogni acquisto accumulato di",
-  "Prize valid for (hours)": "Validità del premio (ore)",
+  "Prize valid for (hours, 0 = never expires)": "Validità del premio (ore, 0 = non scade mai)",
   "Big prizes per week (cap)": "Premi grandi a settimana (limite)",
   "Chances are relative numbers: 35, 30, 20 ... are normalised, so they do not have to add up to 100. The result is drawn on the server only.": "Le probabilità sono numeri relativi: 35, 30, 20 ... vengono normalizzati, quindi non devono sommare 100. Il risultato viene estratto solo sul server.",
   "Prizes": "Premi",
@@ -381,8 +381,6 @@ Object.assign(window.ADMIN_TR, {
   "Wings": "Alette",
   "Classic burger": "Burger classico",
   "Customer sign-in": "Accesso dei clienti",
-  "Sign-in method": "Metodo di accesso",
-  "Mobile number (one-time code)": "Numero di cellulare (codice monouso)",
   "Default country for numbers": "Paese predefinito dei numeri",
   "Palestine": "Palestina",
   "Saudi Arabia": "Arabia Saudita",
@@ -390,5 +388,5 @@ Object.assign(window.ADMIN_TR, {
   "Kuwait": "Kuwait",
   "Jordan": "Giordania",
   "Ask for a code even for numbers that signed in before (safer)": "Chiedi un codice anche per i numeri che hanno già effettuato l'accesso (più sicuro)",
-  "With the mobile number method there is no Google sign-in. A known number signs in without a code and its saved name and address are filled in at checkout; anyone who knows a number could see that name and address, so turn the option above on if that matters to you.": "Con il metodo del numero di cellulare non c'è l'accesso con Google. Un numero già noto entra senza codice e il suo nome e indirizzo salvati vengono precompilati all'ordine; chiunque conosca un numero potrebbe vedere quel nome e indirizzo, quindi attiva l'opzione qui sopra se ti interessa."
+  "A known number signs in without a code and its saved name and address are filled in at checkout; anyone who knows a number could see that name and address, so turn the option above on if that matters to you.": "Un numero già noto entra senza codice e il suo nome e indirizzo salvati vengono precompilati all'ordine; chiunque conosca un numero potrebbe vedere quel nome e indirizzo, quindi attiva l'opzione qui sopra se ti interessa."
 });

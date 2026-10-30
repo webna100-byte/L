@@ -173,7 +173,7 @@ Object.assign(window.ADMIN_TR, {
   "Button": "Bouton",
   "Background image": "Image de fond",
   "Sign-in card": "Carte de connexion",
-  "Google button text": "Texte du bouton Google",
+  "Sign-in button text": "Texte du bouton de connexion",
   "Categories section": "Section des catégories",
   "Small line": "Petite ligne",
   "Featured products": "Produits mis en avant",
@@ -348,7 +348,7 @@ Object.assign(window.ADMIN_TR, {
   "Title": "Titre",
   "Minimum order to use a prize": "Commande minimale pour utiliser un lot",
   "Golden spin for every purchases of": "Tour doré pour chaque tranche d'achats de",
-  "Prize valid for (hours)": "Validité du lot (heures)",
+  "Prize valid for (hours, 0 = never expires)": "Validité du lot (heures, 0 = n'expire jamais)",
   "Big prizes per week (cap)": "Gros lots par semaine (plafond)",
   "Chances are relative numbers: 35, 30, 20 ... are normalised, so they do not have to add up to 100. The result is drawn on the server only.": "Les chances sont des nombres relatifs : 35, 30, 20 ... sont normalisés, ils n'ont donc pas à totaliser 100. Le résultat est tiré uniquement sur le serveur.",
   "Prizes": "Lots",
@@ -381,8 +381,6 @@ Object.assign(window.ADMIN_TR, {
   "Wings": "Ailes de poulet",
   "Classic burger": "Burger classique",
   "Customer sign-in": "Connexion des clients",
-  "Sign-in method": "Méthode de connexion",
-  "Mobile number (one-time code)": "Numéro de mobile (code à usage unique)",
   "Default country for numbers": "Pays par défaut des numéros",
   "Palestine": "Palestine",
   "Saudi Arabia": "Arabie saoudite",
@@ -390,5 +388,5 @@ Object.assign(window.ADMIN_TR, {
   "Kuwait": "Koweït",
   "Jordan": "Jordanie",
   "Ask for a code even for numbers that signed in before (safer)": "Demander un code même aux numéros déjà connectés (plus sûr)",
-  "With the mobile number method there is no Google sign-in. A known number signs in without a code and its saved name and address are filled in at checkout; anyone who knows a number could see that name and address, so turn the option above on if that matters to you.": "Avec la méthode par numéro de mobile, il n'y a pas de connexion Google. Un numéro connu se connecte sans code et son nom et son adresse enregistrés sont préremplis à la commande ; toute personne connaissant un numéro pourrait voir ce nom et cette adresse, activez donc l'option ci-dessus si cela compte pour vous."
+  "A known number signs in without a code and its saved name and address are filled in at checkout; anyone who knows a number could see that name and address, so turn the option above on if that matters to you.": "Un numéro connu se connecte sans code et son nom et son adresse enregistrés sont préremplis à la commande ; toute personne connaissant un numéro pourrait voir ce nom et cette adresse, activez donc l'option ci-dessus si cela compte pour vous."
 });

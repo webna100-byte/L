@@ -102,13 +102,8 @@ const Wheel = {
   },
 
   renderLogin(box) {
-    box.innerHTML = `<p class="wheel-login-note">${escapeHtml(t('wheel_login'))}</p>${signInBlockHtml(t('menu_login'), 'wheelGoogleBtn')}`;
-    if (Auth.mode() === 'phone') {
-      PhoneLogin.mount(box.querySelector('[data-phone-host]'), { compact: true, onDone: () => this.refresh() });
-    } else {
-      const b = box.querySelector('#wheelGoogleBtn');
-      if (b) b.addEventListener('click', () => doGoogleSignIn(b, location.pathname + '?wheel=1'));
-    }
+    box.innerHTML = `<p class="wheel-login-note">${escapeHtml(t('wheel_login'))}</p>${signInBlockHtml()}`;
+    PhoneLogin.mount(box.querySelector('[data-phone-host]'), { compact: true, onDone: () => this.refresh() });
   },
   renderActions(box) {
     const st = this.st;
@@ -126,8 +121,14 @@ const Wheel = {
     if (!el) return;
     el.innerHTML = list.length ? `<h3>${t('wheel_my_prizes')}</h3>` + list.map(p => `
       <div class="wheel-prize-row"><div><strong>${escapeHtml(p.label)}</strong>
-        <small>${escapeHtml(t('wheel_code'))}: <b dir="ltr">${escapeHtml(p.code)}</b> · ${escapeHtml(t('wheel_valid_until', { date: this.fmtDate(p.expiresAt) }))}</small>
-        ${p.minOrder ? `<small>${escapeHtml(t('wheel_min_order', { amount: fmtMoney(p.minOrder) }))}</small>` : ''}</div></div>`).join('') : '';
+        <small>${escapeHtml(this.prizeNote(p))}</small></div></div>`).join('') : '';
+  },
+  /* "Applied automatically on orders of 100 ₪ or more" (+ the end date only when prizes expire). */
+  prizeNote(p) {
+    const min = Number(p.minOrder) || 0;
+    const parts = [min ? t('wheel_auto_min', { amount: fmtMoney(min) }) : t('wheel_auto')];
+    if (Number(p.expiresAt) > 0) parts.push(t('wheel_valid_until', { date: this.fmtDate(p.expiresAt) }));
+    return parts.join(' · ');
   },
   fmtDate(ms) { try { return new Date(ms).toLocaleString(langLocale(), { weekday: 'short', hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'short' }); } catch (e) { return new Date(ms).toLocaleString(); } },
 
@@ -248,13 +249,11 @@ const Wheel = {
   /* ---------- result ---------- */
   celebrate(prize) {
     const el = document.getElementById('wheelResult');
-    const min = Number(prize.minOrder) || 0;
     el.innerHTML = `
       <div class="wheel-won">
         <small>${escapeHtml(t('wheel_won'))}</small>
         <strong>${escapeHtml(prize.label)}</strong>
-        <span class="wheel-code">${escapeHtml(t('wheel_code'))}: <b dir="ltr">${escapeHtml(prize.code)}</b></span>
-        <small>${escapeHtml(t('wheel_valid_until', { date: this.fmtDate(prize.expiresAt) }))}${min ? ' · ' + escapeHtml(t('wheel_min_order', { amount: fmtMoney(min) })) : ''}</small>
+        <small>${escapeHtml(this.prizeNote(prize))}</small>
         <div class="wheel-won-actions">
           <a class="btn-primary btn-inline" href="${menuUrl()}">${escapeHtml(t('wheel_use_now'))}</a>
           <button type="button" class="btn-secondary-ghost" id="wheelShare">${escapeHtml(t('wheel_share'))}</button>

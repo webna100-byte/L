@@ -12,7 +12,7 @@
    big         = counts against the weekly cap of big prizes */
 import { dayKey } from './orders.js';
 
-export const WHEEL_DEFAULTS = { minOrder: 100, goldenEvery: 150, validHours: 48, weeklyBigCap: 10 };
+export const WHEEL_DEFAULTS = { minOrder: 100, goldenEvery: 150, validHours: 0, weeklyBigCap: 10 };
 const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
 export function wheelSettings(config) {
@@ -23,7 +23,7 @@ export function wheelSettings(config) {
     title: w.title || '',
     minOrder: num(w.minOrder, WHEEL_DEFAULTS.minOrder),
     goldenEvery: num(w.goldenEvery, WHEEL_DEFAULTS.goldenEvery, 1),
-    validHours: num(w.validHours, WHEEL_DEFAULTS.validHours, 1),
+    validHours: num(w.validHours, WHEEL_DEFAULTS.validHours, 0),   // 0 = the prize never expires
     weeklyBigCap: num(w.weeklyBigCap, WHEEL_DEFAULTS.weeklyBigCap),
     prizes: Array.isArray(w.prizes) ? w.prizes : []
   };
@@ -113,9 +113,10 @@ export function prizeRecord(def, { uid, phone, kind, code, now, wheel }) {
     big: !!def.big,
     minOrder: wheel.minOrder,
     issuedAt: now,
-    expiresAt: now + wheel.validHours * 3600 * 1000,
+    expiresAt: wheel.validHours > 0 ? now + wheel.validHours * 3600 * 1000 : 0,
     used: false
   };
 }
 
-export const prizeActive = (p, now) => !!p && p.used !== true && Number(p.expiresAt) > now;
+/* expiresAt 0 = no expiry: the prize stays on the customer's number until it is used. */
+export const prizeActive = (p, now) => !!p && p.used !== true && (!Number(p.expiresAt) || Number(p.expiresAt) > now);

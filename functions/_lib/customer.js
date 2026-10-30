@@ -1,4 +1,4 @@
-/* Phone-mode customers. The phone number IS the account: a stable customer
+/* Customers. The phone number IS the account: a stable customer
    id is derived from (site, phone), so orders, points, wheel spins and
    prizes of one number always belong together. The browser signs in to
    Firebase with a custom token carrying { customer: true, site, ph }. */
@@ -19,20 +19,17 @@ export async function issueCustomerToken(env, site, phone, uid) {
 export function authSettings(config) {
   const a = (config && config.settings && config.settings.auth) || {};
   return {
-    mode: a.mode === 'phone' ? 'phone' : 'google',
     country: ['PS', 'SA', 'AE', 'KW', 'JO'].includes(a.country) ? a.country : 'PS',
     requireOtpForExisting: a.requireOtpForExisting === true,
     otpLength: [4, 5, 6].includes(Number(a.otpLength)) ? Number(a.otpLength) : 5,
-    // Demo sites only (never the main site): show the code on screen so a prospect can try the flow without an SMS provider.
-    demoShowCode: a.demoShowCode === true
+    // Demo sites only (never the main site): the code is also shown on screen so a prospect can try the
+    // flow without an SMS provider. Set demoShowCode to false on a demo to behave like a real site.
+    demoShowCode: a.demoShowCode !== false
   };
 }
 
-/* May this signed-in user act as a customer of this site? Phone sites accept
-   phone customers only; Google sites accept Google customers only. */
-export function customerAllowed(user, config, site = '') {
-  if (!user || user.role) return false;
-  const phoneMode = authSettings(config).mode === 'phone';
-  if (user.customer === true) return phoneMode && (user.site || '') === (site || '');
-  return !phoneMode && !!user.firebase && user.firebase.sign_in_provider === 'google.com';
+/* May this signed-in user act as a customer of this site? Only phone customers
+   of this very site (their token carries customer: true and the site). */
+export function customerAllowed(user, site = '') {
+  return !!user && !user.role && user.customer === true && (user.site || '') === (site || '');
 }

@@ -173,7 +173,7 @@ Object.assign(window.ADMIN_TR, {
   "Button": "Botão",
   "Background image": "Imagem de fundo",
   "Sign-in card": "Cartão de início de sessão",
-  "Google button text": "Texto do botão Google",
+  "Sign-in button text": "Texto do botão de início de sessão",
   "Categories section": "Secção de categorias",
   "Small line": "Linha pequena",
   "Featured products": "Produtos em destaque",
@@ -348,7 +348,7 @@ Object.assign(window.ADMIN_TR, {
   "Title": "Título",
   "Minimum order to use a prize": "Pedido mínimo para usar um prémio",
   "Golden spin for every purchases of": "Rodada dourada por cada compra acumulada de",
-  "Prize valid for (hours)": "Validade do prémio (horas)",
+  "Prize valid for (hours, 0 = never expires)": "Validade do prémio (horas, 0 = nunca expira)",
   "Big prizes per week (cap)": "Prémios grandes por semana (limite)",
   "Chances are relative numbers: 35, 30, 20 ... are normalised, so they do not have to add up to 100. The result is drawn on the server only.": "As probabilidades são números relativos: 35, 30, 20 ... são normalizados, por isso não precisam de somar 100. O resultado é sorteado apenas no servidor.",
   "Prizes": "Prémios",
@@ -381,8 +381,6 @@ Object.assign(window.ADMIN_TR, {
   "Wings": "Asinhas",
   "Classic burger": "Hambúrguer clássico",
   "Customer sign-in": "Início de sessão dos clientes",
-  "Sign-in method": "Método de início de sessão",
-  "Mobile number (one-time code)": "Número de telemóvel (código de uso único)",
   "Default country for numbers": "País predefinido dos números",
   "Palestine": "Palestina",
   "Saudi Arabia": "Arábia Saudita",
@@ -390,5 +388,5 @@ Object.assign(window.ADMIN_TR, {
   "Kuwait": "Kuwait",
   "Jordan": "Jordânia",
   "Ask for a code even for numbers that signed in before (safer)": "Pedir um código mesmo aos números que já iniciaram sessão (mais seguro)",
-  "With the mobile number method there is no Google sign-in. A known number signs in without a code and its saved name and address are filled in at checkout; anyone who knows a number could see that name and address, so turn the option above on if that matters to you.": "Com o método do número de telemóvel não existe início de sessão com Google. Um número já conhecido entra sem código e o nome e a morada guardados são preenchidos ao finalizar o pedido; qualquer pessoa que conheça um número poderia ver esse nome e morada, por isso ative a opção acima se isso for importante para si."
+  "A known number signs in without a code and its saved name and address are filled in at checkout; anyone who knows a number could see that name and address, so turn the option above on if that matters to you.": "Um número já conhecido entra sem código e o nome e a morada guardados são preenchidos ao finalizar o pedido; qualquer pessoa que conheça um número poderia ver esse nome e morada, por isso ative a opção acima se isso for importante para si."
 });
