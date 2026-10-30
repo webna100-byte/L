@@ -385,5 +385,19 @@ Object.assign(window.ADMIN_TR, {
   "Ask for a code even for numbers that signed in before (safer)": "Ook een code vragen voor nummers die al eerder inloggen (veiliger)",
   "A known number signs in without a code and its saved name and address are filled in at checkout; anyone who knows a number could see that name and address, so turn the option above on if that matters to you.": "Een bekend nummer logt in zonder code en de opgeslagen naam en het adres worden bij het afrekenen ingevuld; iedereen die een nummer kent, kan die naam en dat adres zien. Zet de optie hierboven aan als dat voor jou belangrijk is.",
   "At least one prize needs a chance": "Minstens één prijs heeft een kans nodig",
-  "Chance": "Kans"
+  "Chance": "Kans",
+  "Sales report": "Verkooprapport",
+  "Previous": "Vorige",
+  "Next": "Volgende",
+  "Sales are the food of delivered orders after discounts, without delivery fees. Subscribers are new verified phone numbers; new customers are new numbers that also had a delivered order this month.": "Omzet is het eten van geleverde bestellingen na kortingen, zonder bezorgkosten. Abonnees zijn nieuwe geverifieerde mobiele nummers; nieuwe klanten zijn nieuwe nummers met ook een geleverde bestelling deze maand.",
+  "Website sales": "Omzet website",
+  "Orders delivered": "Geleverde bestellingen",
+  "Average order": "Gemiddelde bestelling",
+  "New subscribers": "Nieuwe abonnees",
+  "New customers": "Nieuwe klanten",
+  "Orders cancelled": "Geannuleerde bestellingen",
+  "Commission rate %": "Commissiepercentage %",
+  "Commission": "Commissie",
+  "Day": "Dag",
+  "No orders this month.": "Geen bestellingen deze maand."
 });

@@ -17,6 +17,7 @@ const SECTIONS = [
   ['discounts', L('Discounts'), 'badge-percent'],
   ['loyalty', L('Points, Gifts & Levels'), 'gift'],
   ['wheel', L('Wheel game'), 'dices'],
+  ['report', L('Sales report'), 'chart-no-axes-column'],
   ['homepage', L('Homepage'), 'house'],
   ['slider', L('Menu Slider'), 'images'],
   ['pages', L('Pages'), 'file-text'],
@@ -786,6 +787,40 @@ function renderGeneral(el) {
   });
 }
 
+/* ===================== Sales report ===================== */
+async function renderReport(el) {
+  const s = CONFIG.settings; s.report = s.report || {};
+  const now = new Date();
+  let month = renderReport.month || `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  const shift = d => { const [y, m] = month.split('-').map(Number); const dt = new Date(y, m - 1 + d, 1); month = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}`; renderReport.month = month; renderReport(el); };
+  el.innerHTML = card(L('Sales report'), `
+    <div class="report-bar"><button class="btn-sm btn-edit" id="repPrev" aria-label="${L('Previous')}">‹</button><strong dir="ltr" id="repMonth">${month}</strong><button class="btn-sm btn-edit" id="repNext" aria-label="${L('Next')}">›</button></div>
+    <p class="mini-note">${L('Sales are the food of delivered orders after discounts, without delivery fees. Subscribers are new verified phone numbers; new customers are new numbers that also had a delivered order this month.')}</p>
+    <div id="repBody"><p class="mini-note">${L('Loading…')}</p></div>`);
+  $('repPrev').addEventListener('click', () => shift(-1));
+  $('repNext').addEventListener('click', () => shift(1));
+  let r;
+  try { r = await api('/api/admin/report?month=' + month, { token: await StaffAuth.token() }); }
+  catch (e) { $('repBody').innerHTML = `<p class="form-error">${L('Results are not available yet.')}</p>`; return; }
+  const money = v => fmtMoney(v);
+  const tile = (v, label) => `<div><strong>${v}</strong><span>${label}</span></div>`;
+  $('repBody').innerHTML = `
+    <div class="stat-grid">
+      ${tile(money(r.sales), L('Website sales'))}${tile(r.delivered, L('Orders delivered'))}${tile(money(r.average), L('Average order'))}
+      ${tile(r.subscribers, L('New subscribers'))}${tile(r.newCustomers, L('New customers'))}${tile(r.cancelled, L('Orders cancelled'))}
+      ${tile(r.spins, L('Spins'))}${tile(r.prizeOrders, L('Orders with a prize'))}
+    </div>
+    <div class="report-commission">
+      <div class="form-group"><label>${L('Commission rate %')}</label><input type="number" min="0" max="100" step="0.1" id="repPct" value="${r.percent}"></div>
+      <button class="btn-primary btn-inline" id="repSave">${L('Save')}</button>
+      <div class="report-due"><span>${L('Commission')}</span><strong>${money(r.commission)}</strong></div>
+    </div>
+    ${r.days.length ? `<div class="table-wrap"><table class="mini-table"><thead><tr><th>${L('Day')}</th><th>${L('Orders delivered')}</th><th>${L('Website sales')}</th></tr></thead><tbody>${r.days.map(d => `<tr><td dir="ltr">${d.day}</td><td>${d.orders}</td><td>${money(d.sales)}</td></tr>`).join('')}</tbody></table></div>` : `<p class="mini-note">${L('No orders this month.')}</p>`}`;
+  const due = () => $('repBody').querySelector('.report-due strong');
+  $('repPct').addEventListener('input', () => { const p = Math.max(0, Math.min(100, Number($('repPct').value) || 0)); due().textContent = money(Math.round(r.sales * p) / 100); });
+  $('repSave').addEventListener('click', () => { s.report.commissionPercent = Math.max(0, Math.min(100, Number($('repPct').value) || 0)); persist(); toast(L('Saved')); });
+}
+
 /* ===================== Wheel game ===================== */
 const WHEEL_DEFAULT = {
   enabled: false, title: '', minOrder: 100, validHours: 0, weeklyBigCap: 10, prizes: []
@@ -1000,7 +1035,7 @@ async function renderSites(el) {
   list();
 }
 
-const RENDER = { wheel: renderWheel, orders: renderOrders, branches: renderBranches, categories: renderCategories, products: renderProducts, delivery: renderDelivery, discounts: renderDiscounts, loyalty: renderLoyalty, homepage: renderHomepage, slider: renderSlider, pages: renderPages, notifications: renderNotifications, cashiers: renderCashiers, colors: renderColors, general: renderGeneral, footer: renderFooterSettings, data: renderData, sites: renderSites };
+const RENDER = { report: renderReport, wheel: renderWheel, orders: renderOrders, branches: renderBranches, categories: renderCategories, products: renderProducts, delivery: renderDelivery, discounts: renderDiscounts, loyalty: renderLoyalty, homepage: renderHomepage, slider: renderSlider, pages: renderPages, notifications: renderNotifications, cashiers: renderCashiers, colors: renderColors, general: renderGeneral, footer: renderFooterSettings, data: renderData, sites: renderSites };
 
 /* ===================== Boot ===================== */
 (async function init() {

@@ -32,6 +32,11 @@ export async function startFakeFirestore() {
     const want = decodeFields({ v: ff.value }).v;
     const have = fieldGet(data, ff.field.fieldPath);
     if (ff.op === 'EQUAL') return have === want;
+    if (have === undefined || have === null) return false;
+    if (ff.op === 'GREATER_THAN_OR_EQUAL') return have >= want;
+    if (ff.op === 'GREATER_THAN') return have > want;
+    if (ff.op === 'LESS_THAN_OR_EQUAL') return have <= want;
+    if (ff.op === 'LESS_THAN') return have < want;
     throw new Error('unsupported op ' + ff.op);
   }
   function applyWrite(w) {

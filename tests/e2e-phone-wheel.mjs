@@ -185,6 +185,9 @@ try {
     assert.equal(await E.page.locator('.wheel-row').count(), 5);
     await E.page.waitForSelector('.stat-grid');
     await shot(E.page, '13-admin-wheel');
+    await E.page.click('[data-key="report"]'); await E.page.waitForSelector('.report-commission');
+    assert.match(await E.page.textContent('#repBody'), /ℹ|\d/);
+    await shot(E.page, '15-admin-report');
     await E.page.click('[data-key="general"]'); await E.page.waitForSelector('#aCountry'); await shot(E.page, '14-admin-signin');
   });
   await E.ctx.close();

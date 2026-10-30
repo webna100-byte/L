@@ -385,5 +385,19 @@ Object.assign(window.ADMIN_TR, {
   "Ask for a code even for numbers that signed in before (safer)": "Pedir um código mesmo aos números que já iniciaram sessão (mais seguro)",
   "A known number signs in without a code and its saved name and address are filled in at checkout; anyone who knows a number could see that name and address, so turn the option above on if that matters to you.": "Um número já conhecido entra sem código e o nome e a morada guardados são preenchidos ao finalizar o pedido; qualquer pessoa que conheça um número poderia ver esse nome e morada, por isso ative a opção acima se isso for importante para si.",
   "At least one prize needs a chance": "Pelo menos um prémio precisa de probabilidade",
-  "Chance": "Probabilidade"
+  "Chance": "Probabilidade",
+  "Sales report": "Relatório de vendas",
+  "Previous": "Anterior",
+  "Next": "Seguinte",
+  "Sales are the food of delivered orders after discounts, without delivery fees. Subscribers are new verified phone numbers; new customers are new numbers that also had a delivered order this month.": "As vendas são a comida dos pedidos entregues após descontos, sem taxas de entrega. Os subscritores são novos números de telemóvel verificados; os novos clientes são novos números que também tiveram um pedido entregue este mês.",
+  "Website sales": "Vendas do site",
+  "Orders delivered": "Pedidos entregues",
+  "Average order": "Pedido médio",
+  "New subscribers": "Novos subscritores",
+  "New customers": "Novos clientes",
+  "Orders cancelled": "Pedidos cancelados",
+  "Commission rate %": "Percentagem de comissão %",
+  "Commission": "Comissão",
+  "Day": "Dia",
+  "No orders this month.": "Sem pedidos este mês."
 });
