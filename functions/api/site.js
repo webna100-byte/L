@@ -6,6 +6,7 @@ import { json, fail, handle, loadConfig, siteCacheUrl } from '../_lib/http.js';
 import { firebaseWebConfig } from '../_lib/public.js';
 import { siteOf, kvKey } from '../_lib/site.js';
 import { publicWheel } from '../_lib/wheel.js';
+import { withoutGoogleTexts } from '../_lib/legacy.js';
 
 export const onRequestGet = handle(async ({ request, env, waitUntil }) => {
   const site = siteOf(request);
@@ -20,7 +21,8 @@ export const onRequestGet = handle(async ({ request, env, waitUntil }) => {
   // A demo link that was deleted (or mistyped): never fall back to the main site.
   if (site && !config) return fail(404, 'site_not_found');
   // Visitors never see the wheel's chances (they are only used on the server).
-  const visible = config && config.wheel ? { ...config, wheel: { ...config.wheel, ...publicWheel(config) } } : config;
+  const cleaned = withoutGoogleTexts(config);
+  const visible = cleaned && cleaned.wheel ? { ...cleaned, wheel: { ...cleaned.wheel, ...publicWheel(cleaned) } } : cleaned;
   const res = json({ config: visible, notifications: notifications || [], firebase: firebaseWebConfig(env) }, 200, {
     'Cache-Control': 'private, max-age=20', Vary: 'Cookie'
   });

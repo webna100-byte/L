@@ -380,3 +380,19 @@ test('prizes have no code to type and, by default, no expiry; a set validity exp
     assert.ok(Math.abs(s2.prize.expiresAt - (Date.now() + 24 * 3600 * 1000)) < 5000);
   } finally { await t.close(); }
 });
+
+test('old saved texts that mention Google are cleaned before visitors see them', async () => {
+  const old = baseConfig();
+  old.settings.homepage.login = { title: 'Entra', text: 'Inicia sesión con tu cuenta de Google para pedir, ganar puntos y seguir tus pedidos.', button: 'Iniciar sesión con Google' };
+  old.pages.login = { title: 'Entra', button: 'Continuar con Google' };
+  old.settings.lang = 'es';
+  const t = await setup(old);
+  try {
+    const body = await (await siteApi({ request: req('/api/site'), env: t.env, waitUntil: () => {} })).json();
+    assert.equal(body.config.settings.homepage.login.button, 'Inicia sesión con tu número de móvil');
+    assert.match(body.config.settings.homepage.login.text, /número de móvil/);
+    assert.equal(body.config.pages.login.button, 'Continuar con tu número de móvil');
+    assert.ok(!/google/i.test(JSON.stringify(body.config)));
+    assert.match(JSON.stringify(JSON.parse(await t.env.STORE.get('config'))), /Google/, 'the stored config is not rewritten');
+  } finally { await t.close(); }
+});

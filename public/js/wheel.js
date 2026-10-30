@@ -13,7 +13,7 @@ const Wheel = {
     if (!w || !w.enabled || !Array.isArray(w.prizes) || !w.prizes.length || document.body.classList.contains('admin-body')) return;
     this.cfg = w;
     const title = w.title || t('wheel_title');
-    if (pageKey === 'home') this.banner(document.getElementById('homeHero'), 'after', title);
+    if (pageKey === 'home') this.banner(document.getElementById('homeAccount') || document.getElementById('homeHero'), 'after', title);
     if (pageKey === 'menu') this.banner(document.getElementById('main'), 'prepend', title);
     if (pageKey !== 'checkout' && pageKey !== 'cart') this.fab(title);
     // /?wheel=1 opens the wheel (used by links and shared images)
