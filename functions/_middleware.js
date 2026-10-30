@@ -49,9 +49,10 @@ export async function onRequest({ request, next, env, waitUntil }) {
 <meta property="og:description" content="${esc(meta.description)}">
 <meta property="og:url" content="${esc(url.origin + url.pathname)}">
 ${abs ? `<meta property="og:image" content="${esc(abs)}"><meta name="twitter:card" content="summary_large_image">` : ''}
-<link rel="canonical" href="${esc(url.origin + url.pathname)}">`;
+<link rel="canonical" href="${esc(url.origin + url.pathname)}">
+<meta name="google" content="notranslate">`;
   return new HTMLRewriter()
-    .on('html', { element(el) { el.setAttribute('lang', meta.lang); if (meta.lang === 'ar') el.setAttribute('dir', 'rtl'); } })
+    .on('html', { element(el) { el.setAttribute('lang', meta.lang); el.setAttribute('translate', 'no'); if (meta.lang === 'ar') el.setAttribute('dir', 'rtl'); } })
     .on('title', { element(el) { el.setInnerContent(title); } })
     .on('meta[name="theme-color"]', { element(el) { el.setAttribute('content', meta.color); } })
     .on('head', { element(el) { el.append(tags, { html: true }); } })

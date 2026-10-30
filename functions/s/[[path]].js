@@ -32,7 +32,7 @@ export async function onRequestGet({ request, params, env }) {
   const description = textOf(hero.text, lang);
   const image = hero.image || s.logo || '';
   const abs = image && image.startsWith('/') ? url.origin + image : image;
-  const html = `<!DOCTYPE html><html lang="${esc(lang)}"><head><meta charset="utf-8">
+  const html = `<!DOCTYPE html><html lang="${esc(lang)}" translate="no"><head><meta charset="utf-8"><meta name="google" content="notranslate">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(name)}</title>
 <meta name="description" content="${esc(description)}">

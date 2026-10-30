@@ -475,6 +475,7 @@ function tField(field, lang) {
 function applyDocDir() {
   const lang = getLang();
   document.documentElement.lang = lang;
+  document.documentElement.setAttribute('translate', 'no');   // the site is already in the restaurant's language: browsers must not translate it
   document.documentElement.dir = SITE_LANGS[lang].rtl ? 'rtl' : 'ltr';
 }
 
