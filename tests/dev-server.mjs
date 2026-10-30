@@ -40,6 +40,12 @@ export async function startDevServer({ config, env: extraEnv = {} } = {}) {
         res.writeHead(out.status, Object.fromEntries(out.headers));
         return res.end(Buffer.from(await out.arrayBuffer()));
       }
+      if (url.pathname.startsWith('/img/')) {
+        const request = new Request('http://localhost' + req.url);
+        const out = await handler('functions/img/[id].js', 'GET', { request, env, params: { id: url.pathname.slice(5) }, waitUntil: p => pending.push(p) });
+        res.writeHead(out.status, Object.fromEntries(out.headers));
+        return res.end(Buffer.from(await out.arrayBuffer()));
+      }
       let p = decodeURIComponent(url.pathname);
       const cands = [p, p + '.html', path.join(p, 'index.html')];
       const hit = cands.map(c => path.join(root, 'public', c)).find(f => f.startsWith(path.join(root, 'public')) && fs.existsSync(f) && fs.statSync(f).isFile());

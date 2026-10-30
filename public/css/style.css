@@ -649,8 +649,8 @@ body.cat-bar-static .menu-category-section { scroll-margin-top: calc(var(--heade
 .wheel-banner-text strong { font-size: 1.05rem; font-weight: 800; }
 .wheel-banner-text small { opacity: .9; font-size: .8rem; }
 .wheel-banner-cta { background: #fff; color: var(--accent); font-weight: 800; font-size: .82rem; padding: 8px 14px; border-radius: 99px; white-space: nowrap; }
-.wheel-mini { flex: 0 0 auto; position: relative; display: block; width: 52px; height: 52px; border-radius: 50%; border: 3px solid #fff; background: conic-gradient(#ffd666 0 60deg, #fff 60deg 120deg, #ff9c6e 120deg 180deg, #fff 180deg 240deg, #ffd666 240deg 300deg, #fff 300deg 360deg); animation: wheel-idle 9s linear infinite; box-shadow: 0 2px 8px rgba(0,0,0,.25); }
-.wheel-mini i { position: absolute; inset: 18px; border-radius: 50%; background: var(--accent); border: 2px solid #fff; }
+.wheel-mini { flex: 0 0 auto; position: relative; display: block; width: 52px; height: 52px; border-radius: 50%; border: 3px solid #fff; background: repeating-conic-gradient(#ffffff 0 22.5deg, #ffc9c9 22.5deg 45deg); animation: wheel-idle 9s linear infinite; box-shadow: 0 2px 8px rgba(0,0,0,.25); }
+.wheel-mini i { position: absolute; inset: 17px; border-radius: 50%; background: var(--accent); border: 3px solid #fff; }
 @keyframes wheel-idle { to { transform: rotate(360deg); } }
 .wheel-fab { position: fixed; inset-inline-end: 14px; bottom: calc(var(--nav-h) + var(--safe-b) + 14px); z-index: 90; width: 62px; height: 62px; border-radius: 50%; border: 0; padding: 0; display: grid; place-items: center; background: var(--secondary-bg); box-shadow: var(--shadow-lg); cursor: pointer; }
 .wheel-fab .wheel-mini { width: 46px; height: 46px; }
@@ -668,7 +668,7 @@ body.wheel-open { overflow: hidden; }
 #wheelCanvas { width: 100%; height: 100%; border-radius: 50%; display: block; background: #fff; will-change: transform; }
 .wheel-pointer { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); z-index: 3; width: 0; height: 0; border-inline: 13px solid transparent; border-top: 26px solid #16181d; filter: drop-shadow(0 2px 2px rgba(0,0,0,.35)); }
 .wheel-hub { position: absolute; z-index: 2; top: 50%; left: 50%; width: 19%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; background: #fff; border: 4px solid #fff; box-shadow: 0 2px 10px rgba(0,0,0,.35); display: grid; place-items: center; overflow: hidden; }
-.wheel-hub img { width: 100%; height: 100%; object-fit: cover; }
+.wheel-hub img { width: 100%; height: 100%; object-fit: contain; padding: 8%; box-sizing: border-box; background: #fff; }
 .wheel-actions { display: grid; gap: 8px; margin: 4px 0 8px; }
 .wheel-actions .wheel-spin { width: 100%; font-size: 1.05rem; padding: 14px; }
 .wheel-login-note { margin: 0; font-weight: 700; }

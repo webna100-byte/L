@@ -11,10 +11,11 @@ import crypto from 'node:crypto';
 import { encodeFields, decodeFields } from '../functions/_lib/firestore.js';
 
 export class FakeKV {
-  constructor() { this.m = new Map(); }
+  constructor() { this.m = new Map(); this.meta = new Map(); }
   async get(k, type) { const v = this.m.get(k); if (v === undefined) return null; return type === 'json' ? JSON.parse(v) : v; }
-  async put(k, v) { this.m.set(k, typeof v === 'string' ? v : String(v)); }
-  async delete(k) { this.m.delete(k); }
+  async getWithMetadata(k) { const v = this.m.get(k); if (v === undefined) return { value: null, metadata: null }; const buf = typeof v === 'string' ? new TextEncoder().encode(v) : v; return { value: buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength), metadata: this.meta.get(k) || null }; }
+  async put(k, v, opts) { this.m.set(k, typeof v === 'string' ? v : new Uint8Array(v)); if (opts && opts.metadata) this.meta.set(k, opts.metadata); }
+  async delete(k) { this.m.delete(k); this.meta.delete(k); }
 }
 
 const B = 'projects/demo/databases/(default)/documents';
