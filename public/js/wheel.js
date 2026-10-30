@@ -39,6 +39,9 @@ const Wheel = {
     el.innerHTML = `${this.miniWheel()}<span class="wheel-fab-dot"></span>`;
     el.addEventListener('click', () => this.open());
     document.body.appendChild(el);
+    // The button steps aside while the banner is on screen (it would cover the banner's own button).
+    const banner = document.getElementById('wheelBanner');
+    if (banner && 'IntersectionObserver' in window) new IntersectionObserver(es => el.classList.toggle('wheel-fab-away', es[0].isIntersecting), { threshold: 0.4 }).observe(banner);
   },
 
   /* ---------- modal ---------- */

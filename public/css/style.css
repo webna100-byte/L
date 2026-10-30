@@ -706,3 +706,6 @@ body.wheel-open { overflow: hidden; }
 .mini-table { width: 100%; border-collapse: collapse; font-size: .88rem; }
 .mini-table th, .mini-table td { padding: 8px 6px; border-bottom: 1px solid var(--border); text-align: start; }
 .mini-table th { color: var(--muted); font-weight: 600; }
+
+.wheel-fab { transition: opacity .2s, transform .2s; }
+.wheel-fab-away { opacity: 0; transform: scale(.6); pointer-events: none; }

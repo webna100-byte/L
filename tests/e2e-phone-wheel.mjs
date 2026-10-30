@@ -60,7 +60,7 @@ try {
     await A.page.goto(dev.url + '/menu'); await A.page.waitForSelector('#wheelBanner'); await shot(A.page, '02-menu');
   });
   await step('wheel opens; signed out it asks for the number (no Google button)', async () => {
-    await A.page.click('#wheelFab'); await A.page.waitForSelector('#wheelOverlay.open #plPhone');
+    await A.page.click('#wheelBanner'); await A.page.waitForSelector('#wheelOverlay.open #plPhone');
     assert.equal(await A.page.locator('.btn-google, [id*=oogle]').count(), 0);
     await shot(A.page, '03-wheel-login');
   });

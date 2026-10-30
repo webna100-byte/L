@@ -58,7 +58,7 @@ await page.goto(dev.url + '/branches'); await page.waitForSelector('.branch-card
 await page.evaluate(() => localStorage.setItem('selected_branch', 'irsal'));
 await page.goto(dev.url + '/'); await page.waitForSelector('#wheelBanner'); await page.waitForTimeout(600); await shot('1-home');
 await page.goto(dev.url + '/menu'); await page.waitForSelector('#wheelBanner'); await page.waitForTimeout(600); await shot('2-menu');
-await page.click('#wheelFab'); await page.waitForSelector('#plPhone'); await page.waitForTimeout(500); await shot('3-wheel-login');
+await page.click('#wheelBanner'); await page.waitForSelector('#plPhone'); await page.waitForTimeout(500); await shot('3-wheel-login');
 await page.fill('#plPhone', '0597101010'); await page.click('#plConfirm'); await page.waitForSelector('#plOtpBox:not(.hidden)'); await shot('4-otp');
 const code = (await page.textContent('#plDev')).match(/\d{5}/)[0];
 await page.fill('#plCode', code); await page.click('#plVerify'); await page.waitForSelector('.wheel-spin'); await page.waitForTimeout(400); await shot('5-wheel-ready');
