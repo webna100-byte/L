@@ -77,7 +77,6 @@ export const onRequestPost = handle(async ({ request, env }) => {
         invoiceDiscount: quote.invoiceDiscount,
         level: quote.level,
         levelDiscount: quote.levelDiscount,
-        net: quote.net,
         deliveryFee: quote.deliveryFee,
         deliveryDiscount: quote.deliveryDiscount,
         tax: quote.tax,

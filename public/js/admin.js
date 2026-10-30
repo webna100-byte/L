@@ -788,7 +788,7 @@ function renderGeneral(el) {
 
 /* ===================== Wheel game ===================== */
 const WHEEL_DEFAULT = {
-  enabled: false, title: '', minOrder: 100, goldenEvery: 150, validHours: 0, weeklyBigCap: 10, prizes: []
+  enabled: false, title: '', minOrder: 100, validHours: 0, weeklyBigCap: 10, prizes: []
 };
 async function renderWheel(el) {
   CONFIG.wheel = Object.assign({}, WHEEL_DEFAULT, CONFIG.wheel || {});
@@ -801,8 +801,7 @@ async function renderWheel(el) {
       <div class="form-group"><label>${L('Type')}</label><select class="w-type"><option value="product" ${p.type !== 'percent' ? 'selected' : ''}>${L('Free product')}</option><option value="percent" ${p.type === 'percent' ? 'selected' : ''}>${L('Percentage %')}</option></select></div>
       <div class="form-group w-prod ${p.type === 'percent' ? 'hidden' : ''}"><label>${L('Product')}</label><select class="w-product">${prodOptions(p.productId)}</select></div>
       <div class="form-group w-pct ${p.type === 'percent' ? '' : 'hidden'}"><label>${L('Value')}</label><input type="number" min="1" max="100" class="w-value" value="${Number(p.value) || 10}"></div>
-      <div class="form-group"><label>${L('Daily spin chance')}</label><input type="number" min="0" step="0.1" class="w-weight" value="${Number(p.weight) || 0}"></div>
-      <div class="form-group"><label>${L('Golden spin chance')}</label><input type="number" min="0" step="0.1" class="w-gold" value="${Number(p.goldWeight) || 0}"></div>
+      <div class="form-group"><label>${L('Chance')}</label><input type="number" min="0" step="0.1" class="w-weight" value="${Number(p.weight) || 0}"></div>
       <label class="w-big-label"><input type="checkbox" class="w-big" ${p.big ? 'checked' : ''}> ${L('Big prize (weekly cap)')}</label>
       <button class="btn-sm btn-del w-del" title="${L('Delete')}">×</button>
     </div>`;
@@ -812,7 +811,6 @@ async function renderWheel(el) {
       <div class="form-row">
         <div class="form-group"><label>${L('Title')}</label><input type="text" id="wTitle" maxlength="40" value="${escapeHtml(w.title || '')}" placeholder="${escapeHtml(t('wheel_title'))}"></div>
         <div class="form-group"><label>${L('Minimum order to use a prize')}</label><input type="number" min="0" step="0.001" id="wMin" value="${w.minOrder}"></div>
-        <div class="form-group"><label>${L('Golden spin for every purchases of')}</label><input type="number" min="1" step="0.001" id="wGold" value="${w.goldenEvery}"></div>
         <div class="form-group"><label>${L('Prize valid for (hours, 0 = never expires)')}</label><input type="number" min="0" id="wHours" value="${w.validHours}"></div>
         <div class="form-group"><label>${L('Big prizes per week (cap)')}</label><input type="number" min="0" id="wCap" value="${w.weeklyBigCap}"></div>
       </div>
@@ -829,14 +827,14 @@ async function renderWheel(el) {
       const old = w.prizes[Number(r.dataset.i)] || {};
       return { id: old.id || uid('prize'), label: r.querySelector('.w-label').value.trim(), type,
         ...(type === 'percent' ? { value: Math.min(100, Math.max(1, num2(r.querySelector('.w-value').value))) } : { productId: r.querySelector('.w-product').value }),
-        weight: Math.max(0, num2(r.querySelector('.w-weight').value)), goldWeight: Math.max(0, num2(r.querySelector('.w-gold').value)), big: r.querySelector('.w-big').checked };
+        weight: Math.max(0, num2(r.querySelector('.w-weight').value)), big: r.querySelector('.w-big').checked };
     });
   }
   const num2 = v => { const n = Number(v); return Number.isFinite(n) ? n : 0; };
   function sums() {
-    const rows = read(); const a = rows.reduce((x, p) => x + p.weight, 0), b = rows.reduce((x, p) => x + p.goldWeight, 0);
+    const rows = read(); const a = rows.reduce((x, p) => x + p.weight, 0);
     const pct = (v, tot) => tot ? (100 * v / tot).toFixed(1) + '%' : '—';
-    $('wSum').innerHTML = rows.map(p => `${escapeHtml(p.label || '?')}: ${pct(p.weight, a)} / <b>${pct(p.goldWeight, b)}</b>`).join(' · ');
+    $('wSum').innerHTML = rows.map(p => `${escapeHtml(p.label || '?')}: ${pct(p.weight, a)}`).join(' · ');
   }
   function redraw() { w.prizes = read(); renderWheel(el); }
   el.querySelectorAll('.wheel-row').forEach(r => {
@@ -844,15 +842,15 @@ async function renderWheel(el) {
     r.querySelectorAll('input').forEach(i => i.addEventListener('input', sums));
     r.querySelector('.w-del').addEventListener('click', () => { w.prizes = read(); w.prizes.splice(Number(r.dataset.i), 1); renderWheel(el); });
   });
-  $('wAdd').addEventListener('click', () => { w.prizes = read(); w.prizes.push({ id: uid('prize'), label: '', type: 'product', productId: '', weight: 10, goldWeight: 10, big: false }); renderWheel(el); });
+  $('wAdd').addEventListener('click', () => { w.prizes = read(); w.prizes.push({ id: uid('prize'), label: '', type: 'product', productId: '', weight: 10, big: false }); renderWheel(el); });
   $('wSample').addEventListener('click', () => {
     const find = re => (products.find(p => re.test(nameOf(p.name))) || {}).id || '';
     w.prizes = [
-      { id: uid('prize'), label: L('Drink'), type: 'product', productId: find(/cola|drink|مشروب|ليمون|lemon|water|مياه/i), weight: 35, goldWeight: 0, big: false },
-      { id: uid('prize'), label: L('Fries'), type: 'product', productId: find(/fries|بطاط|patat|potato/i), weight: 30, goldWeight: 20, big: false },
-      { id: uid('prize'), label: L('10% off'), type: 'percent', value: 10, weight: 20, goldWeight: 20, big: false },
-      { id: uid('prize'), label: L('Wings'), type: 'product', productId: find(/wing|أجنحة|جناح|chicken|دجاج/i), weight: 12, goldWeight: 35, big: true },
-      { id: uid('prize'), label: L('Classic burger'), type: 'product', productId: find(/classic|كلاسيك|burger|برغر/i), weight: 3, goldWeight: 25, big: true }
+      { id: uid('prize'), label: L('Drink'), type: 'product', productId: find(/cola|drink|مشروب|ليمون|lemon|water|مياه/i), weight: 35, big: false },
+      { id: uid('prize'), label: L('Fries'), type: 'product', productId: find(/fries|بطاط|patat|potato/i), weight: 30, big: false },
+      { id: uid('prize'), label: L('10% off'), type: 'percent', value: 10, weight: 20, big: false },
+      { id: uid('prize'), label: L('Wings'), type: 'product', productId: find(/wing|أجنحة|جناح|chicken|دجاج/i), weight: 12, big: true },
+      { id: uid('prize'), label: L('Classic burger'), type: 'product', productId: find(/classic|كلاسيك|burger|برغر/i), weight: 3, big: true }
     ];
     renderWheel(el);
   });
@@ -862,16 +860,16 @@ async function renderWheel(el) {
       if (prizes.length < 2) return toast(L('Add at least two prizes'));
       if (prizes.some(p => !p.label)) return toast(L('Every prize needs a name'));
       if (prizes.some(p => p.type === 'product' && !p.productId)) return toast(L('Choose a product for every product prize'));
-      if (!prizes.some(p => p.weight > 0) || !prizes.some(p => p.goldWeight > 0)) return toast(L('At least one prize needs a chance in each spin type'));
+      if (!prizes.some(p => p.weight > 0)) return toast(L('At least one prize needs a chance'));
     }
-    Object.assign(CONFIG.wheel, { enabled: $('wEnabled').checked, title: $('wTitle').value.trim(), minOrder: Math.max(0, num2($('wMin').value)), goldenEvery: Math.max(1, num2($('wGold').value) || 150), validHours: Math.max(0, Math.floor(num2($('wHours').value))), weeklyBigCap: Math.max(0, Math.floor(num2($('wCap').value))), prizes });
+    Object.assign(CONFIG.wheel, { enabled: $('wEnabled').checked, title: $('wTitle').value.trim(), minOrder: Math.max(0, num2($('wMin').value)), validHours: Math.max(0, Math.floor(num2($('wHours').value))), weeklyBigCap: Math.max(0, Math.floor(num2($('wCap').value))), prizes });
     persist(); toast(L('Saved'));
   });
   sums();
   try {
     const st = await api('/api/admin/wheel', { token: await StaffAuth.token() });
     const rows = (CONFIG.wheel.prizes || []).map(p => { const b = st.byPrize[p.id] || {}; return `<tr><td>${escapeHtml(p.label)}</td><td>${b.spins || 0}</td><td>${b.used || 0}</td><td>${fmtMoney(b.sales || 0)}</td></tr>`; }).join('');
-    $('wheelStats').innerHTML = `<div class="stat-grid"><div><strong>${st.spins}</strong><span>${L('Spins')}</span></div><div><strong>${st.gold}</strong><span>${L('Golden spins')}</span></div><div><strong>${st.used}</strong><span>${L('Prizes used')}</span></div><div><strong>${fmtMoney(st.sales)}</strong><span>${L('Orders with a prize')}</span></div><div><strong>${st.bigThisWeek}</strong><span>${L('Big prizes this week')}</span></div></div>
+    $('wheelStats').innerHTML = `<div class="stat-grid"><div><strong>${st.spins}</strong><span>${L('Spins')}</span></div><div><strong>${st.used}</strong><span>${L('Prizes used')}</span></div><div><strong>${fmtMoney(st.sales)}</strong><span>${L('Orders with a prize')}</span></div><div><strong>${st.bigThisWeek}</strong><span>${L('Big prizes this week')}</span></div></div>
       <div class="table-wrap"><table class="mini-table"><thead><tr><th>${L('Prize')}</th><th>${L('Spins')}</th><th>${L('Used')}</th><th>${L('Sales')}</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   } catch (e) { $('wheelStats').innerHTML = `<p class="mini-note">${L('Results are not available yet.')}</p>`; }
 }

@@ -40,12 +40,12 @@ c.settings.slider = { images: ['/demo/slide1.webp', '/demo/slide2.webp', '/demo/
 c.settings.homepage.featured.selectedIds = ['crispy', 'steak', 'hawaii', 'onion'];
 c.settings.homepage.categories.selectedIds = ['burgers', 'wings', 'sides', 'drinks'];
 c.version = 1;
-c.wheel = { enabled: true, title: 'لف العجلة واربح!', minOrder: 100, goldenEvery: 150, validHours: 0, weeklyBigCap: 10, prizes: [
-  { id: 'drink', label: 'مشروب', type: 'product', productId: 'cola', weight: 35, goldWeight: 0, big: false },
-  { id: 'fries', label: 'بطاطا', type: 'product', productId: 'fries', weight: 30, goldWeight: 20, big: false },
-  { id: 'd10', label: 'خصم 10%', type: 'percent', value: 10, weight: 20, goldWeight: 20, big: false },
-  { id: 'wings', label: 'أجنحة', type: 'product', productId: 'wings6', weight: 12, goldWeight: 35, big: true },
-  { id: 'classic', label: 'كلاسيك برغر', type: 'product', productId: 'hawaii', weight: 3, goldWeight: 25, big: true }
+c.wheel = { enabled: true, title: 'لف العجلة واربح!', minOrder: 100, validHours: 0, weeklyBigCap: 10, prizes: [
+  { id: 'drink', label: 'مشروب', type: 'product', productId: 'cola', weight: 35, big: false },
+  { id: 'fries', label: 'بطاطا', type: 'product', productId: 'fries', weight: 30, big: false },
+  { id: 'd10', label: 'خصم 10%', type: 'percent', value: 10, weight: 20, big: false },
+  { id: 'wings', label: 'أجنحة', type: 'product', productId: 'wings6', weight: 12, big: true },
+  { id: 'classic', label: 'كلاسيك برغر', type: 'product', productId: 'hawaii', weight: 3, big: true }
 ] };
 const dev = await startDevServer({ config: c });
 const browser = await chromium.launch();
@@ -62,7 +62,7 @@ await page.click('#wheelBanner'); await page.waitForSelector('#plPhone'); await 
 await page.fill('#plPhone', '0597101010'); await page.click('#plConfirm'); await page.waitForSelector('#plOtpBox:not(.hidden)'); await shot('4-otp');
 const code = (await page.textContent('#plDev')).match(/\d{5}/)[0];
 await page.fill('#plCode', code); await page.click('#plVerify'); await page.waitForSelector('.wheel-spin'); await page.waitForTimeout(400); await shot('5-wheel-ready');
-await page.click('.wheel-spin[data-kind="free"]'); await page.waitForSelector('.wheel-won', { timeout: 15000 }); await page.waitForTimeout(2800); await shot('6-wheel-won');
+await page.click('.wheel-spin'); await page.waitForSelector('.wheel-won', { timeout: 15000 }); await page.waitForTimeout(2800); await shot('6-wheel-won');
 await page.click('#wheelClose');
 await page.evaluate(() => localStorage.setItem('cart_irsal', JSON.stringify([{ productId: 'steak', qty: 3, selections: {}, notes: '' }, { productId: 'crispy', qty: 1, selections: {}, notes: '' }])));
 // a second, fresh visitor: type -> number -> Confirm -> fields appear

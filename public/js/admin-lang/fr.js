@@ -347,7 +347,6 @@ Object.assign(window.ADMIN_TR, {
   "Game is on": "Jeu activé",
   "Title": "Titre",
   "Minimum order to use a prize": "Commande minimale pour utiliser un lot",
-  "Golden spin for every purchases of": "Tour doré pour chaque tranche d'achats de",
   "Prize valid for (hours, 0 = never expires)": "Validité du lot (heures, 0 = n'expire jamais)",
   "Big prizes per week (cap)": "Gros lots par semaine (plafond)",
   "Chances are relative numbers: 35, 30, 20 ... are normalised, so they do not have to add up to 100. The result is drawn on the server only.": "Les chances sont des nombres relatifs : 35, 30, 20 ... sont normalisés, ils n'ont donc pas à totaliser 100. Le résultat est tiré uniquement sur le serveur.",
@@ -358,16 +357,12 @@ Object.assign(window.ADMIN_TR, {
   "Prize name": "Nom du lot",
   "Free product": "Produit offert",
   "Product": "Produit",
-  "Daily spin chance": "Chance du tour quotidien",
-  "Golden spin chance": "Chance du tour doré",
   "Big prize (weekly cap)": "Gros lot (plafond hebdomadaire)",
   "Add at least two prizes": "Ajoutez au moins deux lots",
   "Every prize needs a name": "Chaque lot a besoin d'un nom",
   "Choose a product for every product prize": "Choisissez un produit pour chaque lot produit",
-  "At least one prize needs a chance in each spin type": "Au moins un lot doit avoir une chance dans chaque type de tour",
   "Results": "Résultats",
   "Spins": "Tours",
-  "Golden spins": "Tours dorés",
   "Prizes used": "Lots utilisés",
   "Orders with a prize": "Commandes avec un lot",
   "Big prizes this week": "Gros lots cette semaine",
@@ -388,5 +383,7 @@ Object.assign(window.ADMIN_TR, {
   "Kuwait": "Koweït",
   "Jordan": "Jordanie",
   "Ask for a code even for numbers that signed in before (safer)": "Demander un code même aux numéros déjà connectés (plus sûr)",
-  "A known number signs in without a code and its saved name and address are filled in at checkout; anyone who knows a number could see that name and address, so turn the option above on if that matters to you.": "Un numéro connu se connecte sans code et son nom et son adresse enregistrés sont préremplis à la commande ; toute personne connaissant un numéro pourrait voir ce nom et cette adresse, activez donc l'option ci-dessus si cela compte pour vous."
+  "A known number signs in without a code and its saved name and address are filled in at checkout; anyone who knows a number could see that name and address, so turn the option above on if that matters to you.": "Un numéro connu se connecte sans code et son nom et son adresse enregistrés sont préremplis à la commande ; toute personne connaissant un numéro pourrait voir ce nom et cette adresse, activez donc l'option ci-dessus si cela compte pour vous.",
+  "At least one prize needs a chance": "Au moins un lot doit avoir une chance",
+  "Chance": "Chance"
 });

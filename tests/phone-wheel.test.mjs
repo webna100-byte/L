@@ -28,13 +28,13 @@ function baseConfig(wheelOver = {}, authOver = {}) {
   c.settings.timezone = 'Asia/Hebron';
   c.version = 1;
   c.wheel = {
-    enabled: true, title: 'لف العجلة', minOrder: 20, goldenEvery: 30, validHours: 48, weeklyBigCap: 10,
+    enabled: true, title: 'لف العجلة', minOrder: 20, validHours: 48, weeklyBigCap: 10,
     prizes: [
-      { id: 'drink', label: 'مشروب', type: 'product', productId: 'prod_cola', weight: 35, goldWeight: 0, big: false },
-      { id: 'lemon', label: 'ليموناضة', type: 'product', productId: 'prod_lemonade', weight: 30, goldWeight: 10, big: false },
-      { id: 'disc10', label: 'خصم 10%', type: 'percent', value: 10, weight: 20, goldWeight: 20, big: false },
-      { id: 'wings', label: 'دجاج', type: 'product', productId: 'prod_crispy_chicken', weight: 12, goldWeight: 40, big: true },
-      { id: 'classic', label: 'كلاسيك', type: 'product', productId: 'prod_classic_burger', weight: 3, goldWeight: 30, big: true }
+      { id: 'drink', label: 'مشروب', type: 'product', productId: 'prod_cola', weight: 35, big: false },
+      { id: 'lemon', label: 'ليموناضة', type: 'product', productId: 'prod_lemonade', weight: 30, big: false },
+      { id: 'disc10', label: 'خصم 10%', type: 'percent', value: 10, weight: 20, big: false },
+      { id: 'wings', label: 'دجاج', type: 'product', productId: 'prod_crispy_chicken', weight: 12, big: true },
+      { id: 'classic', label: 'كلاسيك', type: 'product', productId: 'prod_classic_burger', weight: 3, big: true }
     ],
     ...wheelOver
   };
@@ -182,7 +182,7 @@ test('wheel: one free spin per day per number, result drawn on the server, prize
   try {
     const c = await signUp(t, '0594445555');
     const st = await call(wheelStatus, t.ctx, req('/api/wheel/status', { token: c.token }));
-    assert.deepEqual([st.enabled, st.freeAvailable, st.goldAvailable, st.prizes.length], [true, true, 0, 0]);
+    assert.deepEqual([st.enabled, st.freeAvailable, st.goldAvailable, st.prizes.length], [true, true, undefined, 0]);
     assert.ok(st.wheel.prizes.every(p => !('weight' in p) && !('goldWeight' in p)), 'chances are never sent to the browser');
     const s1 = await call(wheelSpin, t.ctx, req('/api/wheel/spin', { method: 'POST', token: c.token, body: { kind: 'free' } }));
     assert.equal(s1.status, 200, JSON.stringify(s1));
@@ -192,20 +192,20 @@ test('wheel: one free spin per day per number, result drawn on the server, prize
     assert.deepEqual([pz.phone, pz.used, pz.expiresAt - pz.issuedAt, pz.minOrder], ['+970594445555', false, 48 * 3600 * 1000, 20]);
     const s2 = await call(wheelSpin, t.ctx, req('/api/wheel/spin', { method: 'POST', token: c.token, body: { kind: 'free' } }));
     assert.deepEqual([s2.status, s2.error], [409, 'no_spin_available']);
-    assert.equal((await call(wheelSpin, t.ctx, req('/api/wheel/spin', { method: 'POST', token: c.token, body: { kind: 'gold' } }))).status, 409);
     const st2 = await call(wheelStatus, t.ctx, req('/api/wheel/status', { token: c.token }));
     assert.deepEqual([st2.freeAvailable, st2.prizes.length, st2.prizes[0].code], [false, 1, s1.prize.code]);
     // another number has its own spin
     const d = await signUp(t, '0595556666');
     assert.equal((await call(wheelSpin, t.ctx, req('/api/wheel/spin', { method: 'POST', token: d.token, body: { kind: 'free' } }))).status, 200);
     // the client cannot choose a prize or fake a kind
-    assert.equal((await call(wheelSpin, t.ctx, req('/api/wheel/spin', { method: 'POST', token: d.token, body: { kind: 'vip', prizeId: 'classic' } }))).status, 400);
+    // the client cannot choose the prize: a request asking for one is simply a normal spin (here the daily one is already used)
+    assert.equal((await call(wheelSpin, t.ctx, req('/api/wheel/spin', { method: 'POST', token: d.token, body: { prizeId: 'classic', kind: 'gold' } }))).status, 409);
     assert.equal((await call(wheelSpin, t.ctx, req('/api/wheel/spin', { method: 'POST', body: { kind: 'free' } }))).status, 401);
   } finally { await t.close(); }
 });
 
 test('prize use: minimum order, same number only, once, applied to the order total', async () => {
-  const cfg = baseConfig({ prizes: [{ id: 'disc10', label: 'خصم 10%', type: 'percent', value: 10, weight: 1, goldWeight: 1, big: false }] });
+  const cfg = baseConfig({ prizes: [{ id: 'disc10', label: 'خصم 10%', type: 'percent', value: 10, weight: 1, big: false }] });
   const t = await setup(cfg);
   try {
     const c = await signUp(t, '0596667777');
@@ -220,7 +220,7 @@ test('prize use: minimum order, same number only, once, applied to the order tot
     assert.equal(ok.status, 200, JSON.stringify(ok));
     const placed = t.store.list('orders').find(o => o.prize && o.prize.code === code);
     assert.equal(placed.prize.discount, 2.85);                  // 10% of 28.5
-    assert.equal(placed.net, 25.65);
+    assert.equal(placed.total, 25.65);
     assert.equal(placed.subtotal, 28.5);
     const used = t.store.get('prizes/' + code);
     assert.deepEqual([used.used, used.orderId.length > 5, used.orderTotal], [true, true, placed.total]);
@@ -236,7 +236,7 @@ test('prize use: minimum order, same number only, once, applied to the order tot
 });
 
 test('free-product prize adds a free line; expired prizes are refused', async () => {
-  const cfg = baseConfig({ prizes: [{ id: 'cola', label: 'مشروب', type: 'product', productId: 'prod_cola', weight: 1, goldWeight: 1, big: false }] });
+  const cfg = baseConfig({ prizes: [{ id: 'cola', label: 'مشروب', type: 'product', productId: 'prod_cola', weight: 1, big: false }] });
   const t = await setup(cfg);
   try {
     const c = await signUp(t, '0598889999');
@@ -257,33 +257,10 @@ test('free-product prize adds a free line; expired prizes are refused', async ()
   } finally { await t.close(); }
 });
 
-test('golden spins: one per 30 of delivered purchases, stronger prizes, none for undelivered orders', async () => {
-  const t = await setup();
-  try {
-    const c = await signUp(t, '0591010101');
-    const admin = staffToken({ role: 'admin', site: '' });
-    const placed = await order(t, c.token, { items: [{ productId: 'prod_classic_burger', qty: 7 }], customer: { name: 'س' } });
-    assert.equal(placed.status, 200);
-    assert.equal((await call(wheelStatus, t.ctx, req('/api/wheel/status', { token: c.token }))).goldAvailable, 0, 'not delivered yet');
-    for (const status of ['preparing', 'delivered']) assert.equal((await call(setStatus, t.ctx, req('/api/orders/status', { method: 'POST', token: admin, body: { orderId: placed.id, status } }))).status, 200);
-    const st = await call(wheelStatus, t.ctx, req('/api/wheel/status', { token: c.token }));
-    assert.equal(st.goldAvailable, 2, '66.5 spent -> 2 golden spins (every 30)');
-    const g1 = await call(wheelSpin, t.ctx, req('/api/wheel/spin', { method: 'POST', token: c.token, body: { kind: 'gold' } }));
-    assert.equal(g1.status, 200);
-    assert.notEqual(g1.prize.label, 'مشروب', 'a golden spin never gives the plain drink');
-    assert.equal((await call(wheelStatus, t.ctx, req('/api/wheel/status', { token: c.token }))).goldAvailable, 1);
-    assert.equal((await call(wheelSpin, t.ctx, req('/api/wheel/spin', { method: 'POST', token: c.token, body: { kind: 'gold' } }))).status, 200);
-    assert.equal((await call(wheelSpin, t.ctx, req('/api/wheel/spin', { method: 'POST', token: c.token, body: { kind: 'gold' } }))).status, 409);
-    // reopening a delivered order takes the spend back
-    await call(setStatus, t.ctx, req('/api/orders/status', { method: 'POST', token: admin, body: { orderId: placed.id, status: 'cancelled' } }));
-    assert.equal(t.store.list('users')[0].lifetimeSpend, 0);
-  } finally { await t.close(); }
-});
-
 test('weekly cap: big prizes stop once the cap is reached, small ones continue', async () => {
   const cfg = baseConfig({ weeklyBigCap: 2, prizes: [
-    { id: 'big', label: 'كبيرة', type: 'product', productId: 'prod_classic_burger', weight: 100, goldWeight: 100, big: true },
-    { id: 'small', label: 'صغيرة', type: 'product', productId: 'prod_cola', weight: 1, goldWeight: 1, big: false }
+    { id: 'big', label: 'كبيرة', type: 'product', productId: 'prod_classic_burger', weight: 100, big: true },
+    { id: 'small', label: 'صغيرة', type: 'product', productId: 'prod_cola', weight: 1, big: false }
   ] });
   const t = await setup(cfg);
   try {
@@ -307,14 +284,10 @@ test('draw odds follow the configured chances (large sample) and the cap removes
   let seedN = 12345;
   const rng = () => { seedN = (seedN * 1664525 + 1013904223) % 4294967296; return seedN / 4294967296; };
   const n = 40000, count = {};
-  for (let i = 0; i < n; i++) { const p = pickPrize(w, 'free', { rng }); count[p.id] = (count[p.id] || 0) + 1; }
+  for (let i = 0; i < n; i++) { const p = pickPrize(w, { rng }); count[p.id] = (count[p.id] || 0) + 1; }
   const near = (id, pct) => assert.ok(Math.abs(count[id] / n * 100 - pct) < 1.2, `${id}: ${(count[id] / n * 100).toFixed(1)}% vs ${pct}%`);
   near('drink', 35); near('lemon', 30); near('disc10', 20); near('wings', 12); near('classic', 3);
-  const gold = {};
-  for (let i = 0; i < n; i++) { const p = pickPrize(w, 'gold', { rng }); gold[p.id] = (gold[p.id] || 0) + 1; }
-  assert.equal(gold.drink, undefined, 'golden spins never give the drink');
-  assert.ok(gold.wings > gold.lemon);
-  for (let i = 0; i < 2000; i++) assert.equal(pickPrize(w, 'free', { rng, bigAllowed: false }).big, false);
+  for (let i = 0; i < 2000; i++) assert.equal(pickPrize(w, { rng, bigAllowed: false }).big, false);
 });
 
 test('weeks run Monday-Sunday in the restaurant time zone; spin state follows the local day', () => {
@@ -360,7 +333,7 @@ test('demo sites show the code on screen by default; the main site never does', 
 });
 
 test('prizes have no code to type and, by default, no expiry; a set validity expires them', async () => {
-  const one = [{ id: 'cola', label: 'مشروب', type: 'product', productId: 'prod_cola', weight: 1, goldWeight: 1, big: false }];
+  const one = [{ id: 'cola', label: 'مشروب', type: 'product', productId: 'prod_cola', weight: 1, big: false }];
   const t = await setup(baseConfig({ validHours: 0, prizes: one }));
   try {
     const c = await signUp(t, '0591515151');

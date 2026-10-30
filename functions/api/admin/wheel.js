@@ -14,15 +14,15 @@ export const onRequestGet = handle(async ({ request, env }) => {
   const [spins, prizes, weekDoc] = await Promise.all([fs.query('spins', { limit: 5000 }), fs.query('prizes', { limit: 5000 }), fs.get(`meta/wheel_${week}`)]);
   const byPrize = {};
   for (const s of spins) {
-    const b = byPrize[s.data.prizeId] || (byPrize[s.data.prizeId] = { spins: 0, gold: 0, used: 0, orders: 0, sales: 0 });
-    b.spins++; if (s.data.kind === 'gold') b.gold++;
+    const b = byPrize[s.data.prizeId] || (byPrize[s.data.prizeId] = { spins: 0, used: 0, sales: 0 });
+    b.spins++;
   }
   let used = 0, sales = 0;
   for (const p of prizes) {
     if (p.data.used) {
       used++; sales += Number(p.data.orderTotal) || 0;
-      const b = byPrize[p.data.prizeId]; if (b) { b.used++; b.orders++; b.sales += Number(p.data.orderTotal) || 0; }
+      const b = byPrize[p.data.prizeId]; if (b) { b.used++; b.sales += Number(p.data.orderTotal) || 0; }
     }
   }
-  return json({ spins: spins.length, gold: spins.filter(s => s.data.kind === 'gold').length, prizes: prizes.length, used, sales, week, bigThisWeek: weekDoc ? Number(weekDoc.data.big) || 0 : 0, byPrize });
+  return json({ spins: spins.length, prizes: prizes.length, used, sales, week, bigThisWeek: weekDoc ? Number(weekDoc.data.big) || 0 : 0, byPrize });
 });

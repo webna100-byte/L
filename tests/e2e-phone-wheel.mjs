@@ -20,12 +20,12 @@ config.settings.auth = { country: 'PS' };
 config.settings.timezone = 'Asia/Hebron';
 config.settings.currency = 'ILS';
 config.settings.multiBranch = false;
-config.wheel = { enabled: true, title: 'لف العجلة واربح!', minOrder: 20, goldenEvery: 30, validHours: 0, weeklyBigCap: 10, prizes: [
-  { id: 'drink', label: 'مشروب', type: 'product', productId: 'prod_cola', weight: 1, goldWeight: 0, big: false },
-  { id: 'lemon', label: 'ليموناضة', type: 'product', productId: 'prod_lemonade', weight: 1, goldWeight: 1, big: false },
-  { id: 'd10', label: 'خصم 10%', type: 'percent', value: 10, weight: 1, goldWeight: 1, big: false },
-  { id: 'chk', label: 'دجاج كرسبي', type: 'product', productId: 'prod_crispy_chicken', weight: 1, goldWeight: 1, big: true },
-  { id: 'cls', label: 'كلاسيك برغر', type: 'product', productId: 'prod_classic_burger', weight: 1, goldWeight: 1, big: true }
+config.wheel = { enabled: true, title: 'لف العجلة واربح!', minOrder: 20, validHours: 0, weeklyBigCap: 10, prizes: [
+  { id: 'drink', label: 'مشروب', type: 'product', productId: 'prod_cola', weight: 1, big: false },
+  { id: 'lemon', label: 'ليموناضة', type: 'product', productId: 'prod_lemonade', weight: 1, big: false },
+  { id: 'd10', label: 'خصم 10%', type: 'percent', value: 10, weight: 1, big: false },
+  { id: 'chk', label: 'دجاج كرسبي', type: 'product', productId: 'prod_crispy_chicken', weight: 1, big: true },
+  { id: 'cls', label: 'كلاسيك برغر', type: 'product', productId: 'prod_classic_burger', weight: 1, big: true }
 ] };
 
 const dev = await startDevServer({ config });
@@ -73,27 +73,23 @@ try {
     assert.match(await A.page.textContent('#plError'), /غير صحيح/);
     await shot(A.page, '04-otp');
     await A.page.fill('#plCode', dev1); await A.page.click('#plVerify');
-    await A.page.waitForSelector('.wheel-spin[data-kind="free"]');
+    await A.page.waitForSelector('.wheel-spin');
     await shot(A.page, '05-wheel-ready');
   });
   let prizeLabel;
   await step('free spin: wheel turns, a prize and code appear, the spin is used up', async () => {
-    await A.page.click('.wheel-spin[data-kind="free"]');
+    await A.page.click('.wheel-spin');
     await A.page.waitForSelector('#wheelResult:not(.hidden) .wheel-won', { timeout: 15000 });
     prizeLabel = await A.page.textContent('.wheel-won strong');
     assert.equal(await A.page.locator('.wheel-code').count(), 0, 'no code is shown to the customer');
     assert.match(await A.page.textContent('.wheel-won'), /تلقائي/);
     await shot(A.page, '06-wheel-won');
     await A.page.waitForSelector('#wheelActions .wheel-wait');
-    assert.equal(await A.page.locator('.wheel-spin[data-kind="free"]').count(), 0);
+    assert.equal(await A.page.locator('.wheel-spin').count(), 0, 'only one spin a day');
     assert.equal(await A.page.locator('.wheel-prize-row').count(), 1);
   });
-  await step('share creates a 9:16 story image', async () => {
-    const dl = A.page.waitForEvent('download');
-    await A.page.click('#wheelShare');
-    const file = await dl; const p = `${OUT}/story.png`; await file.saveAs(p);
-    const buf = fs.readFileSync(p);
-    assert.equal(buf.readUInt32BE(16), 1080); assert.equal(buf.readUInt32BE(20), 1920);
+  await step('there is no share button and no code is shown', async () => {
+    assert.equal(await A.page.locator('#wheelShare').count(), 0);
   });
   await step('checkout: prize applied automatically, summary shows it', async () => {
     await A.page.click('#wheelClose');
@@ -155,7 +151,8 @@ try {
     await C.page.fill('#plCode', code); await C.page.click('#plVerify');
     await C.page.waitForSelector('#checkoutForm:not(.hidden)');
     assert.equal(await C.page.inputValue('#custName'), '');
-    assert.match(await C.page.textContent('.phone-confirmed'), /970567778888/);
+    assert.equal((await C.page.textContent('.phone-confirmed strong')).trim(), '+970567778888');
+    assert.ok(!/مسجّل/.test(await C.page.textContent('.phone-confirmed')), 'no wording in front of the number');
     await shot(C.page, '11-checkout-new');
     await C.page.click('#changePhone');
     await C.page.waitForSelector('#phoneGate #plPhone');

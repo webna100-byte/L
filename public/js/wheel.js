@@ -16,7 +16,7 @@ const Wheel = {
     if (pageKey === 'home') this.banner(document.getElementById('homeAccount') || document.getElementById('homeHero'), 'after', title);
     if (pageKey === 'menu') this.banner(document.getElementById('main'), 'prepend', title);
     if (pageKey !== 'checkout' && pageKey !== 'cart') this.fab(title);
-    // /?wheel=1 opens the wheel (used by links and shared images)
+    // /?wheel=1 opens the wheel (for links)
     if (new URLSearchParams(location.search).get('wheel') === '1') this.open();
   },
 
@@ -73,7 +73,7 @@ const Wheel = {
       renderIcons();
     }
     ov.classList.add('open'); document.body.classList.add('wheel-open');
-    await this.drawWheel('free');
+    await this.drawWheel();
     await this.refresh();
   },
   close() {
@@ -100,7 +100,7 @@ const Wheel = {
     this.renderActions(box);
     this.renderPrizes();
     const dot = document.querySelector('.wheel-fab-dot');
-    if (dot) dot.classList.toggle('hidden', !(this.st.freeAvailable || this.st.goldAvailable > 0));
+    if (dot) dot.classList.toggle('hidden', !this.st.freeAvailable);
     if (res && !this.spinning) res.classList.add('hidden');
   },
 
@@ -110,13 +110,12 @@ const Wheel = {
   },
   renderActions(box) {
     const st = this.st;
-    const golden = Math.max(0, st.goldAvailable || 0);
+    const min = Number(this.cfg.minOrder) || 0;
     box.innerHTML = `
-      ${st.freeAvailable ? `<button type="button" class="btn-primary wheel-spin" data-kind="free">${escapeHtml(t('wheel_spin_free'))}</button>` : `<p class="mini-note wheel-wait">${escapeHtml(t('wheel_next_day'))}</p>`}
-      ${golden ? `<button type="button" class="btn-primary wheel-spin gold" data-kind="gold">${escapeHtml(t('wheel_spin_gold', { n: golden }))}</button>` : ''}
-      <p class="mini-note">${escapeHtml(t('wheel_golden_hint', { amount: fmtMoney(this.cfg.goldenEvery || 150) }))}</p>`;
-    box.querySelectorAll('.wheel-spin').forEach(b => b.addEventListener('click', () => this.spin(b.dataset.kind)));
-    this.setGold(!st.freeAvailable && golden > 0);
+      ${st.freeAvailable ? `<button type="button" class="btn-primary wheel-spin">${escapeHtml(t('wheel_spin_free'))}</button>` : `<p class="mini-note wheel-wait">${escapeHtml(t('wheel_next_day'))}</p>`}
+      ${min ? `<p class="mini-note">${escapeHtml(t('wheel_rule', { amount: fmtMoney(min) }))}</p>` : ''}`;
+    const b = box.querySelector('.wheel-spin');
+    if (b) b.addEventListener('click', () => this.spin());
   },
   renderPrizes() {
     const list = (this.st && this.st.prizes) || [];
@@ -136,7 +135,6 @@ const Wheel = {
   fmtDate(ms) { try { return new Date(ms).toLocaleString(langLocale(), { weekday: 'short', hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'short' }); } catch (e) { return new Date(ms).toLocaleString(); } },
 
   /* ---------- drawing ---------- */
-  setGold(on) { const s = document.getElementById('wheelStage'); if (s) s.classList.toggle('gold', !!on); },
   prizeImage(p) {
     if (p.image) return p.image;
     const prod = p.type === 'product' && (Store.data.products || []).find(x => x.id === p.productId);
@@ -147,7 +145,7 @@ const Wheel = {
     if (this.imgs[src]) return this.imgs[src];
     return (this.imgs[src] = new Promise(res => { const i = new Image(); i.crossOrigin = 'anonymous'; i.onload = () => res(i); i.onerror = () => res(null); i.src = src; }));
   },
-  async drawWheel(kind) {
+  async drawWheel() {
     const cv = document.getElementById('wheelCanvas');
     if (!cv) return;
     const prizes = this.cfg.prizes, n = prizes.length, seg = 2 * Math.PI / n;
@@ -158,47 +156,43 @@ const Wheel = {
     ctx.clearRect(0, 0, S, S);
     const fills = [accent, '#fff4e3'];
     prizes.forEach((p, i) => {
-      const a0 = -Math.PI / 2 + i * seg, a1 = a0 + seg;
+      const a0 = -Math.PI / 2 + i * seg, a1 = a0 + seg, mid = a0 + seg / 2;
       ctx.beginPath(); ctx.moveTo(R, R); ctx.arc(R, R, R - 6, a0, a1); ctx.closePath();
       ctx.fillStyle = p.color || fills[i % 2]; ctx.fill();
       ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(255,255,255,.9)'; ctx.stroke();
-      const dark = !p.color && i % 2 === 1;
+      const light = !p.color && i % 2 === 1;
       ctx.save();
-      ctx.translate(R, R); ctx.rotate(a0 + seg / 2);
-      ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
-      ctx.fillStyle = dark ? '#3b1d00' : '#fff';
-      ctx.font = `800 ${n > 6 ? 26 : 30}px Cairo, Poppins, sans-serif`;
-      ctx.direction = 'ltr';
+      ctx.translate(R, R); ctx.rotate(mid);
+      // Layout along the spoke: hub (0-22%) | name (26-60%) | picture (62-92%). They never overlap.
       const label = String(p.label || '');
-      ctx.fillText(label.length > 14 ? label.slice(0, 13) + '…' : label, R - 40, 0);
-      const img = imgs[i];
-      const sz = n > 6 ? 76 : 92, x = R * 0.5;
-      if (img) {
-        ctx.save(); ctx.beginPath(); ctx.arc(x, 0, sz / 2, 0, 7); ctx.clip(); ctx.rotate(Math.PI / 2 * 0);
-        ctx.fillStyle = '#fff'; ctx.fillRect(x - sz / 2, -sz / 2, sz, sz);
-        ctx.drawImage(img, x - sz / 2, -sz / 2, sz, sz); ctx.restore();
-        ctx.lineWidth = 4; ctx.strokeStyle = '#fff'; ctx.beginPath(); ctx.arc(x, 0, sz / 2, 0, 7); ctx.stroke();
-      } else if (p.type === 'percent') {
-        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(x, 0, sz / 2, 0, 7); ctx.fill();
-        ctx.fillStyle = accent; ctx.font = '800 34px Poppins, sans-serif'; ctx.textAlign = 'center';
-        ctx.fillText((Number(p.value) || 0) + '%', x, 2);
-      }
+      const lx = R * 0.43, maxW = R * 0.34;
+      let size = 30; ctx.font = `800 ${size}px Cairo, Poppins, sans-serif`;
+      while (size > 15 && ctx.measureText(label).width > maxW) { size -= 1; ctx.font = `800 ${size}px Cairo, Poppins, sans-serif`; }
+      ctx.save(); ctx.translate(lx, 0);
+      if (Math.cos(mid) < 0) ctx.rotate(Math.PI);          // keep names readable on the left half
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.direction = 'inherit';
+      ctx.fillStyle = light ? '#3b1d00' : '#fff'; ctx.fillText(label, 0, 0); ctx.restore();
+      const sz = Math.min(R * 0.3, seg * R * 0.62), x = R * 0.77;
+      ctx.save(); ctx.translate(x, 0); ctx.rotate(Math.PI / 2);   // the picture stands upright when its slice is at the top
+      ctx.beginPath(); ctx.arc(0, 0, sz / 2, 0, 7); ctx.fillStyle = '#fff'; ctx.fill(); ctx.save(); ctx.clip();
+      if (imgs[i]) ctx.drawImage(imgs[i], -sz / 2, -sz / 2, sz, sz);
+      else if (p.type === 'percent') { ctx.fillStyle = accent; ctx.font = '800 34px Poppins, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText((Number(p.value) || 0) + '%', 0, 2); }
+      ctx.restore(); ctx.lineWidth = 4; ctx.strokeStyle = '#fff'; ctx.beginPath(); ctx.arc(0, 0, sz / 2, 0, 7); ctx.stroke(); ctx.restore();
       ctx.restore();
     });
-    ctx.beginPath(); ctx.arc(R, R, R - 3, 0, 7); ctx.lineWidth = 8; ctx.strokeStyle = kind === 'gold' ? '#d4a017' : accent; ctx.stroke();
+    ctx.beginPath(); ctx.arc(R, R, R - 3, 0, 7); ctx.lineWidth = 8; ctx.strokeStyle = accent; ctx.stroke();
   },
 
   /* ---------- spin ---------- */
-  async spin(kind) {
+  async spin() {
     if (this.spinning) return;
     const box = document.getElementById('wheelActions');
     this.spinning = true;
     box.querySelectorAll('button').forEach(b => { b.disabled = true; });
     document.getElementById('wheelResult').classList.add('hidden');
-    this.setGold(kind === 'gold');
     this.audioUnlock();
     let res;
-    try { res = await api('/api/wheel/spin', { method: 'POST', token: await Auth.token(), body: { kind } }); }
+    try { res = await api('/api/wheel/spin', { method: 'POST', token: await Auth.token(), body: {} }); }
     catch (e) {
       this.spinning = false;
       toast(t(e.message === 'no_spin_available' ? 'no_spin_available' : 'wheel_error'));
@@ -259,11 +253,9 @@ const Wheel = {
         <small>${escapeHtml(this.prizeNote(prize))}</small>
         <div class="wheel-won-actions">
           <a class="btn-primary btn-inline" href="${menuUrl()}">${escapeHtml(t('wheel_use_now'))}</a>
-          <button type="button" class="btn-secondary-ghost" id="wheelShare">${escapeHtml(t('wheel_share'))}</button>
         </div>
       </div>`;
     el.classList.remove('hidden');
-    el.querySelector('#wheelShare').addEventListener('click', () => this.share(prize));
     this.winSound(); this.confetti();
   },
   confetti() {
@@ -281,64 +273,6 @@ const Wheel = {
     })(t0);
   },
 
-  /* ---------- "share your win": a 9:16 story image ---------- */
-  async storyBlob(prize) {
-    const W = 1080, H = 1920;
-    const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
-    const ctx = cv.getContext('2d');
-    const css = getComputedStyle(document.documentElement);
-    const accent = (css.getPropertyValue('--accent') || '#b30000').trim() || '#b30000';
-    const accent2 = (css.getPropertyValue('--accent-2') || accent).trim() || accent;
-    try { await document.fonts.load('800 80px Cairo'); await document.fonts.load('600 40px Cairo'); } catch (e) { /* use fallback fonts */ }
-    const g = ctx.createLinearGradient(0, 0, W, H); g.addColorStop(0, accent); g.addColorStop(1, '#16181d');
-    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-    ctx.fillStyle = 'rgba(255,255,255,.06)';
-    for (let i = 0; i < 9; i++) { ctx.beginPath(); ctx.arc(W * (i % 3) / 2, H * (Math.floor(i / 3) + 0.5) / 3, 260, 0, 7); ctx.fill(); }
-    const name = tField(Store.data.settings.restaurantName);
-    const logo = await this.loadImg(Store.data.settings.logo);
-    ctx.textAlign = 'center'; ctx.direction = Store.data.settings.lang === 'ar' ? 'rtl' : 'ltr';
-    let y = 260;
-    if (logo) {
-      ctx.save(); ctx.beginPath(); ctx.arc(W / 2, y, 150, 0, 7); ctx.clip(); ctx.fillStyle = '#fff'; ctx.fillRect(W / 2 - 150, y - 150, 300, 300);
-      const k = Math.min(300 / logo.width, 300 / logo.height); ctx.drawImage(logo, W / 2 - logo.width * k / 2, y - logo.height * k / 2, logo.width * k, logo.height * k); ctx.restore();
-      ctx.lineWidth = 10; ctx.strokeStyle = '#fff'; ctx.beginPath(); ctx.arc(W / 2, y, 150, 0, 7); ctx.stroke();
-      y += 260;
-    }
-    ctx.fillStyle = '#fff'; ctx.font = '800 70px Cairo, Poppins, sans-serif'; ctx.fillText(name, W / 2, y); y += 200;
-    ctx.fillStyle = 'rgba(255,255,255,.85)'; ctx.font = '600 56px Cairo, Poppins, sans-serif'; ctx.fillText(t('wheel_won'), W / 2, y); y += 150;
-    // prize card
-    const pimg = await this.loadImg(this.prizeImage(Object.assign({ type: prize.type, productId: prize.productId, image: prize.image })));
-    ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.roundRect(110, y - 70, W - 220, 620, 60); ctx.fill();
-    if (pimg) { ctx.save(); ctx.beginPath(); ctx.roundRect(W / 2 - 170, y - 20, 340, 340, 40); ctx.clip(); ctx.drawImage(pimg, W / 2 - 170, y - 20, 340, 340); ctx.restore(); }
-    else if (prize.type === 'percent') { ctx.fillStyle = accent; ctx.font = '800 220px Poppins, sans-serif'; ctx.fillText((Number(prize.value) || 0) + '%', W / 2, y + 230); }
-    ctx.fillStyle = '#16181d'; ctx.font = '800 92px Cairo, Poppins, sans-serif';
-    this.wrapText(ctx, prize.label, W / 2, y + 450, W - 300, 100);
-    y += 760;
-    ctx.fillStyle = accent2 === accent ? '#ffd666' : accent2;
-    ctx.beginPath(); ctx.roundRect(W / 2 - 360, y, 720, 120, 60); ctx.fill();
-    ctx.fillStyle = '#16181d'; ctx.font = '800 54px Cairo, Poppins, sans-serif'; ctx.fillText(t('wheel_title'), W / 2, y + 78);
-    ctx.fillStyle = '#fff'; ctx.font = '600 48px Poppins, Cairo, sans-serif'; ctx.direction = 'ltr';
-    ctx.fillText(location.host, W / 2, H - 140);
-    return new Promise(res => cv.toBlob(b => res(b), 'image/png'));
-  },
-  wrapText(ctx, text, x, y, maxW, lh) {
-    const words = String(text).split(' '); let line = '', lines = [];
-    words.forEach(w => { const test = line ? line + ' ' + w : w; if (ctx.measureText(test).width > maxW && line) { lines.push(line); line = w; } else line = test; });
-    lines.push(line);
-    const top = y - (lines.length - 1) * lh / 2;
-    lines.slice(0, 3).forEach((l, i) => ctx.fillText(l, x, top + i * lh));
-  },
-  async share(prize) {
-    try {
-      const blob = await this.storyBlob(prize);
-      if (!blob) throw new Error('no image');
-      const file = new File([blob], 'wheel-win.png', { type: 'image/png' });
-      const text = `${t('wheel_won')} ${prize.label}! ${location.origin}`;
-      if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], text, url: location.origin }); return; }
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'wheel-win.png'; document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-    } catch (e) { if (e && e.name !== 'AbortError') { console.error(e); toast(t('wheel_share_failed')); } }
-  }
 };
 
 /* Start the wheel once a page has booted. */

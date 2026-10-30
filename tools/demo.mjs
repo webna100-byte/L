@@ -67,14 +67,14 @@ if (cmd === 'list') {
   if (!config) { console.error('site not found'); process.exit(1); }
   const name = p => String(typeof p.name === 'string' ? p.name : Object.values(p.name || {})[0] || '');
   const find = re => (config.products.find(p => re.test(name(p))) || {}).id || '';
-  const prize = (id, label, productId, weight, goldWeight, big) => ({ id, label, type: 'product', productId, weight, goldWeight, big });
+  const prize = (id, label, productId, weight, big) => ({ id, label, type: 'product', productId, weight, big });
   config.settings.auth = { mode: 'phone', country, demoShowCode: true };
-  config.wheel = { enabled: true, title: '', minOrder: 100, goldenEvery: 150, validHours: 48, weeklyBigCap: 10, prizes: [
-    prize('drink', 'مشروب', find(/cola|drink|مشروب|ليمون|lemon|water|مياه|pepsi|بيبسي/i), 35, 0, false),
-    prize('fries', 'بطاطا', find(/fries|بطاط|patat|potato/i) || find(/salad|سلطة/i), 30, 20, false),
-    { id: 'd10', label: 'خصم 10%', type: 'percent', value: 10, weight: 20, goldWeight: 20, big: false },
-    prize('wings', 'أجنحة', find(/wing|أجنحة|جناح|chicken|دجاج/i), 12, 35, true),
-    prize('classic', 'كلاسيك برغر', find(/classic|كلاسيك|burger|برغر/i), 3, 25, true)
+  config.wheel = { enabled: true, title: '', minOrder: 100, validHours: 0, weeklyBigCap: 10, prizes: [
+    prize('drink', 'مشروب', find(/cola|drink|مشروب|ليمون|lemon|water|مياه|pepsi|بيبسي/i), 35, false),
+    prize('fries', 'بطاطا', find(/fries|بطاط|patat|potato/i) || find(/salad|سلطة/i), 30, false),
+    { id: 'd10', label: 'خصم 10%', type: 'percent', value: 10, weight: 20, big: false },
+    prize('wings', 'أجنحة', find(/wing|أجنحة|جناح|chicken|دجاج/i), 12, true),
+    prize('classic', 'كلاسيك برغر', find(/classic|كلاسيك|burger|برغر/i), 3, true)
   ] };
   if (config.wheel.prizes.some(p => p.type === 'product' && !p.productId)) { console.error('could not match every prize to a product; set them in Admin > Wheel game'); }
   await call(`${BASE}/api/admin/config`, { method: 'PUT', headers: h, body: JSON.stringify({ config, baseVersion: Number(config.version) || 0 }) });

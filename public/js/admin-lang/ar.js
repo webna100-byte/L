@@ -347,7 +347,6 @@ Object.assign(window.ADMIN_TR, {
   "Game is on": "اللعبة مفعّلة",
   "Title": "العنوان",
   "Minimum order to use a prize": "الحد الأدنى للطلب لاستخدام الجائزة",
-  "Golden spin for every purchases of": "لفّة ذهبية مقابل كل مشتريات بقيمة",
   "Prize valid for (hours, 0 = never expires)": "صلاحية الجائزة (بالساعات، 0 = لا تنتهي)",
   "Big prizes per week (cap)": "سقف الجوائز الكبيرة أسبوعيًا",
   "Chances are relative numbers: 35, 30, 20 ... are normalised, so they do not have to add up to 100. The result is drawn on the server only.": "الاحتمالات أرقام نسبية: 35 و30 و20 ... تُحسب تلقائيًا ولا يلزم أن يكون مجموعها 100. النتيجة تُحسب على السيرفر فقط.",
@@ -358,16 +357,12 @@ Object.assign(window.ADMIN_TR, {
   "Prize name": "اسم الجائزة",
   "Free product": "منتج مجاني",
   "Product": "المنتج",
-  "Daily spin chance": "احتمال اللفة اليومية",
-  "Golden spin chance": "احتمال اللفة الذهبية",
   "Big prize (weekly cap)": "جائزة كبيرة (تخضع للسقف)",
   "Add at least two prizes": "أضف جائزتين على الأقل",
   "Every prize needs a name": "لكل جائزة اسم",
   "Choose a product for every product prize": "اختر منتجًا لكل جائزة منتج",
-  "At least one prize needs a chance in each spin type": "يجب أن تكون لجائزة واحدة على الأقل فرصة في كل نوع لفّة",
   "Results": "النتائج",
   "Spins": "اللفّات",
-  "Golden spins": "اللفّات الذهبية",
   "Prizes used": "جوائز مستخدمة",
   "Orders with a prize": "مبيعات بطلبات بجائزة",
   "Big prizes this week": "جوائز كبيرة هذا الأسبوع",
@@ -388,5 +383,7 @@ Object.assign(window.ADMIN_TR, {
   "Kuwait": "الكويت",
   "Jordan": "الأردن",
   "Ask for a code even for numbers that signed in before (safer)": "اطلب رمزًا حتى للأرقام التي سجّلت من قبل (أكثر أمانًا)",
-  "A known number signs in without a code and its saved name and address are filled in at checkout; anyone who knows a number could see that name and address, so turn the option above on if that matters to you.": "الرقم المعروف يدخل بلا رمز ويُملأ اسمه وعنوانه المحفوظان عند الطلب؛ أي شخص يعرف الرقم يستطيع رؤية الاسم والعنوان، فإن كان ذلك يهمك فعّل الخيار أعلاه."
+  "A known number signs in without a code and its saved name and address are filled in at checkout; anyone who knows a number could see that name and address, so turn the option above on if that matters to you.": "الرقم المعروف يدخل بلا رمز ويُملأ اسمه وعنوانه المحفوظان عند الطلب؛ أي شخص يعرف الرقم يستطيع رؤية الاسم والعنوان، فإن كان ذلك يهمك فعّل الخيار أعلاه.",
+  "At least one prize needs a chance": "يجب أن تكون لجائزة واحدة على الأقل فرصة",
+  "Chance": "الاحتمال"
 });

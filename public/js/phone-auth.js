@@ -15,11 +15,11 @@ Object.assign(I18N.en, {
   signed_in_as: 'Signed in as', confirm_phone_first: 'Confirm your mobile number to continue.', dev_code: 'Test code: {code}', login_failed: 'Could not sign in. Please try again.',
   prize_invalid: 'This prize is no longer valid.', prize_min_order: 'Your prize needs an order of at least {amount}.', prize_unavailable: 'The prize item is not available at this branch.',
   prize_applied: 'Wheel prize applied: {label}', prize_remove: 'Remove', prize_use: 'Use prize', prize_line: 'Wheel prize',
-  wheel_title: 'Spin the wheel and win!', wheel_sub: 'One free spin every day', wheel_spin_free: 'Free spin', wheel_spin_gold: 'Golden spin ({n})',
-  wheel_next_day: 'Your next free spin is tomorrow.', wheel_login: 'Sign in to spin the wheel', wheel_won: 'Congratulations! You won', wheel_code: 'Prize code',
-  wheel_valid_until: 'Valid until {date}', wheel_min_order: 'On orders of {amount} or more', wheel_use_now: 'Use it now', wheel_share: 'Share your win',
-  wheel_my_prizes: 'My prizes', wheel_none: 'No prizes yet', wheel_golden_hint: 'You earn a golden spin for every {amount} you spend.', wheel_error: 'The spin failed. Please try again.',
-  wheel_auto: 'Applied automatically on your next order', wheel_auto_min: 'Applied automatically on orders of {amount} or more', no_spin_available: 'No spin available right now.', wheel_sound: 'Sound', wheel_spinning: 'Spinning…', wheel_share_failed: 'Could not create the image.'
+  wheel_title: 'Spin the wheel and win!', wheel_sub: 'One free spin every day', wheel_rule: 'Your prize is applied automatically on an order of {amount} or more.', wheel_spin_free: 'Free spin',
+  wheel_next_day: 'Your next free spin is tomorrow.', wheel_login: 'Sign in to spin the wheel', wheel_won: 'Congratulations! You won',
+  wheel_valid_until: 'Valid until {date}', wheel_min_order: 'On orders of {amount} or more', wheel_use_now: 'Use it now',
+  wheel_my_prizes: 'My prizes', wheel_none: 'No prizes yet', wheel_error: 'The spin failed. Please try again.',
+  wheel_auto: 'Applied automatically on your next order', wheel_auto_min: 'Applied automatically on orders of {amount} or more', no_spin_available: 'No spin available right now.', wheel_sound: 'Sound', wheel_spinning: 'Spinning…'
 });
 Object.assign(I18N.ar, {
   phone_label: 'رقم الجوال', phone_ph: '059 123 4567', confirm: 'تأكيد', otp_label: 'رمز التحقق',
@@ -29,11 +29,11 @@ Object.assign(I18N.ar, {
   signed_in_as: 'مسجّل برقم', confirm_phone_first: 'أكّد رقم جوالك للمتابعة.', dev_code: 'رمز التجربة: {code}', login_failed: 'تعذّر تسجيل الدخول، حاول مرة أخرى.',
   prize_invalid: 'هذه الجائزة لم تعد صالحة.', prize_min_order: 'جائزتك تحتاج طلبًا بقيمة {amount} على الأقل.', prize_unavailable: 'منتج الجائزة غير متوفر في هذا الفرع.',
   prize_applied: 'تم تطبيق جائزة العجلة: {label}', prize_remove: 'إزالة', prize_use: 'استخدم الجائزة', prize_line: 'جائزة العجلة',
-  wheel_title: 'لف العجلة واربح!', wheel_sub: 'لفّة مجانية كل يوم', wheel_spin_free: 'لفّة مجانية', wheel_spin_gold: 'لفّة ذهبية ({n})',
-  wheel_next_day: 'لفّتك المجانية القادمة غدًا.', wheel_login: 'سجّل دخولك لتلف العجلة', wheel_won: 'مبروك! ربحت', wheel_code: 'كود الجائزة',
-  wheel_valid_until: 'صالحة حتى {date}', wheel_min_order: 'عند طلب بقيمة {amount} أو أكثر', wheel_use_now: 'استخدمها الآن', wheel_share: 'شارك نتيجتك',
-  wheel_my_prizes: 'جوائزي', wheel_none: 'لا توجد جوائز حاليًا', wheel_golden_hint: 'تحصل على لفّة ذهبية مقابل كل {amount} مشتريات.', wheel_error: 'تعذّرت اللفّة، حاول مرة أخرى.',
-  wheel_auto: 'تُطبَّق تلقائيًا على طلبك القادم', wheel_auto_min: 'تُطبَّق تلقائيًا عند طلب بقيمة {amount} أو أكثر', no_spin_available: 'لا توجد لفّة متاحة الآن.', wheel_sound: 'الصوت', wheel_spinning: 'تدور العجلة…', wheel_share_failed: 'تعذّر إنشاء الصورة.'
+  wheel_title: 'لف العجلة واربح!', wheel_sub: 'لفّة مجانية كل يوم', wheel_rule: 'تُطبَّق جائزتك تلقائيًا عند طلب بقيمة {amount} أو أكثر.', wheel_spin_free: 'لفّة مجانية',
+  wheel_next_day: 'لفّتك المجانية القادمة غدًا.', wheel_login: 'سجّل دخولك لتلف العجلة', wheel_won: 'مبروك! ربحت',
+  wheel_valid_until: 'صالحة حتى {date}', wheel_min_order: 'عند طلب بقيمة {amount} أو أكثر', wheel_use_now: 'استخدمها الآن',
+  wheel_my_prizes: 'جوائزي', wheel_none: 'لا توجد جوائز حاليًا', wheel_error: 'تعذّرت اللفّة، حاول مرة أخرى.',
+  wheel_auto: 'تُطبَّق تلقائيًا على طلبك القادم', wheel_auto_min: 'تُطبَّق تلقائيًا عند طلب بقيمة {amount} أو أكثر', no_spin_available: 'لا توجد لفّة متاحة الآن.', wheel_sound: 'الصوت', wheel_spinning: 'تدور العجلة…'
 });
 
 Object.assign(Auth, {

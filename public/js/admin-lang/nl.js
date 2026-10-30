@@ -347,7 +347,6 @@ Object.assign(window.ADMIN_TR, {
   "Game is on": "Spel staat aan",
   "Title": "Titel",
   "Minimum order to use a prize": "Minimumbestelling om een prijs te gebruiken",
-  "Golden spin for every purchases of": "Gouden draai voor elke aankoop van",
   "Prize valid for (hours, 0 = never expires)": "Prijs geldig voor (uren, 0 = verloopt nooit)",
   "Big prizes per week (cap)": "Grote prijzen per week (limiet)",
   "Chances are relative numbers: 35, 30, 20 ... are normalised, so they do not have to add up to 100. The result is drawn on the server only.": "De kansen zijn relatieve getallen: 35, 30, 20 ... worden genormaliseerd en hoeven dus niet op 100 uit te komen. De uitslag wordt alleen op de server getrokken.",
@@ -358,16 +357,12 @@ Object.assign(window.ADMIN_TR, {
   "Prize name": "Naam van de prijs",
   "Free product": "Gratis product",
   "Product": "Product",
-  "Daily spin chance": "Kans bij de dagelijkse draai",
-  "Golden spin chance": "Kans bij de gouden draai",
   "Big prize (weekly cap)": "Grote prijs (wekelijkse limiet)",
   "Add at least two prizes": "Voeg minstens twee prijzen toe",
   "Every prize needs a name": "Elke prijs heeft een naam nodig",
   "Choose a product for every product prize": "Kies een product voor elke productprijs",
-  "At least one prize needs a chance in each spin type": "Minstens één prijs heeft een kans nodig bij elk soort draai",
   "Results": "Resultaten",
   "Spins": "Draaien",
-  "Golden spins": "Gouden draaien",
   "Prizes used": "Gebruikte prijzen",
   "Orders with a prize": "Bestellingen met een prijs",
   "Big prizes this week": "Grote prijzen deze week",
@@ -388,5 +383,7 @@ Object.assign(window.ADMIN_TR, {
   "Kuwait": "Koeweit",
   "Jordan": "Jordanië",
   "Ask for a code even for numbers that signed in before (safer)": "Ook een code vragen voor nummers die al eerder inloggen (veiliger)",
-  "A known number signs in without a code and its saved name and address are filled in at checkout; anyone who knows a number could see that name and address, so turn the option above on if that matters to you.": "Een bekend nummer logt in zonder code en de opgeslagen naam en het adres worden bij het afrekenen ingevuld; iedereen die een nummer kent, kan die naam en dat adres zien. Zet de optie hierboven aan als dat voor jou belangrijk is."
+  "A known number signs in without a code and its saved name and address are filled in at checkout; anyone who knows a number could see that name and address, so turn the option above on if that matters to you.": "Een bekend nummer logt in zonder code en de opgeslagen naam en het adres worden bij het afrekenen ingevuld; iedereen die een nummer kent, kan die naam en dat adres zien. Zet de optie hierboven aan als dat voor jou belangrijk is.",
+  "At least one prize needs a chance": "Minstens één prijs heeft een kans nodig",
+  "Chance": "Kans"
 });

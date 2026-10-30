@@ -347,7 +347,6 @@ Object.assign(window.ADMIN_TR, {
   "Game is on": "Gioco attivo",
   "Title": "Titolo",
   "Minimum order to use a prize": "Ordine minimo per usare un premio",
-  "Golden spin for every purchases of": "Giro dorato ogni acquisto accumulato di",
   "Prize valid for (hours, 0 = never expires)": "Validità del premio (ore, 0 = non scade mai)",
   "Big prizes per week (cap)": "Premi grandi a settimana (limite)",
   "Chances are relative numbers: 35, 30, 20 ... are normalised, so they do not have to add up to 100. The result is drawn on the server only.": "Le probabilità sono numeri relativi: 35, 30, 20 ... vengono normalizzati, quindi non devono sommare 100. Il risultato viene estratto solo sul server.",
@@ -358,16 +357,12 @@ Object.assign(window.ADMIN_TR, {
   "Prize name": "Nome del premio",
   "Free product": "Prodotto gratuito",
   "Product": "Prodotto",
-  "Daily spin chance": "Probabilità del giro giornaliero",
-  "Golden spin chance": "Probabilità del giro dorato",
   "Big prize (weekly cap)": "Premio grande (limite settimanale)",
   "Add at least two prizes": "Aggiungi almeno due premi",
   "Every prize needs a name": "Ogni premio ha bisogno di un nome",
   "Choose a product for every product prize": "Scegli un prodotto per ogni premio prodotto",
-  "At least one prize needs a chance in each spin type": "Almeno un premio deve avere una probabilità in ogni tipo di giro",
   "Results": "Risultati",
   "Spins": "Giri",
-  "Golden spins": "Giri dorati",
   "Prizes used": "Premi usati",
   "Orders with a prize": "Ordini con un premio",
   "Big prizes this week": "Premi grandi questa settimana",
@@ -388,5 +383,7 @@ Object.assign(window.ADMIN_TR, {
   "Kuwait": "Kuwait",
   "Jordan": "Giordania",
   "Ask for a code even for numbers that signed in before (safer)": "Chiedi un codice anche per i numeri che hanno già effettuato l'accesso (più sicuro)",
-  "A known number signs in without a code and its saved name and address are filled in at checkout; anyone who knows a number could see that name and address, so turn the option above on if that matters to you.": "Un numero già noto entra senza codice e il suo nome e indirizzo salvati vengono precompilati all'ordine; chiunque conosca un numero potrebbe vedere quel nome e indirizzo, quindi attiva l'opzione qui sopra se ti interessa."
+  "A known number signs in without a code and its saved name and address are filled in at checkout; anyone who knows a number could see that name and address, so turn the option above on if that matters to you.": "Un numero già noto entra senza codice e il suo nome e indirizzo salvati vengono precompilati all'ordine; chiunque conosca un numero potrebbe vedere quel nome e indirizzo, quindi attiva l'opzione qui sopra se ti interessa.",
+  "At least one prize needs a chance": "Almeno un premio deve avere una probabilità",
+  "Chance": "Probabilità"
 });

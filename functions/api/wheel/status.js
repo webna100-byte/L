@@ -1,6 +1,6 @@
 /* GET /api/wheel/status (signed-in customer)
-   -> what this customer can do now: today's free spin, golden spins earned
-      from past purchases, and the prizes still waiting to be used. */
+   -> whether today's free spin is still available, and the prizes waiting
+      on this number to be used. */
 import { json, fail, handle, authUser, loadConfig } from '../../_lib/http.js';
 import { customerAllowed } from '../../_lib/customer.js';
 import { Firestore, where } from '../../_lib/firestore.js';
@@ -30,7 +30,6 @@ export const onRequestGet = handle(async ({ request, env }) => {
     enabled: true,
     wheel: publicWheel(config),
     freeAvailable: st.freeAvailable,
-    goldAvailable: st.goldAvailable,
-    prizes: (await activePrizes(fs, user.uid, now)).map(p => ({ code: p.code, label: p.label, type: p.type, productId: p.productId, value: p.value, image: p.image, minOrder: p.minOrder, expiresAt: p.expiresAt, kind: p.kind }))
+    prizes: (await activePrizes(fs, user.uid, now)).map(p => ({ code: p.code, label: p.label, type: p.type, productId: p.productId, value: p.value, image: p.image, minOrder: p.minOrder, expiresAt: p.expiresAt }))
   });
 });

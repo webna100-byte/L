@@ -59,15 +59,3 @@ export function statusMessage(order, status, settings) {
   if (!text) return null;
   return { title: `${name} · #${order.number}`, body: text };
 }
-
-/* Money spent by a customer counts toward golden wheel spins once the order
-   is delivered (and is taken back if a delivered order is reopened). */
-export function spendEffects(order, to) {
-  const from = order.status;
-  const base = Number(order.net != null ? order.net : order.total) || 0;
-  let awarded = !!order.spendAwarded;
-  let spend = 0;
-  if (to === 'delivered' && !awarded && base > 0) { spend += base; awarded = true; }
-  if (from === 'delivered' && to !== 'delivered' && awarded) { spend -= base; awarded = false; }
-  return { spendAwarded: awarded, spend };
-}

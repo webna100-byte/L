@@ -5,7 +5,7 @@
    "delivered"; gift points go back when it is cancelled. */
 import { json, fail, handle, readJson, authUser, isAdmin, activeCashier, loadConfig } from '../../_lib/http.js';
 import { Firestore } from '../../_lib/firestore.js';
-import { STATUSES, CASHIER_TRANSITIONS, statusEffects, spendEffects, statusMessage } from '../../_lib/orders.js';
+import { STATUSES, CASHIER_TRANSITIONS, statusEffects, statusMessage } from '../../_lib/orders.js';
 import { sendToTokens } from '../../_lib/push.js';
 import { siteOf } from '../../_lib/site.js';
 
@@ -35,16 +35,15 @@ export const onRequestPost = handle(async ({ request, env, waitUntil }) => {
     if (order.status === status) return { writes: [], result: { order, changed: false } };
 
     const fx = statusEffects(order, status);
-    const sp = spendEffects(order, status);
     const writes = [];
-    if (fx.points || fx.lifetime || sp.spend) {
+    if (fx.points || fx.lifetime) {
       if (fx.needPoints) {
         const u = await fs.get(`users/${order.uid}`, tx);
         if (!u || (Number(u.data.points) || 0) < fx.needPoints) {
           throw Object.assign(new Error('insufficient_points'), { status: 409, publicMessage: 'customer_points_spent' });
         }
       }
-      writes.push(fs.merge(`users/${order.uid}`, { updatedAt: now }, { increments: { points: fx.points, lifetimePoints: fx.lifetime, lifetimeSpend: sp.spend } }));
+      writes.push(fs.merge(`users/${order.uid}`, { updatedAt: now }, { increments: { points: fx.points, lifetimePoints: fx.lifetime } }));
     }
     // A cancelled order gives its wheel prize back, if the prize has not expired.
     let prizeRestored = !!order.prizeRestored;
@@ -57,7 +56,7 @@ export const onRequestPost = handle(async ({ request, env, waitUntil }) => {
     }
     const history = (Array.isArray(order.statusHistory) ? order.statusHistory : []).concat({ status, at: now, by }).slice(-20);
     writes.push(fs.merge(`orders/${orderId}`, {
-      status, statusHistory: history, updatedAtMs: now, pointsAwarded: fx.pointsAwarded, giftRefunded: fx.giftRefunded, spendAwarded: sp.spendAwarded, prizeRestored
+      status, statusHistory: history, updatedAtMs: now, pointsAwarded: fx.pointsAwarded, giftRefunded: fx.giftRefunded, prizeRestored
     }, { mustExist: true }));
     return { writes, result: { order: { ...order, status }, changed: true } };
   });
