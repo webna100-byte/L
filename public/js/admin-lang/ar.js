@@ -385,19 +385,5 @@ Object.assign(window.ADMIN_TR, {
   "Ask for a code even for numbers that signed in before (safer)": "اطلب رمزًا حتى للأرقام التي سجّلت من قبل (أكثر أمانًا)",
   "A known number signs in without a code and its saved name and address are filled in at checkout; anyone who knows a number could see that name and address, so turn the option above on if that matters to you.": "الرقم المعروف يدخل بلا رمز ويُملأ اسمه وعنوانه المحفوظان عند الطلب؛ أي شخص يعرف الرقم يستطيع رؤية الاسم والعنوان، فإن كان ذلك يهمك فعّل الخيار أعلاه.",
   "At least one prize needs a chance": "يجب أن تكون لجائزة واحدة على الأقل فرصة",
-  "Chance": "الاحتمال",
-  "Sales report": "تقرير المبيعات",
-  "Previous": "السابق",
-  "Next": "التالي",
-  "Sales are the food of delivered orders after discounts, without delivery fees. Subscribers are new verified phone numbers; new customers are new numbers that also had a delivered order this month.": "المبيعات هي الطعام في الطلبات المسلَّمة بعد الخصومات وبدون رسوم التوصيل. المشتركون هم أرقام جوال جديدة تم التحقق منها، والزبائن الجدد هم أرقام جديدة أتمّت أيضًا طلبًا مسلَّمًا هذا الشهر.",
-  "Website sales": "مبيعات الموقع",
-  "Orders delivered": "الطلبات المسلَّمة",
-  "Average order": "متوسط الطلب",
-  "New subscribers": "مشتركون جدد",
-  "New customers": "زبائن جدد",
-  "Orders cancelled": "الطلبات الملغاة",
-  "Commission rate %": "نسبة العمولة %",
-  "Commission": "العمولة",
-  "Day": "اليوم",
-  "No orders this month.": "لا توجد طلبات هذا الشهر."
+  "Chance": "الاحتمال"
 });

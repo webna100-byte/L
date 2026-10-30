@@ -704,10 +704,3 @@ body.wheel-open { overflow: hidden; }
 
 .wheel-fab { transition: opacity .2s, transform .2s; }
 .wheel-fab-away { opacity: 0; transform: scale(.6); pointer-events: none; }
-
-.report-bar { display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 8px; }
-.report-commission { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; margin: 6px 0 14px; padding: 12px; background: var(--surface-2); border-radius: 12px; }
-.report-commission .form-group { margin: 0; flex: 0 0 140px; }
-.report-due { margin-inline-start: auto; display: grid; text-align: end; }
-.report-due span { color: var(--muted); font-size: .76rem; }
-.report-due strong { font-size: 1.3rem; }

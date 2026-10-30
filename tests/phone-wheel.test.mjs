@@ -20,7 +20,6 @@ const wheelStatus = (await import('../functions/api/wheel/status.js')).onRequest
 const wheelSpin = (await import('../functions/api/wheel/spin.js')).onRequestPost;
 const wheelStats = (await import('../functions/api/admin/wheel.js')).onRequestGet;
 const siteApi = (await import('../functions/api/site.js')).onRequestGet;
-const report = (await import('../functions/api/admin/report.js')).onRequestGet;
 
 const seed = JSON.parse(fs.readFileSync(new URL('../public/seed/demo-config.json', import.meta.url)));
 function baseConfig(wheelOver = {}, authOver = {}) {
@@ -368,33 +367,5 @@ test('old saved texts that mention Google are cleaned before visitors see them',
     assert.equal(body.config.pages.login.button, 'Continuar con tu número de móvil');
     assert.ok(!/google/i.test(JSON.stringify(body.config)));
     assert.match(JSON.stringify(JSON.parse(await t.env.STORE.get('config'))), /Google/, 'the stored config is not rewritten');
-  } finally { await t.close(); }
-});
-
-test('sales report: delivered food sales, new subscribers/customers, commission from the percentage', async () => {
-  const cfg = baseConfig(); cfg.settings.report = { commissionPercent: 10 };
-  const t = await setup(cfg);
-  try {
-    const admin = staffToken({ role: 'admin', site: '' });
-    const a = await signUp(t, '0592020201'), b = await signUp(t, '0592020202'), c = await signUp(t, '0592020203');   // 3 subscribers
-    const o1 = await order(t, a.token, { items: [{ productId: 'prod_classic_burger', qty: 4 }], customer: { name: 'أ' } });             // 38
-    const o2 = await order(t, b.token, { type: 'delivery', zoneId: 'zone_branch_downtown_standard', items: [{ productId: 'prod_classic_burger', qty: 2 }], customer: { name: 'ب', address: 'رام الله' } }); // 19 + delivery
-    const o3 = await order(t, c.token, { items: [{ productId: 'prod_cola', qty: 2 }], customer: { name: 'ج' } });                       // cancelled
-    const set = (id, status) => call(setStatus, t.ctx, req('/api/orders/status', { method: 'POST', token: admin, body: { orderId: id, status } }));
-    for (const id of [o1.id, o2.id]) for (const st of ['preparing', 'delivered']) assert.equal((await set(id, st)).status, 200);
-    await set(o3.id, 'cancelled');
-    await call(wheelSpin, t.ctx, req('/api/wheel/spin', { method: 'POST', token: a.token, body: {} }));
-    const r = await call(report, t.ctx, req('/api/admin/report', { token: admin }));
-    assert.equal(r.status, 200, JSON.stringify(r));
-    const food1 = t.store.list('orders').find(o => o.number === o1.number), food2 = t.store.list('orders').find(o => o.number === o2.number);
-    const expected = Math.round(((food1.total - food1.deliveryFee + food1.deliveryDiscount) + (food2.total - food2.deliveryFee + food2.deliveryDiscount)) * 100) / 100;
-    assert.deepEqual([r.delivered, r.cancelled, r.subscribers, r.newCustomers, r.spins], [2, 1, 3, 2, 1]);
-    assert.equal(r.sales, expected, 'delivery fees are not part of the sales');
-    assert.equal(r.commission, Math.round(expected * 10) / 100, '10% of the sales');
-    assert.equal(r.average, Math.round(expected / 2 * 100) / 100);
-    assert.equal(r.days.length, 1);
-    assert.equal((await call(report, t.ctx, req('/api/admin/report?month=2001-01', { token: admin }))).delivered, 0, 'other months are empty');
-    assert.equal((await call(report, t.ctx, req('/api/admin/report?month=nope', { token: admin }))).status, 400);
-    assert.equal((await call(report, t.ctx, req('/api/admin/report', { token: googleToken('x') }))).status, 401);
   } finally { await t.close(); }
 });
