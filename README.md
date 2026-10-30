@@ -22,7 +22,7 @@ It all runs on the **free plans** of Cloudflare and Firebase.
 - **Header:** logo, cart, hamburger menu (sign in/out, privacy policy, refund policy).
 - **Bottom bar:** Levels · Gifts · Home · Notifications · My Orders.
 - **Menu:** categories bar (3 styles), product options (sizes with their own price, paid extras, free choices), product discounts, multiple locations.
-- **Sign-in with Google only.** Browsing and the cart are open to everyone; placing an order needs sign-in.
+- **Sign-in:** Google (default) or **mobile number + one-time code** per site (*Admin › Restaurant Settings › Customer sign-in*, see [Phone sign-in & wheel](#phone-sign-in--wheel)). Browsing and the cart are open to everyone; placing an order needs sign-in.
 - **Levels (Silver → Gold → Diamond)** by lifetime points, each with a permanent discount.
 - **Gifts** redeemed with points; points are deducted in the same transaction that creates the order, so they can never be spent twice.
 - **Discounts:** by order amount (percentage or fixed), on delivery (percentage, fixed or free), minimum delivery order, optional tax.
@@ -96,6 +96,29 @@ Safari blocks third-party storage, which can break sign-in when the site is inst
 
 ### iPhone notifications
 iOS 16.4+ delivers web push **only after the site is added to the home screen** (an Apple rule). The Notifications page explains the steps to customers automatically. Android and desktop work right away.
+
+## Phone sign-in & wheel
+
+Per site, in *Admin › Restaurant Settings › Customer sign-in*: **Mobile number (one-time code)** removes Google sign-in completely and makes the phone number the customer's account (orders, points, wheel spins and prizes all belong to it). The default stays Google, so existing sites do not change.
+
+**Checkout order:** pickup/delivery → mobile number + *Confirm* → name, address, summary.
+- *New number:* a 5-digit code (5 minutes, 3 codes per number per hour, 5 wrong guesses) is sent; after it is entered the name/address fields start empty.
+- *Known number:* no code and no message; the saved name/address are filled in (editable) and updated when the order is placed. Option *Ask for a code even for numbers that signed in before* turns the code on for them too: **turn it on if anyone knowing a number must not see that person's name and address.**
+- Numbers are normalised to E.164 (059/056 → +970, other 05x → +972, Gulf prefixes by the site's default country).
+
+**Sending the code** goes through one interface (`functions/_lib/otp.js`), chosen with the `OTP_PROVIDER` variable:
+
+| `OTP_PROVIDER` | Variables | |
+|---|---|---|
+| `console` (default) | – | prints the code in the server log (development) |
+| `twilio` | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM`, optional `TWILIO_CHANNEL=whatsapp` | SMS or WhatsApp |
+| `webhook` | `OTP_WEBHOOK_URL`, optional `OTP_WEBHOOK_TOKEN`, `OTP_CHANNEL` | POSTs `{to, code, text, channel}` to any gateway |
+
+Also set `OTP_SECRET` (any long random string; codes are stored only as an HMAC). To add a provider, add one function to `PROVIDERS`. `OTP_DEV_ECHO=1` returns the code in the API response (local tests only). For **demo sites** only, `settings.auth.demoShowCode = true` shows the code on screen so a prospect can try the flow; it is ignored on the main site.
+
+**Wheel** (*Admin › Wheel game*): banner on the home and menu pages, a floating button, one free spin per day per number, a golden spin for every N spent on delivered orders, one-time 48-hour prize codes bound to the number and applied automatically at checkout when the order reaches the minimum, a weekly cap for big prizes, and results. The draw, the entitlement checks and the cap run only in `functions/api/wheel/spin.js` (one Firestore transaction); chances are never sent to browsers. Firestore collections used: `prizes`, `spins`, `meta/wheel_<week>`, and the customer's `users/<id>` (`lastFreeSpinDay`, `goldSpinsUsed`, `lifetimeSpend`).
+
+Tests: `node --test tests/phone-wheel.test.mjs` (API, in memory) and `node tests/e2e-phone-wheel.mjs` (real pages in Chromium, Firebase SDK stubbed).
 
 ## Free-plan limits (far above a normal restaurant)
 

@@ -53,16 +53,18 @@ boot('home', async (d) => {
           <h2>${tx(login.title) || t('menu_login')}</h2>
           ${tField(login.text) ? `<p>${tx(login.text)}</p>` : ''}
         </div>
-        ${googleButtonHtml(tField(login.button) || t('menu_login'), 'homeGoogleBtn')}
+        ${Auth.mode() === 'phone' ? `<a class="btn-primary btn-inline" href="${loginUrl('/')}">${tField(login.button) || t('menu_login')}</a>` : googleButtonHtml(tField(login.button) || t('menu_login'), 'homeGoogleBtn')}
       </div>`;
-    document.getElementById('homeGoogleBtn').addEventListener('click', e => doGoogleSignIn(e.currentTarget, '/'));
+    const gb = document.getElementById('homeGoogleBtn');
+    if (gb) gb.addEventListener('click', e => doGoogleSignIn(e.currentTarget, '/'));
   }
   async function renderSignedIn(user) {
-    const first = (user.displayName || '').split(' ')[0];
+    let first = (user.displayName || '').split(' ')[0];
     box.innerHTML = `<div class="account-card signed-in"><div class="account-text"><h2>${escapeHtml(t('hello', { name: first }))}</h2><p class="mini-note">${t('loading')}</p></div></div>`;
     if (!loyaltyOn) { box.querySelector('.mini-note').remove(); return; }
     try {
       const me = await Auth.profile();
+      first = (user.displayName || me.name || '').split(' ')[0] || first;
       const level = Pricing.levelFor(d.loyalty, me.lifetimePoints);
       box.innerHTML = `
         <div class="account-card signed-in">

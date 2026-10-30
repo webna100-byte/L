@@ -15,9 +15,10 @@ const Pages = {
     main.innerHTML = `
       ${heroHtml(page)}
       <div class="locked-card login-card">
-        ${googleButtonHtml(tField(page.button) || t('menu_login'))}
+        ${Auth.mode() === 'phone' ? `<h2>${t('phone_login_title')}</h2><p class="mini-note">${t('phone_login_text')}</p>` : ''}
+        ${signInBlockHtml(tField(page.button) || t('menu_login'))}
       </div>`;
-    document.getElementById('googleBtn').addEventListener('click', e => doGoogleSignIn(e.currentTarget, safeNext));
+    bindSignIn(main, { next: safeNext });
   },
 
   /* ---------- Levels ---------- */

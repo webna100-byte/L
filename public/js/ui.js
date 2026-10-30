@@ -139,7 +139,7 @@ function renderDrawer() {
         ${s.logo ? `<img src="${escapeHtml(s.logo)}" alt="">` : ''}
         <div>
           <strong>${tx(s.restaurantName)}</strong>
-          ${user ? `<span>${escapeHtml(user.displayName || user.email || '')}</span>` : ''}
+          ${user ? `<span>${escapeHtml(user.displayName || user.email || Auth.phoneLabel() || '')}</span>` : ''}
         </div>
         <button class="icon-btn drawer-close" id="drawerClose" aria-label="${t('close')}"><i data-lucide="x"></i></button>
       </div>

@@ -1,7 +1,10 @@
 /* ===================== Checkout ===================== */
 boot('checkout', async (data) => {
   const user = Auth.user;
-  if (!user) { location.replace(loginUrl('/checkout')); return; }
+  // Phone sites sign the customer in right here (number + Confirm), so a
+  // visitor without a session still sees the page; Google sites go to /login.
+  const phoneMode = Auth.mode() === 'phone';
+  if (!user && !phoneMode) { location.replace(loginUrl('/checkout')); return; }
   if (Store.isMultiBranch() && !Store.getSelectedBranch()) { location.replace('/branches'); return; }
   const branchId = Store.ensureBranch();
   const branch = data.branches.find(b => b.id === branchId);
@@ -13,8 +16,10 @@ boot('checkout', async (data) => {
   const deliveryOn = branch.deliveryEnabled !== false;
   const zones = Array.isArray(branch.deliveryZones) ? branch.deliveryZones : [];
   let orderType = pickupOn ? 'pickup' : 'delivery';
-  let me = { name: user.displayName || '', phone: '', address: '', lifetimePoints: 0, points: 0 };
-  try { me = { ...me, ...(await Auth.profile(true)) }; } catch (e) { console.error(e); }
+  let me = { name: (user && user.displayName) || '', phone: '', address: '', lifetimePoints: 0, points: 0 };
+  if (user) { try { me = { ...me, ...(await Auth.profile(true)) }; } catch (e) { console.error(e); } }
+  let identified = !phoneMode || !!user;   // phone sites: true once the number is confirmed
+  let prizes = [], activePrize = null, prizeOff = false;
 
   document.getElementById('pageTitle').textContent = t('checkout');
   const root = document.getElementById('checkoutRoot');
@@ -26,11 +31,12 @@ boot('checkout', async (data) => {
     </div>
     ${pickupOn && deliveryOn ? '' : `<p class="mini-note notice">${pickupOn ? t('only_pickup') : t('only_delivery')}</p>`}
     <div class="busy-banner hidden" id="busyBanner"><i data-lucide="clock"></i><span>${t('restaurant_busy')}</span></div>
-    <form id="checkoutForm" novalidate>
+    ${phoneMode ? `<div class="card phone-gate" id="phoneGate"></div>` : ''}
+    <form id="checkoutForm" class="${identified ? '' : 'hidden'}" novalidate>
       <div class="card">
         <h3 id="infoTitle"></h3>
         <div class="form-group"><label for="custName">${t('name')} <span class="req">*</span></label><input type="text" id="custName" maxlength="60" autocomplete="name" value="${escapeHtml(me.name)}" required></div>
-        <div class="form-group"><label for="custPhone">${t('phone')} <span class="req">*</span></label><input type="tel" id="custPhone" dir="ltr" maxlength="20" autocomplete="tel" inputmode="tel" value="${escapeHtml(me.phone)}" required></div>
+        ${phoneMode ? '' : `<div class="form-group"><label for="custPhone">${t('phone')} <span class="req">*</span></label><input type="tel" id="custPhone" dir="ltr" maxlength="20" autocomplete="tel" inputmode="tel" value="${escapeHtml(me.phone)}" required></div>`}
         <div class="form-group delivery-only"><label for="custZone">${t('zone')} <span class="req">*</span></label>
           <select id="custZone">${zones.length ? `<option value="">${t('select_zone')}</option>` + zones.map(z => `<option value="${escapeHtml(z.id)}">${tx(z.name)} — ${fmtMoney(z.price)}</option>`).join('') : `<option value="">${t('no_zones')}</option>`}</select>
         </div>
@@ -39,6 +45,7 @@ boot('checkout', async (data) => {
       </div>
       <div class="card">
         <h3>${t('order_summary')}</h3>
+        <div id="prizeBox"></div>
         <div id="orderSummary"></div>
       </div>
       <p class="form-error hidden" id="formError"></p>
@@ -69,14 +76,19 @@ boot('checkout', async (data) => {
       type: orderType,
       zoneId: zoneSelect.value,
       items: Store.getCart().map(i => ({ productId: i.productId, qty: i.qty, selections: i.selections, notes: i.notes })),
-      gifts: Store.getGiftCart().map(g => ({ giftId: g.giftId, qty: g.qty }))
+      gifts: Store.getGiftCart().map(g => ({ giftId: g.giftId, qty: g.qty })),
+      prizeCode: appliedPrize() ? activePrize.code : undefined
     };
   }
 
+  /* The wheel prize used for this order, if it can be (right number, big enough order). */
+  function appliedPrize() { return activePrize && !prizeOff ? activePrize : null; }
+
   function errorText(code, extra = {}) {
+    if (code === 'prize_min_order') return t('prize_min_order', { amount: fmtMoney(extra.minimum || 0) });
     if (code === 'below_minimum') return t('below_minimum', { amount: fmtMoney(extra.minimum || data.settings.minimumOrder || 0) });
     if (code === 'empty_cart') return t('empty_cart_err');
-    const map = { zone_required: 'zone_required', no_zones: 'no_zones', product_unavailable: 'product_unavailable', invalid_option: 'invalid_option', invalid_gift: 'invalid_gift', insufficient_points: 'insufficient_points', restaurant_busy: 'restaurant_busy', phone_invalid: 'phone_invalid', address_required: 'address_required', name_required: 'name_required', login_required: 'login_required_to_order' };
+    const map = { zone_required: 'zone_required', no_zones: 'no_zones', product_unavailable: 'product_unavailable', invalid_option: 'invalid_option', invalid_gift: 'invalid_gift', insufficient_points: 'insufficient_points', restaurant_busy: 'restaurant_busy', phone_invalid: 'phone_invalid', address_required: 'address_required', name_required: 'name_required', login_required: 'login_required_to_order', prize_invalid: 'prize_invalid', prize_min_order: 'prize_min_order', prize_unavailable: 'prize_unavailable' };
     return map[code] ? t(map[code]) : t('order_failed');
   }
 
@@ -87,7 +99,14 @@ boot('checkout', async (data) => {
     const probe = { ...input() };
     // Show totals even before a zone is picked.
     if (orderType === 'delivery' && !probe.zoneId && zones.length) probe.zoneId = zones[0].id;
-    try { q = Pricing.computeOrder(data, probe, { lifetimePoints: me.lifetimePoints }); } catch (e) { error = e; }
+    const customer = { lifetimePoints: me.lifetimePoints, prize: appliedPrize() };
+    try { q = Pricing.computeOrder(data, probe, customer); } catch (e) { error = e; }
+    if (!q && error && /^prize_/.test(error.code)) {
+      // The prize does not fit this order (too small, item unavailable): show the order without it.
+      const why = error; error = null;
+      try { q = Pricing.computeOrder(data, probe, { lifetimePoints: me.lifetimePoints }); } catch (e) { error = e; }
+      renderPrizeBox(why);
+    } else renderPrizeBox(null);
     if (!q) {
       try { q = Pricing.computeOrder(data, { ...probe, type: 'pickup' }, { lifetimePoints: me.lifetimePoints }); } catch (e2) { q = null; }
     }
@@ -101,6 +120,7 @@ boot('checkout', async (data) => {
     html += line(t('subtotal'), fmtMoney(q.subtotal));
     if (q.invoiceDiscount) html += line(t('invoice_discount'), '−' + fmtMoney(q.invoiceDiscount), 'discount');
     if (q.levelDiscount) html += line(t('level_discount', { level: tField(q.level.name) }) + ` (${q.level.discountPercent}%)`, '−' + fmtMoney(q.levelDiscount), 'discount');
+    if (q.prizeDiscount) html += line(t('prize_line') + ': ' + q.prize.label, '−' + fmtMoney(q.prizeDiscount), 'discount');
     if (orderType === 'delivery' && q.type === 'delivery') {
       html += line(t('delivery_fee'), q.deliveryFee ? fmtMoney(q.deliveryFee) : t('free'));
       if (q.deliveryDiscount) html += line(t('delivery_discount'), '−' + fmtMoney(q.deliveryDiscount), 'discount');
@@ -113,7 +133,63 @@ boot('checkout', async (data) => {
     renderIcons();
   }
 
+  /* Wheel prize card above the summary: applied automatically, can be removed. */
+  function renderPrizeBox(problem) {
+    const box = document.getElementById('prizeBox');
+    if (!box) return;
+    if (!activePrize) { box.innerHTML = ''; return; }
+    const min = Number(activePrize.minOrder) || 0;
+    box.innerHTML = `<div class="prize-box ${prizeOff ? 'off' : ''}">
+      <span class="prize-box-icon"><i data-lucide="gift"></i></span>
+      <div class="prize-box-text"><strong>${escapeHtml(prizeOff ? activePrize.label : t('prize_applied', { label: activePrize.label }))}</strong>
+        ${problem ? `<small class="warn">${escapeHtml(errorText(problem.code, problem))}</small>` : (min ? `<small>${escapeHtml(t('wheel_min_order', { amount: fmtMoney(min) }))}</small>` : '')}</div>
+      <button type="button" class="link-btn" id="prizeToggle">${prizeOff ? t('prize_use') : t('prize_remove')}</button>
+    </div>`;
+    document.getElementById('prizeToggle').addEventListener('click', () => { prizeOff = !prizeOff; renderSummary(); });
+    renderIcons();
+  }
+  async function loadPrizes() {
+    prizes = []; activePrize = null;
+    if (!Store.data.wheel || !Store.data.wheel.enabled || !Auth.user) return;
+    try { prizes = (await api('/api/wheel/status', { token: await Auth.token() })).prizes || []; } catch (e) { return; }
+    activePrize = prizes[0] || null;     // the one that expires first
+    renderSummary();
+  }
+
   setType(orderType);
+
+  /* ----- Phone sites: number + Confirm first, the rest appears afterwards ----- */
+  const nameInput = document.getElementById('custName');
+  const addressInput = document.getElementById('custAddress');
+  const formEl = document.getElementById('checkoutForm');
+  function showGate() {
+    const gate = document.getElementById('phoneGate');
+    if (!gate) return;
+    if (identified) {
+      const phone = me.phone || Auth.phoneLabel();
+      gate.innerHTML = `<div class="phone-confirmed"><span><i data-lucide="check-circle-2"></i> ${escapeHtml(t('signed_in_as'))} <strong dir="ltr">${escapeHtml(phone)}</strong></span><button type="button" class="link-btn" id="changePhone">${t('change_number')}</button></div>`;
+      document.getElementById('changePhone').addEventListener('click', async () => {
+        await Auth.signOut(); me = { name: '', phone: '', address: '', lifetimePoints: 0, points: 0 }; identified = false; prizes = []; activePrize = null;
+        nameInput.value = ''; addressInput.value = ''; formEl.classList.add('hidden'); showGate(); renderSummary();
+      });
+      renderIcons();
+    } else {
+      gate.innerHTML = `<h3>${t('phone_label')}</h3><p class="mini-note">${t('confirm_phone_first')}</p><div id="gateHost"></div>`;
+      PhoneLogin.mount(document.getElementById('gateHost'), {
+        onDone: async (profile, { phone }) => {
+          try { me = { ...me, ...(await Auth.profile(true)) }; } catch (e) { console.error(e); }
+          me.phone = me.phone || phone;
+          // Known numbers come back with their saved details; both fields stay editable.
+          nameInput.value = profile.name || me.name || '';
+          addressInput.value = profile.address || me.address || '';
+          identified = true; formEl.classList.remove('hidden'); showGate(); renderSummary(); loadPrizes();
+          formEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    }
+  }
+  if (phoneMode) showGate();
+  if (identified) loadPrizes();
 
   /* "Busy" mode set by the branch cashier: no new orders until it is off. */
   let busy = false;
@@ -134,18 +210,20 @@ boot('checkout', async (data) => {
     e.preventDefault();
     errBox.classList.add('hidden');
     const name = document.getElementById('custName').value.trim();
-    const phone = document.getElementById('custPhone').value.trim();
+    const phoneEl = document.getElementById('custPhone');
+    const phone = phoneEl ? phoneEl.value.trim() : (me.phone || '');
     const address = document.getElementById('custAddress').value.trim();
     const notes = document.getElementById('custNotes').value.trim();
     const showErr = msg => { errBox.textContent = msg; errBox.classList.remove('hidden'); errBox.scrollIntoView({ behavior: 'smooth', block: 'center' }); };
     if (busy) return showErr(t('restaurant_busy'));
     if (!name) return showErr(t('name_required'));
-    if (!/^\+?[0-9\s().-]{6,24}$/.test(phone)) return showErr(t('phone_invalid'));
+    if (!identified) return showErr(t('confirm_phone_first'));
+    if (!phoneMode && !/^\+?[0-9\s().-]{6,24}$/.test(phone)) return showErr(t('phone_invalid'));
     if (orderType === 'delivery') {
       if (!zoneSelect.value) return showErr(t('zone_required'));
       if (address.length < 3) return showErr(t('address_required'));
     }
-    try { Pricing.computeOrder(data, input(), { lifetimePoints: me.lifetimePoints }); } catch (err) { return showErr(errorText(err.code, err)); }
+    try { Pricing.computeOrder(data, input(), { lifetimePoints: me.lifetimePoints, prize: appliedPrize() }); } catch (err) { return showErr(errorText(err.code, err)); }
     const giftCost = Store.giftCartPoints();
     if (giftCost > (Number(me.points) || 0)) return showErr(t('insufficient_points'));
 
@@ -175,10 +253,11 @@ boot('checkout', async (data) => {
     } catch (err) {
       console.error(err);
       btn.disabled = false; btn.classList.remove('loading');
-      if (err.status === 401) { location.href = loginUrl('/checkout'); return; }
+      if (err.status === 401) { if (phoneMode) { identified = false; formEl.classList.add('hidden'); showGate(); return showErr(t('login_required_to_order')); } location.href = loginUrl('/checkout'); return; }
       showErr(errorText(err.message, err.data || {}));
       if (err.message === 'restaurant_busy') checkBusy();
       if (err.message === 'insufficient_points') { Auth._profile = null; }
+      if (err.message === 'prize_invalid') { prizeOff = true; loadPrizes(); }
     }
   });
 }, { colors: 'checkout', needsAuth: true });

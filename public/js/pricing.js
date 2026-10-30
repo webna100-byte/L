@@ -191,7 +191,24 @@
     const level = levelFor(loyalty, customer && customer.lifetimePoints);
     const afterInvoice = subtotal - invoiceDiscount;
     const levelDiscount = level ? round(afterInvoice * (Number(level.discountPercent) || 0) / 100, dec) : 0;
-    const net = round(Math.max(0, afterInvoice - levelDiscount), dec);
+
+    /* Wheel prize (one-time code): a % off the order, or a free product line.
+       Only valid on orders of at least the prize's minimum. */
+    const prize = customer && customer.prize;
+    let prizeDiscount = 0, prizeInfo = null;
+    if (prize) {
+      const minimum = Number(prize.minOrder) || 0;
+      if (subtotal < minimum) throw err('prize_min_order', { minimum });
+      if (prize.type === 'percent') {
+        prizeDiscount = round((afterInvoice - levelDiscount) * (Number(prize.value) || 0) / 100, dec);
+      } else if (prize.type === 'product') {
+        const gift = (config.products || []).find(p => p.id === prize.productId);
+        if (!gift || !availableForBranch(gift, branch.id)) throw err('prize_unavailable', { productId: prize.productId });
+        lines.push({ productId: gift.id, name: gift.name, image: gift.image || '', qty: 1, selections: {}, options: '', notes: '', unitPrice: 0, lineTotal: 0, prize: true });
+      }
+      prizeInfo = { code: prize.code || '', label: prize.label || '', type: prize.type, discount: prizeDiscount };
+    }
+    const net = round(Math.max(0, afterInvoice - levelDiscount - prizeDiscount), dec);
 
     let zone = null, deliveryFee = 0, deliveryDiscount = 0;
     if (type === 'delivery') {
@@ -228,6 +245,8 @@
       invoiceRule: invRule ? { type: invRule.type, value: Number(invRule.value) || 0 } : null,
       level: level ? { id: level.id, name: level.name, discountPercent: Number(level.discountPercent) || 0 } : null,
       levelDiscount,
+      prize: prizeInfo,
+      prizeDiscount,
       net,
       deliveryFee,
       deliveryDiscount,

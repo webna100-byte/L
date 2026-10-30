@@ -16,6 +16,7 @@ const SECTIONS = [
   ['delivery', L('Delivery Zones'), 'truck'],
   ['discounts', L('Discounts'), 'badge-percent'],
   ['loyalty', L('Points, Gifts & Levels'), 'gift'],
+  ['wheel', L('Wheel game'), 'dices'],
   ['homepage', L('Homepage'), 'house'],
   ['slider', L('Menu Slider'), 'images'],
   ['pages', L('Pages'), 'file-text'],
@@ -747,6 +748,7 @@ const TIMEZONES = ['Europe/Madrid', 'Europe/Paris', 'Europe/Berlin', 'Europe/Rom
 const langOptions = sel => Object.entries(SITE_LANGS).map(([k, v]) => `<option value="${k}" ${k === sel ? 'selected' : ''}>${escapeHtml(v.name)}</option>`).join('');
 const currencyOptions = sel => CURRENCIES.map(c => `<option value="${c.code}" ${c.code === sel ? 'selected' : ''}>${L(c.name)} (${c.code})</option>`).join('');
 const tzOptions = sel => TIMEZONES.map(z => `<option ${z === sel ? 'selected' : ''}>${z}</option>`).join('');
+const authMode = () => (CONFIG.settings.auth && CONFIG.settings.auth.mode) === 'phone' ? 'phone' : 'google';
 function renderGeneral(el) {
   const s = CONFIG.settings;
   const lang = contentLang();
@@ -760,8 +762,20 @@ function renderGeneral(el) {
       <div class="form-group"><label>${L('Receipt width')}</label><select id="gPaper"><option value="80" ${(s.receipt?.paperWidth || 80) == 80 ? 'selected' : ''}>${L('80 mm')}</option><option value="58" ${s.receipt?.paperWidth == 58 ? 'selected' : ''}>${L('58 mm')}</option><option value="a4" ${s.receipt?.paperWidth === 'a4' ? 'selected' : ''}>${L('A4 / normal printer')}</option></select></div>
     </div>
     <p class="mini-note">${L('The whole website (buttons, cart, checkout, receipts and notifications) uses this language. Write your menu and page texts in the same language.')}</p>
-    ${saveBtn('gSave')}`);
+    ${saveBtn('gSave')}`) +
+    card(L('Customer sign-in'), `
+      <div class="form-row">
+        <div class="form-group"><label>${L('Sign-in method')}</label><select id="aMode"><option value="google" ${authMode() === 'google' ? 'selected' : ''}>Google</option><option value="phone" ${authMode() === 'phone' ? 'selected' : ''}>${L('Mobile number (one-time code)')}</option></select></div>
+        <div class="form-group"><label>${L('Default country for numbers')}</label><select id="aCountry">${[['PS', L('Palestine')], ['SA', L('Saudi Arabia')], ['AE', L('United Arab Emirates')], ['KW', L('Kuwait')], ['JO', L('Jordan')]].map(([k, n]) => `<option value="${k}" ${((s.auth && s.auth.country) || 'PS') === k ? 'selected' : ''}>${n}</option>`).join('')}</select></div>
+      </div>
+      <label class="check-row"><input type="checkbox" id="aOtpExisting" ${s.auth && s.auth.requireOtpForExisting ? 'checked' : ''}> ${L('Ask for a code even for numbers that signed in before (safer)')}</label>
+      <p class="mini-note">${L('With the mobile number method there is no Google sign-in. A known number signs in without a code and its saved name and address are filled in at checkout; anyone who knows a number could see that name and address, so turn the option above on if that matters to you.')}</p>
+      ${saveBtn('aSave')}`);
   bindImg('gLogo', 512);
+  $('aSave').addEventListener('click', () => {
+    s.auth = { ...(s.auth || {}), mode: $('aMode').value, country: $('aCountry').value, requireOtpForExisting: $('aOtpExisting').checked };
+    persist(); toast(L('Saved'));
+  });
   $('gSave').addEventListener('click', () => {
     const name = readBi('gName');
     if (!hasBi(name)) return toast(L('Restaurant name is required'));
@@ -772,6 +786,96 @@ function renderGeneral(el) {
     persist().then(() => { if (newLang !== lang) location.reload(); });
     toast(L('Saved'));
   });
+}
+
+/* ===================== Wheel game ===================== */
+const WHEEL_DEFAULT = {
+  enabled: false, title: '', minOrder: 100, goldenEvery: 150, validHours: 48, weeklyBigCap: 10, prizes: []
+};
+async function renderWheel(el) {
+  CONFIG.wheel = Object.assign({}, WHEEL_DEFAULT, CONFIG.wheel || {});
+  const w = CONFIG.wheel;
+  w.prizes = Array.isArray(w.prizes) ? w.prizes : [];
+  const products = CONFIG.products || [];
+  const prodOptions = sel => `<option value="">—</option>` + products.map(p => `<option value="${escapeHtml(p.id)}" ${p.id === sel ? 'selected' : ''}>${escapeHtml(nameOf(p.name))}</option>`).join('');
+  const row = (p, i) => `<div class="wheel-row" data-i="${i}">
+      <div class="form-group"><label>${L('Prize name')}</label><input type="text" class="w-label" maxlength="30" value="${escapeHtml(p.label || '')}"></div>
+      <div class="form-group"><label>${L('Type')}</label><select class="w-type"><option value="product" ${p.type !== 'percent' ? 'selected' : ''}>${L('Free product')}</option><option value="percent" ${p.type === 'percent' ? 'selected' : ''}>${L('Percentage %')}</option></select></div>
+      <div class="form-group w-prod ${p.type === 'percent' ? 'hidden' : ''}"><label>${L('Product')}</label><select class="w-product">${prodOptions(p.productId)}</select></div>
+      <div class="form-group w-pct ${p.type === 'percent' ? '' : 'hidden'}"><label>${L('Value')}</label><input type="number" min="1" max="100" class="w-value" value="${Number(p.value) || 10}"></div>
+      <div class="form-group"><label>${L('Daily spin chance')}</label><input type="number" min="0" step="0.1" class="w-weight" value="${Number(p.weight) || 0}"></div>
+      <div class="form-group"><label>${L('Golden spin chance')}</label><input type="number" min="0" step="0.1" class="w-gold" value="${Number(p.goldWeight) || 0}"></div>
+      <label class="w-big-label"><input type="checkbox" class="w-big" ${p.big ? 'checked' : ''}> ${L('Big prize (weekly cap)')}</label>
+      <button class="btn-sm btn-del w-del" title="${L('Delete')}">×</button>
+    </div>`;
+  el.innerHTML =
+    card(L('Wheel game'), `
+      <label class="check-row"><input type="checkbox" id="wEnabled" ${w.enabled ? 'checked' : ''}> ${L('Game is on')}</label>
+      <div class="form-row">
+        <div class="form-group"><label>${L('Title')}</label><input type="text" id="wTitle" maxlength="40" value="${escapeHtml(w.title || '')}" placeholder="${escapeHtml(t('wheel_title'))}"></div>
+        <div class="form-group"><label>${L('Minimum order to use a prize')}</label><input type="number" min="0" step="0.001" id="wMin" value="${w.minOrder}"></div>
+        <div class="form-group"><label>${L('Golden spin for every purchases of')}</label><input type="number" min="1" step="0.001" id="wGold" value="${w.goldenEvery}"></div>
+        <div class="form-group"><label>${L('Prize valid for (hours)')}</label><input type="number" min="1" id="wHours" value="${w.validHours}"></div>
+        <div class="form-group"><label>${L('Big prizes per week (cap)')}</label><input type="number" min="0" id="wCap" value="${w.weeklyBigCap}"></div>
+      </div>
+      <p class="mini-note">${L('Chances are relative numbers: 35, 30, 20 ... are normalised, so they do not have to add up to 100. The result is drawn on the server only.')}</p>
+      <h4>${L('Prizes')}</h4>
+      <div id="wheelRows">${w.prizes.map(row).join('') || `<p class="mini-note">${L('No prizes yet.')}</p>`}</div>
+      <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap"><button class="btn-sm btn-edit" id="wAdd">${L('+ Add prize')}</button><button class="btn-sm btn-edit" id="wSample">${L('Fill with the standard prizes')}</button>${saveBtn('wSave')}</div>
+      <p class="mini-note" id="wSum"></p>`) +
+    card(L('Results'), `<div id="wheelStats"><p class="mini-note">${L('Loading…')}</p></div>`);
+
+  function read() {
+    return Array.from(el.querySelectorAll('.wheel-row')).map((r, i) => {
+      const type = r.querySelector('.w-type').value;
+      const old = w.prizes[Number(r.dataset.i)] || {};
+      return { id: old.id || uid('prize'), label: r.querySelector('.w-label').value.trim(), type,
+        ...(type === 'percent' ? { value: Math.min(100, Math.max(1, num2(r.querySelector('.w-value').value))) } : { productId: r.querySelector('.w-product').value }),
+        weight: Math.max(0, num2(r.querySelector('.w-weight').value)), goldWeight: Math.max(0, num2(r.querySelector('.w-gold').value)), big: r.querySelector('.w-big').checked };
+    });
+  }
+  const num2 = v => { const n = Number(v); return Number.isFinite(n) ? n : 0; };
+  function sums() {
+    const rows = read(); const a = rows.reduce((x, p) => x + p.weight, 0), b = rows.reduce((x, p) => x + p.goldWeight, 0);
+    const pct = (v, tot) => tot ? (100 * v / tot).toFixed(1) + '%' : '—';
+    $('wSum').innerHTML = rows.map(p => `${escapeHtml(p.label || '?')}: ${pct(p.weight, a)} / <b>${pct(p.goldWeight, b)}</b>`).join(' · ');
+  }
+  function redraw() { w.prizes = read(); renderWheel(el); }
+  el.querySelectorAll('.wheel-row').forEach(r => {
+    r.querySelector('.w-type').addEventListener('change', e => { r.querySelector('.w-prod').classList.toggle('hidden', e.target.value === 'percent'); r.querySelector('.w-pct').classList.toggle('hidden', e.target.value !== 'percent'); });
+    r.querySelectorAll('input').forEach(i => i.addEventListener('input', sums));
+    r.querySelector('.w-del').addEventListener('click', () => { w.prizes = read(); w.prizes.splice(Number(r.dataset.i), 1); renderWheel(el); });
+  });
+  $('wAdd').addEventListener('click', () => { w.prizes = read(); w.prizes.push({ id: uid('prize'), label: '', type: 'product', productId: '', weight: 10, goldWeight: 10, big: false }); renderWheel(el); });
+  $('wSample').addEventListener('click', () => {
+    const find = re => (products.find(p => re.test(nameOf(p.name))) || {}).id || '';
+    w.prizes = [
+      { id: uid('prize'), label: L('Drink'), type: 'product', productId: find(/cola|drink|مشروب|ليمون|lemon|water|مياه/i), weight: 35, goldWeight: 0, big: false },
+      { id: uid('prize'), label: L('Fries'), type: 'product', productId: find(/fries|بطاط|patat|potato/i), weight: 30, goldWeight: 20, big: false },
+      { id: uid('prize'), label: L('10% off'), type: 'percent', value: 10, weight: 20, goldWeight: 20, big: false },
+      { id: uid('prize'), label: L('Wings'), type: 'product', productId: find(/wing|أجنحة|جناح|chicken|دجاج/i), weight: 12, goldWeight: 35, big: true },
+      { id: uid('prize'), label: L('Classic burger'), type: 'product', productId: find(/classic|كلاسيك|burger|برغر/i), weight: 3, goldWeight: 25, big: true }
+    ];
+    renderWheel(el);
+  });
+  $('wSave').addEventListener('click', () => {
+    const prizes = read();
+    if ($('wEnabled').checked) {
+      if (prizes.length < 2) return toast(L('Add at least two prizes'));
+      if (prizes.some(p => !p.label)) return toast(L('Every prize needs a name'));
+      if (prizes.some(p => p.type === 'product' && !p.productId)) return toast(L('Choose a product for every product prize'));
+      if (!prizes.some(p => p.weight > 0) || !prizes.some(p => p.goldWeight > 0)) return toast(L('At least one prize needs a chance in each spin type'));
+    }
+    Object.assign(CONFIG.wheel, { enabled: $('wEnabled').checked, title: $('wTitle').value.trim(), minOrder: Math.max(0, num2($('wMin').value)), goldenEvery: Math.max(1, num2($('wGold').value) || 150), validHours: Math.max(1, Math.floor(num2($('wHours').value) || 48)), weeklyBigCap: Math.max(0, Math.floor(num2($('wCap').value))), prizes });
+    persist(); toast(L('Saved'));
+  });
+  sums();
+  try {
+    const st = await api('/api/admin/wheel', { token: await StaffAuth.token() });
+    const rows = (CONFIG.wheel.prizes || []).map(p => { const b = st.byPrize[p.id] || {}; return `<tr><td>${escapeHtml(p.label)}</td><td>${b.spins || 0}</td><td>${b.used || 0}</td><td>${fmtMoney(b.sales || 0)}</td></tr>`; }).join('');
+    $('wheelStats').innerHTML = `<div class="stat-grid"><div><strong>${st.spins}</strong><span>${L('Spins')}</span></div><div><strong>${st.gold}</strong><span>${L('Golden spins')}</span></div><div><strong>${st.used}</strong><span>${L('Prizes used')}</span></div><div><strong>${fmtMoney(st.sales)}</strong><span>${L('Orders with a prize')}</span></div><div><strong>${st.bigThisWeek}</strong><span>${L('Big prizes this week')}</span></div></div>
+      <div class="table-wrap"><table class="mini-table"><thead><tr><th>${L('Prize')}</th><th>${L('Spins')}</th><th>${L('Used')}</th><th>${L('Sales')}</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  } catch (e) { $('wheelStats').innerHTML = `<p class="mini-note">${L('Results are not available yet.')}</p>`; }
 }
 
 /* ===================== Footer ===================== */
@@ -900,7 +1004,7 @@ async function renderSites(el) {
   list();
 }
 
-const RENDER = { orders: renderOrders, branches: renderBranches, categories: renderCategories, products: renderProducts, delivery: renderDelivery, discounts: renderDiscounts, loyalty: renderLoyalty, homepage: renderHomepage, slider: renderSlider, pages: renderPages, notifications: renderNotifications, cashiers: renderCashiers, colors: renderColors, general: renderGeneral, footer: renderFooterSettings, data: renderData, sites: renderSites };
+const RENDER = { wheel: renderWheel, orders: renderOrders, branches: renderBranches, categories: renderCategories, products: renderProducts, delivery: renderDelivery, discounts: renderDiscounts, loyalty: renderLoyalty, homepage: renderHomepage, slider: renderSlider, pages: renderPages, notifications: renderNotifications, cashiers: renderCashiers, colors: renderColors, general: renderGeneral, footer: renderFooterSettings, data: renderData, sites: renderSites };
 
 /* ===================== Boot ===================== */
 (async function init() {

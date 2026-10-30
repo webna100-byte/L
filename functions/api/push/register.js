@@ -2,7 +2,8 @@
    Subscribes a device's FCM token to the broadcast topic of this site.
    Signed-in customers also get the token saved on their profile so they
    receive order-status updates. */
-import { json, fail, handle, readJson, authUser, isGoogleCustomer } from '../../_lib/http.js';
+import { json, fail, handle, readJson, authUser, loadConfig } from '../../_lib/http.js';
+import { customerAllowed } from '../../_lib/customer.js';
 import { subscribeTopic } from '../../_lib/push.js';
 import { Firestore } from '../../_lib/firestore.js';
 import { siteOf, siteTopic } from '../../_lib/site.js';
@@ -14,7 +15,7 @@ export const onRequestPost = handle(async ({ request, env }) => {
   if (token.length < 20 || token.length > 4096) return fail(400, 'invalid_token');
   await subscribeTopic(env, token, siteTopic(site));
   const user = await authUser(request, env);
-  if (isGoogleCustomer(user)) {
+  if (customerAllowed(user, await loadConfig(env, site), site)) {
     const fs = new Firestore(env, site);
     const doc = await fs.get(`users/${user.uid}`);
     const tokens = (doc && Array.isArray(doc.data.pushTokens) ? doc.data.pushTokens : []).filter(t => t !== token);
