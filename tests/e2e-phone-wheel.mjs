@@ -151,7 +151,7 @@ try {
     await C.page.fill('#plCode', code); await C.page.click('#plVerify');
     await C.page.waitForSelector('#checkoutForm:not(.hidden)');
     assert.equal(await C.page.inputValue('#custName'), '');
-    assert.equal((await C.page.textContent('.phone-confirmed strong')).trim(), '+970567778888');
+    assert.equal((await C.page.textContent('.phone-confirmed strong')).trim(), '056 777 8888', 'the number is shown as typed locally, with no country prefix');
     assert.ok(!/مسجّل/.test(await C.page.textContent('.phone-confirmed')), 'no wording in front of the number');
     await shot(C.page, '11-checkout-new');
     await C.page.click('#changePhone');

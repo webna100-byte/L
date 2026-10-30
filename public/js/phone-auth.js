@@ -97,7 +97,7 @@ const PhoneLogin = {
     function showOtp(res) {
       phone = res.phone;
       $('plOtpBox').classList.remove('hidden');
-      $('plSentTo').textContent = t('otp_sent_to', { phone: res.phone });
+      $('plSentTo').textContent = t('otp_sent_to', { phone: localPhone(res.phone) });
       phoneInput.readOnly = true; confirmBtn.classList.add('hidden');
       codeInput.value = ''; codeInput.maxLength = res.length || 6; codeInput.focus();
       const dev = $('plDev');

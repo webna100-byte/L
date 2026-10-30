@@ -163,7 +163,7 @@ boot('checkout', async (data) => {
     if (!gate) return;
     if (identified) {
       const phone = me.phone || Auth.phoneLabel();
-      gate.innerHTML = `<div class="phone-confirmed"><span><i data-lucide="check-circle-2"></i> <strong dir="ltr">${escapeHtml(phone)}</strong></span><button type="button" class="link-btn" id="changePhone">${t('change_number')}</button></div>`;
+      gate.innerHTML = `<div class="phone-confirmed"><span><i data-lucide="check-circle-2"></i> <strong dir="ltr">${escapeHtml(localPhone(phone))}</strong></span><button type="button" class="link-btn" id="changePhone">${t('change_number')}</button></div>`;
       document.getElementById('changePhone').addEventListener('click', async () => {
         await Auth.signOut(); me = { name: '', phone: '', address: '', lifetimePoints: 0, points: 0 }; identified = false; prizes = []; activePrize = null;
         nameInput.value = ''; addressInput.value = ''; formEl.classList.add('hidden'); showGate(); renderSummary();

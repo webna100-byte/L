@@ -133,7 +133,7 @@
       <article class="staff-order ${o.status === 'pending' ? 'is-new' : ''}">
         <div class="so-head"><div><strong>#${o.number}</strong><div class="mini-note">${escapeHtml(ago(o.createdAtMs))} · ${escapeHtml(fmtDate(o.createdAtMs))}</div></div><span class="status-chip s-${o.status}">${t('status_' + o.status)}</span></div>
         <div class="so-meta"><span class="type-${o.type}">${o.type === 'delivery' ? t('type_delivery') : t('type_pickup')}</span>${o.zone ? `<span>${tx(o.zone.name)}</span>` : ''}${o.level ? `<span>${tx(o.level.name)}</span>` : ''}</div>
-        <div class="so-customer"><strong>${escapeHtml(o.customer?.name || '')}</strong><a href="tel:${escapeHtml(o.customer?.phone || '')}" dir="ltr">${escapeHtml(o.customer?.phone || '')}</a>${o.address ? `<span>${escapeHtml(o.address)}</span>` : ''}</div>
+        <div class="so-customer"><strong>${escapeHtml(o.customer?.name || '')}</strong><a href="tel:${escapeHtml(o.customer?.phone || '')}" dir="ltr">${escapeHtml(localPhone(o.customer?.phone || ''))}</a>${o.address ? `<span>${escapeHtml(o.address)}</span>` : ''}</div>
         ${o.notes ? `<div class="so-notes">${escapeHtml(o.notes)}</div>` : ''}
         <ul class="so-items">${items}</ul>
         <div class="so-totals">

@@ -167,3 +167,12 @@ test('demo sites: cookie, storage keys and topics are per site', () => {
   assert.equal(siteTopic(''), 'all');
   assert.equal(siteTopic('la-paella'), 'site_la_paella');
 });
+
+test('numbers are shown without the country prefix', () => {
+  assert.equal(globalThis.localPhone('+970591234567'), '059 123 4567');
+  assert.equal(globalThis.localPhone('+972521234567'), '052 123 4567');
+  assert.equal(globalThis.localPhone('+966501234567'), '050 123 4567');
+  assert.equal(globalThis.localPhone('+96551234567'), '51234567');
+  assert.equal(globalThis.localPhone(''), '');
+  assert.equal(globalThis.localPhone('0591234567'), '0591234567');
+});

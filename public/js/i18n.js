@@ -496,4 +496,12 @@ function localizeConfig(v, lang) {
   return v;
 }
 
-if (typeof globalThis !== 'undefined') Object.assign(globalThis, { SITE_LANGS, I18N_DICT: I18N, translateFor: translate, localizeConfig });
+/* A canonical number (+970591234567) as people write it: 059 123 4567. No country prefix. */
+function localPhone(p) {
+  const m = String(p || '').match(/^\+(970|972|966|971|962|965)(\d+)$/);
+  if (!m) return String(p || '');
+  const n = (m[1] === '965' ? '' : '0') + m[2];
+  return n.length === 10 ? n.replace(/^(\d{3})(\d{3})(\d{4})$/, '$1 $2 $3') : n;
+}
+
+if (typeof globalThis !== 'undefined') Object.assign(globalThis, { localPhone, SITE_LANGS, I18N_DICT: I18N, translateFor: translate, localizeConfig });

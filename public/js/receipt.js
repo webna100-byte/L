@@ -55,7 +55,7 @@ function printReceipt(order, config) {
     <hr>
     <table>
       ${row(L.customer, esc(order.customer?.name || ''))}
-      ${row(L.phone, `<span dir="ltr">${esc(order.customer?.phone || '')}</span>`)}
+      ${row(L.phone, `<span dir="ltr">${esc(localPhone(order.customer?.phone || ''))}</span>`)}
       ${order.zone ? row(L.zone, esc(tf(order.zone.name))) : ''}
     </table>
     ${order.address ? `<div><b>${L.address}:</b> ${esc(order.address)}</div>` : ''}
