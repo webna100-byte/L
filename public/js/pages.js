@@ -15,8 +15,8 @@ const Pages = {
     main.innerHTML = `
       ${heroHtml(page)}
       <div class="locked-card login-card">
-        <h2>${t('phone_login_title')}</h2><p class="mini-note">${t('phone_login_text')}</p>
-        ${signInBlockHtml()}
+        ${Auth.mode() === 'phone' ? `<h2>${t('phone_login_title')}</h2><p class="mini-note">${t('phone_login_text')}</p>` : ''}
+        ${signInBlockHtml(tField(page.button) || t('menu_login'))}
       </div>`;
     bindSignIn(main, { next: safeNext });
   },

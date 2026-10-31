@@ -157,9 +157,10 @@ test('checkout: name and address are saved on the number and refilled next time;
   } finally { await t.close(); }
 });
 
-test('only phone customers of this site can act: Google tokens and other sites are refused', async () => {
+test('each site has one sign-in method: phone sites refuse Google, Google sites (the default) refuse phone tokens', async () => {
   const t = await setup();
   try {
+    // phone site (baseConfig)
     assert.equal((await order(t, googleToken('g1'), { customer: { name: 'x' } })).status, 401);
     assert.equal((await call(me, t.ctx, req('/api/me', { token: googleToken('g1') }))).status, 401);
     assert.equal((await call(wheelStatus, t.ctx, req('/api/wheel/status', { token: googleToken('g1') }))).status, 401);
@@ -169,11 +170,18 @@ test('only phone customers of this site can act: Google tokens and other sites a
     await t.env.STORE.put('site:demo1:config', JSON.stringify(baseConfig()));
     const other = await call(create, t.ctx, req('/api/orders/create', { method: 'POST', token: c.token, site: 'demo1', body: { branchId: 'branch_downtown', type: 'pickup', items: [{ productId: 'prod_cola', qty: 1 }], customer: { name: 'x' } } }));
     assert.equal(other.status, 401);
-    // there is no sign-in setting to switch: a site config with or without settings.auth behaves the same
-    const bare = baseConfig(); delete bare.settings.auth;
-    await t.env.STORE.put('config', JSON.stringify(bare));
-    assert.equal((await call(lookup, t.ctx, req('/api/auth/phone/lookup', { method: 'POST', body: { phone: '0593335555' } }))).state, 'otp_sent');
-    assert.equal((await order(t, c.token, { customer: { name: 'x' } })).status, 200);
+    // a site with no sign-in setting at all is a Google site: name AND a valid phone are required, phone tokens are refused
+    const plain = baseConfig(); delete plain.settings.auth;
+    await t.env.STORE.put('config', JSON.stringify(plain));
+    assert.equal((await call(lookup, t.ctx, req('/api/auth/phone/lookup', { method: 'POST', body: { phone: '0593335555' } }))).error, 'phone_login_disabled');
+    assert.equal((await order(t, c.token, { customer: { name: 'x' } })).status, 401, 'phone tokens do not work on Google sites');
+    const g = googleToken('g2');
+    assert.equal((await order(t, g, { customer: { name: '', phone: '+34600111222' } })).error, 'name_required');
+    assert.equal((await order(t, g, { customer: { name: 'Ann', phone: '12' } })).error, 'phone_invalid');
+    const ok = await order(t, g, { customer: { name: 'Ann', phone: '+34 600 111 222' } });
+    assert.equal(ok.status, 200, JSON.stringify(ok));
+    assert.equal(t.store.list('orders').find(o => o.number === ok.number).customer.phone, '+34 600 111 222'.replace(/ /g, ' ') && t.store.list('orders').find(o => o.number === ok.number).customer.phone);
+    assert.equal(t.store.list('orders').find(o => o.number === ok.number).customer.email, 'g2@x.com');
   } finally { await t.close(); }
 });
 

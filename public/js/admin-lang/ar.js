@@ -385,5 +385,8 @@ Object.assign(window.ADMIN_TR, {
   "Ask for a code even for numbers that signed in before (safer)": "اطلب رمزًا حتى للأرقام التي سجّلت من قبل (أكثر أمانًا)",
   "A known number signs in without a code and its saved name and address are filled in at checkout; anyone who knows a number could see that name and address, so turn the option above on if that matters to you.": "الرقم المعروف يدخل بلا رمز ويُملأ اسمه وعنوانه المحفوظان عند الطلب؛ أي شخص يعرف الرقم يستطيع رؤية الاسم والعنوان، فإن كان ذلك يهمك فعّل الخيار أعلاه.",
   "At least one prize needs a chance": "يجب أن تكون لجائزة واحدة على الأقل فرصة",
-  "Chance": "الاحتمال"
+  "Chance": "الاحتمال",
+  "Sign-in method": "طريقة الدخول",
+  "Mobile number (one-time code)": "رقم الجوال (رمز لمرة واحدة)",
+  "With the mobile number method there is no Google sign-in. A known number signs in without a code and its saved name and address are filled in at checkout; anyone who knows a number could see that name and address, so turn the option above on if that matters to you.": "مع طريقة رقم الجوال لا يوجد تسجيل عبر Google. الرقم المعروف يدخل بلا رمز ويُملأ اسمه وعنوانه المحفوظان عند الطلب؛ أي شخص يعرف الرقم يستطيع رؤية الاسم والعنوان، فإن كان ذلك يهمك فعّل الخيار أعلاه."
 });

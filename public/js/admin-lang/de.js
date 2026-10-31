@@ -385,5 +385,8 @@ Object.assign(window.ADMIN_TR, {
   "Ask for a code even for numbers that signed in before (safer)": "Auch bei bereits angemeldeten Nummern einen Code verlangen (sicherer)",
   "A known number signs in without a code and its saved name and address are filled in at checkout; anyone who knows a number could see that name and address, so turn the option above on if that matters to you.": "Eine bekannte Nummer meldet sich ohne Code an und ihr gespeicherter Name und ihre Adresse werden beim Bestellen vorausgefüllt; wer eine Nummer kennt, könnte diesen Namen und diese Adresse sehen. Aktiviere die Option oben, wenn dir das wichtig ist.",
   "At least one prize needs a chance": "Mindestens ein Gewinn braucht eine Chance",
-  "Chance": "Chance"
+  "Chance": "Chance",
+  "Sign-in method": "Anmeldemethode",
+  "Mobile number (one-time code)": "Handynummer (Einmalcode)",
+  "With the mobile number method there is no Google sign-in. A known number signs in without a code and its saved name and address are filled in at checkout; anyone who knows a number could see that name and address, so turn the option above on if that matters to you.": "Bei der Anmeldung per Handynummer gibt es kein Google-Login. Eine bekannte Nummer meldet sich ohne Code an und ihr gespeicherter Name und ihre Adresse werden beim Bestellen vorausgefüllt; wer eine Nummer kennt, könnte diesen Namen und diese Adresse sehen. Aktiviere die Option oben, wenn dir das wichtig ist."
 });

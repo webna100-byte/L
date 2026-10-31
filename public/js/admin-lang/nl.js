@@ -385,5 +385,8 @@ Object.assign(window.ADMIN_TR, {
   "Ask for a code even for numbers that signed in before (safer)": "Ook een code vragen voor nummers die al eerder inloggen (veiliger)",
   "A known number signs in without a code and its saved name and address are filled in at checkout; anyone who knows a number could see that name and address, so turn the option above on if that matters to you.": "Een bekend nummer logt in zonder code en de opgeslagen naam en het adres worden bij het afrekenen ingevuld; iedereen die een nummer kent, kan die naam en dat adres zien. Zet de optie hierboven aan als dat voor jou belangrijk is.",
   "At least one prize needs a chance": "Minstens één prijs heeft een kans nodig",
-  "Chance": "Kans"
+  "Chance": "Kans",
+  "Sign-in method": "Inlogmethode",
+  "Mobile number (one-time code)": "Mobiel nummer (eenmalige code)",
+  "With the mobile number method there is no Google sign-in. A known number signs in without a code and its saved name and address are filled in at checkout; anyone who knows a number could see that name and address, so turn the option above on if that matters to you.": "Bij de methode met mobiel nummer is er geen Google-login. Een bekend nummer logt in zonder code en de opgeslagen naam en het adres worden bij het afrekenen ingevuld; iedereen die een nummer kent, kan die naam en dat adres zien. Zet de optie hierboven aan als dat voor jou belangrijk is."
 });

@@ -20,8 +20,10 @@ function replacement(text, lang) {
   return /continu|weiter|doorgaan|المتابعة/i.test(text) ? CONTINUE[l] : BUTTON[l];
 }
 
+import { authSettings } from './customer.js';
+
 export function withoutGoogleTexts(config) {
-  if (!config) return config;
+  if (!config || authSettings(config).mode !== 'phone') return config;   // Google sites keep their Google texts
   const lang = (config.settings && (config.settings.lang || config.settings.defaultLang)) || 'en';
   let changed = false;
   const clean = v => {

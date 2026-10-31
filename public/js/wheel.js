@@ -105,8 +105,9 @@ const Wheel = {
   },
 
   renderLogin(box) {
-    box.innerHTML = `<p class="wheel-login-note">${escapeHtml(t('wheel_login'))}</p>${signInBlockHtml()}`;
-    PhoneLogin.mount(box.querySelector('[data-phone-host]'), { compact: true, onDone: () => this.refresh() });
+    box.innerHTML = `<p class="wheel-login-note">${escapeHtml(t('wheel_login'))}</p>${signInBlockHtml(t('menu_login'), 'wheelGoogleBtn')}`;
+    if (Auth.mode() === 'phone') PhoneLogin.mount(box.querySelector('[data-phone-host]'), { compact: true, onDone: () => this.refresh() });
+    else { const b = box.querySelector('#wheelGoogleBtn'); if (b) b.addEventListener('click', () => doGoogleSignIn(b, location.pathname + '?wheel=1')); }
   },
   renderActions(box) {
     const st = this.st;

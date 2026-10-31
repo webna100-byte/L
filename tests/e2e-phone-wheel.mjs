@@ -7,7 +7,7 @@ import { createRequire } from 'node:module';
 import '../public/js/pricing.js';
 import '../public/js/i18n.js';
 import { startDevServer, FIREBASE_STUBS } from './dev-server.mjs';
-import { idTokenFromCustom } from './fake-backend.mjs';
+import { idTokenFromCustom, googleToken } from './fake-backend.mjs';
 const { chromium } = createRequire(import.meta.url)('playwright');
 
 const OUT = process.argv[2] || '/tmp/e2e';
@@ -16,7 +16,7 @@ const seed = JSON.parse(fs.readFileSync(new URL('../public/seed/demo-config.json
 const config = globalThis.localizeConfig(seed, 'ar');
 config.version = 1;
 config.settings.lang = 'ar'; delete config.settings.defaultLang;
-config.settings.auth = { country: 'PS' };
+config.settings.auth = { mode: 'phone', country: 'PS' };
 config.settings.timezone = 'Asia/Hebron';
 config.settings.currency = 'ILS';
 config.settings.multiBranch = false;
@@ -188,6 +188,29 @@ try {
     await E.page.click('[data-key="general"]'); await E.page.waitForSelector('#aCountry'); await shot(E.page, '14-admin-signin');
   });
   await E.ctx.close();
+  /* ---- 6. a normal (Google) site: Google button, then name AND phone are required at checkout ---- */
+  const dev2 = await startDevServer({ config: (() => { const g = JSON.parse(JSON.stringify(config)); g.settings.auth = {}; delete g.wheel; return g; })() });
+  const G = await newPage();
+  try {
+    await step('Google site: sign-in button on /login, no number box', async () => {
+      await G.page.goto(dev2.url + '/login'); await G.page.waitForSelector('#googleBtn');
+      assert.equal(await G.page.locator('#plPhone').count(), 0);
+      await G.page.goto(dev2.url + '/'); await G.page.waitForSelector('#homeGoogleBtn');
+      assert.equal(await G.page.locator('#wheelBanner').count(), 0, 'no wheel unless the site turns it on');
+    });
+    await step('Google site: checkout asks the name and the phone number (both required)', async () => {
+      await G.page.evaluate(async t => { localStorage.setItem('stub_user_[DEFAULT]', JSON.stringify({ uid: 'g1', idToken: t, claims: {} })); localStorage.setItem('cart_branch_downtown', JSON.stringify([{ productId: 'prod_classic_burger', qty: 3, selections: {}, notes: '' }])); localStorage.setItem('selected_branch', 'branch_downtown'); }, googleToken('g1'));
+      await G.page.goto(dev2.url + '/checkout'); await G.page.waitForSelector('#custName');
+      assert.equal(await G.page.locator('#phoneGate').count(), 0);
+      assert.ok(await G.page.locator('#custPhone').count() === 1);
+      await G.page.fill('#custName', 'Ann'); await G.page.click('#sendBtn');
+      await G.page.waitForSelector('#formError:not(.hidden)'); // phone missing
+      await G.page.fill('#custPhone', '+34 600 111 222'); await G.page.click('#sendBtn');
+      await G.page.waitForSelector('.success-card', { timeout: 15000 });
+      assert.equal(dev2.store.list('orders')[0].customer.phone, '+34 600 111 222');
+      await shot(G.page, '16-google-checkout-done');
+    });
+  } finally { await G.ctx.close(); await dev2.close(); }
   assert.deepEqual(errors, [], 'no browser errors: ' + errors.join('\n'));
   console.log(`\n${n} browser checks passed`);
 } finally {

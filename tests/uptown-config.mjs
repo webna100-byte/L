@@ -2,10 +2,11 @@
 import fs from 'node:fs';
 import '../public/js/pricing.js';
 import '../public/js/i18n.js';
+import { withoutGoogleTexts } from '../functions/_lib/legacy.js';
 export function buildUptownConfig() {
   const seed = JSON.parse(fs.readFileSync(new URL('../public/seed/demo-config.json', import.meta.url)));
   const c = globalThis.localizeConfig(seed, 'ar');
-  Object.assign(c.settings, { lang: 'ar', currency: 'ILS', timezone: 'Asia/Hebron', restaurantName: 'أبتاون برغر آند وينغز', multiBranch: true, minimumOrder: 0, phone: '+970 597 101 010', address: 'رام الله', auth: { country: 'PS' } });
+  Object.assign(c.settings, { lang: 'ar', currency: 'ILS', timezone: 'Asia/Hebron', restaurantName: 'أبتاون برغر آند وينغز', multiBranch: true, minimumOrder: 0, phone: '+970 597 101 010', address: 'رام الله', auth: { mode: 'phone', country: 'PS' } });
   delete c.settings.defaultLang;
   Object.assign(c.settings.colors.secondary, { type: 'gradient', color1: '#b80000', color2: '#e00000' });
   c.settings.homepage.hero.title = 'أبتاون برغر آند وينغز'; c.settings.homepage.hero.eyebrow = 'رام الله'; c.settings.homepage.hero.text = 'برغر وأجنحة طازجة، اطلب الآن للاستلام أو التوصيل.';
@@ -43,5 +44,5 @@ export function buildUptownConfig() {
     { id: 'wings', label: 'أجنحة', type: 'product', productId: 'wings6', weight: 12, big: true },
     { id: 'classic', label: 'كلاسيك برغر', type: 'product', productId: 'hawaii', weight: 3, big: true }
   ] };
-  return c;
+  return withoutGoogleTexts(c);   // phone site: no Google wording in the texts
 }

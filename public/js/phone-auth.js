@@ -1,6 +1,6 @@
 /* ===================== Phone sign-in (customers) =====================
-   The customer's mobile number is the account (there is no other sign-in).
-   The flow, everywhere it appears:
+   Sites with settings.auth.mode = 'phone' have NO Google sign-in: the
+   customer's mobile number is the account. The flow, everywhere it appears:
      1. type the number and press "Confirm"
      2. a number we have seen before signs in at once (no message) and the
         saved name/address are handed back to be pre-filled
@@ -37,6 +37,7 @@ Object.assign(I18N.ar, {
 });
 
 Object.assign(Auth, {
+  mode() { const a = Store.data && Store.data.settings && Store.data.settings.auth; return a && a.mode === 'phone' ? 'phone' : 'google'; },
   phoneLookup(phone) { return api('/api/auth/phone/lookup', { method: 'POST', body: { phone } }); },
   phoneVerify(phone, code) { return api('/api/auth/phone/verify', { method: 'POST', body: { phone, code } }); },
   async signInWithToken(token, phone) {
@@ -144,9 +145,16 @@ const PhoneLogin = {
   }
 };
 
-/* The sign-in block used on /login and inside the wheel. */
-function signInBlockHtml() { return `<div class="phone-login-host" data-phone-host></div>`; }
-function bindSignIn(root, { next = '/', compact = false } = {}) {
-  const host = root.querySelector('[data-phone-host]');
-  if (host) PhoneLogin.mount(host, { compact, onDone: () => { toast(t('logged_in')); location.href = next; } });
+/* The sign-in block used on /login and inside the wheel: the number box on phone sites, the Google button elsewhere. */
+function signInBlockHtml(label, id = 'googleBtn') {
+  return Auth.mode() === 'phone' ? `<div class="phone-login-host" data-phone-host></div>` : googleButtonHtml(label || t('menu_login'), id);
+}
+function bindSignIn(root, { next = '/', id = 'googleBtn', compact = false } = {}) {
+  if (Auth.mode() === 'phone') {
+    const host = root.querySelector('[data-phone-host]');
+    if (host) PhoneLogin.mount(host, { compact, onDone: () => { toast(t('logged_in')); location.href = next; } });
+  } else {
+    const b = root.querySelector('#' + id);
+    if (b) b.addEventListener('click', e => doGoogleSignIn(e.currentTarget, next));
+  }
 }

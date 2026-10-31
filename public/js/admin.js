@@ -764,14 +764,15 @@ function renderGeneral(el) {
     ${saveBtn('gSave')}`) +
     card(L('Customer sign-in'), `
       <div class="form-row">
+        <div class="form-group"><label>${L('Sign-in method')}</label><select id="aMode"><option value="google" ${authMode() === 'google' ? 'selected' : ''}>Google</option><option value="phone" ${authMode() === 'phone' ? 'selected' : ''}>${L('Mobile number (one-time code)')}</option></select></div>
         <div class="form-group"><label>${L('Default country for numbers')}</label><select id="aCountry">${[['PS', L('Palestine')], ['SA', L('Saudi Arabia')], ['AE', L('United Arab Emirates')], ['KW', L('Kuwait')], ['JO', L('Jordan')]].map(([k, n]) => `<option value="${k}" ${((s.auth && s.auth.country) || 'PS') === k ? 'selected' : ''}>${n}</option>`).join('')}</select></div>
       </div>
       <label class="check-row"><input type="checkbox" id="aOtpExisting" ${s.auth && s.auth.requireOtpForExisting ? 'checked' : ''}> ${L('Ask for a code even for numbers that signed in before (safer)')}</label>
-      <p class="mini-note">${L('A known number signs in without a code and its saved name and address are filled in at checkout; anyone who knows a number could see that name and address, so turn the option above on if that matters to you.')}</p>
+      <p class="mini-note">${L('With the mobile number method there is no Google sign-in. A known number signs in without a code and its saved name and address are filled in at checkout; anyone who knows a number could see that name and address, so turn the option above on if that matters to you.')}</p>
       ${saveBtn('aSave')}`);
   bindImg('gLogo', 512);
   $('aSave').addEventListener('click', () => {
-    s.auth = { ...(s.auth || {}), country: $('aCountry').value, requireOtpForExisting: $('aOtpExisting').checked };
+    s.auth = { ...(s.auth || {}), mode: $('aMode').value, country: $('aCountry').value, requireOtpForExisting: $('aOtpExisting').checked };
     persist(); toast(L('Saved'));
   });
   $('gSave').addEventListener('click', () => {
@@ -1000,6 +1001,7 @@ async function renderSites(el) {
   list();
 }
 
+const authMode = () => (CONFIG.settings.auth && CONFIG.settings.auth.mode) === 'phone' ? 'phone' : 'google';
 const RENDER = { wheel: renderWheel, orders: renderOrders, branches: renderBranches, categories: renderCategories, products: renderProducts, delivery: renderDelivery, discounts: renderDiscounts, loyalty: renderLoyalty, homepage: renderHomepage, slider: renderSlider, pages: renderPages, notifications: renderNotifications, cashiers: renderCashiers, colors: renderColors, general: renderGeneral, footer: renderFooterSettings, data: renderData, sites: renderSites };
 
 /* ===================== Boot ===================== */

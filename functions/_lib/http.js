@@ -42,6 +42,10 @@ export async function activeCashier(user, env, site = '') {
   return doc.data;
 }
 
+export function isGoogleCustomer(user) {
+  return !!user && !user.role && user.firebase && user.firebase.sign_in_provider === 'google.com';
+}
+
 /* ---- Site config lives in Cloudflare KV (binding: STORE) ---- */
 export async function loadConfig(env, site = '') {
   if (!env.STORE) throw new Error('KV binding STORE is not configured');

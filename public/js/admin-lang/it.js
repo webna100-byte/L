@@ -385,5 +385,8 @@ Object.assign(window.ADMIN_TR, {
   "Ask for a code even for numbers that signed in before (safer)": "Chiedi un codice anche per i numeri che hanno già effettuato l'accesso (più sicuro)",
   "A known number signs in without a code and its saved name and address are filled in at checkout; anyone who knows a number could see that name and address, so turn the option above on if that matters to you.": "Un numero già noto entra senza codice e il suo nome e indirizzo salvati vengono precompilati all'ordine; chiunque conosca un numero potrebbe vedere quel nome e indirizzo, quindi attiva l'opzione qui sopra se ti interessa.",
   "At least one prize needs a chance": "Almeno un premio deve avere una probabilità",
-  "Chance": "Probabilità"
+  "Chance": "Probabilità",
+  "Sign-in method": "Metodo di accesso",
+  "Mobile number (one-time code)": "Numero di cellulare (codice monouso)",
+  "With the mobile number method there is no Google sign-in. A known number signs in without a code and its saved name and address are filled in at checkout; anyone who knows a number could see that name and address, so turn the option above on if that matters to you.": "Con il metodo del numero di cellulare non c'è l'accesso con Google. Un numero già noto entra senza codice e il suo nome e indirizzo salvati vengono precompilati all'ordine; chiunque conosca un numero potrebbe vedere quel nome e indirizzo, quindi attiva l'opzione qui sopra se ti interessa."
 });

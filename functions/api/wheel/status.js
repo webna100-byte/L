@@ -19,7 +19,7 @@ export const onRequestGet = handle(async ({ request, env }) => {
   const site = siteOf(request);
   const config = await loadConfig(env, site);
   const user = await authUser(request, env);
-  if (!config || !customerAllowed(user, site)) return fail(401, 'login_required');
+  if (!config || !customerAllowed(user, config, site)) return fail(401, 'login_required');
   const wheel = wheelSettings(config);
   if (!wheel.enabled) return json({ enabled: false });
   const fs = new Firestore(env, site);
