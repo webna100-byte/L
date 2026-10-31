@@ -1,0 +1,173 @@
+{
+ "slug": "fatirat-shawarma-taif",
+ "name": "فطيرة الشاورما - الطائف",
+ "lang": "ar",
+ "color": "#a00020",
+ "currency": "SAR",
+ "timezone": "Asia/Riyadh",
+ "phone": "+966 50 854 1363",
+ "address": "الطائف، طريق الشفا",
+ "instagram": "shawarma_pie",
+ "logoFile": "tools/assets/fatira.png",
+ "heroTitle": "فطيرة الشاورما",
+ "heroText": "اطلب فطائرك وقواربك المفضلة مباشرة من مطعمنا، استلام أو توصيل.",
+ "branchName": "الطائف - طريق الشفا",
+ "minimumOrder": 0,
+ "deliveryZones": [
+  {
+   "name": "توصيل بسائق المطعم",
+   "price": 10
+  }
+ ],
+ "categories": [
+  {
+   "id": "c0",
+   "name": "الفطائر",
+   "image": "/demo/cat_burgers.webp",
+   "products": [
+    {
+     "id": "p0_0",
+     "name": "فطيرة الشاورما",
+     "desc": "عجينة الفطيرة الفاخرة محشوة بقطع من دجاج الشاورما مع شرائح من الجبن الشيدر مع مزيج من صوص الشاورما الخاص (حار أو عادي) حسب الطلب مع أعواد البطاطا ومفروم المخلل",
+     "price": 20,
+     "image": "/demo/prod_crispy_chicken.webp"
+    },
+    {
+     "id": "p0_1",
+     "name": "فطيرة دجاج",
+     "desc": "فطيرة محشية بقطع الدجاج",
+     "price": 18,
+     "image": "/demo/prod_crispy_chicken.webp"
+    },
+    {
+     "id": "p0_2",
+     "name": "كاليزوني شاورما",
+     "desc": "",
+     "price": 39,
+     "image": "/demo/prod_crispy_chicken.webp"
+    }
+   ]
+  },
+  {
+   "id": "c1",
+   "name": "الصواريخ والساندويتشات",
+   "image": "/demo/cat_burgers.webp",
+   "products": [
+    {
+     "id": "p1_0",
+     "name": "صاروخ صاج",
+     "desc": "شاورما صاروخ بالخبز الصاج مع المخلل البطاطا والصوص العادي",
+     "price": 15,
+     "image": "/demo/prod_crispy_chicken.webp"
+    },
+    {
+     "id": "p1_1",
+     "name": "صاروخ تورتيلا",
+     "desc": "شاورما صاروخ بالخبز التورتيلا مع المخلل والبطاطا والصوص العادي",
+     "price": 17,
+     "image": "/demo/prod_crispy_chicken.webp"
+    },
+    {
+     "id": "p1_2",
+     "name": "سنجل عربي",
+     "desc": "قطع من الشاورما خبز الصاج يقدم مع البطاطس وصوص ثوم",
+     "price": 21,
+     "image": "/demo/prod_crispy_chicken.webp"
+    }
+   ]
+  },
+  {
+   "id": "c2",
+   "name": "القوارب والوجبات",
+   "image": "/demo/cat_burgers.webp",
+   "products": [
+    {
+     "id": "p2_0",
+     "name": "قوارب شاورما",
+     "desc": "8 قطع من الخبز الفاخر والمحضر على الطلب بحشوة من الشاورما والبطاطا والمخلل ومزيج الصوصات الرائعة",
+     "price": 32,
+     "image": "/demo/prod_classic_burger.webp"
+    },
+    {
+     "id": "p2_1",
+     "name": "قوارب دجاج",
+     "desc": "8 قطع من الخبز الفاخر والمحضر على الطلب بحشوة من الدجاج والبطاطس والمخلل والصوصات",
+     "price": 32,
+     "image": "/demo/prod_classic_burger.webp"
+    },
+    {
+     "id": "p2_2",
+     "name": "شاورما عربي",
+     "desc": "8 قطع من شاورما الصاج، يقدم مع بطاطس مقلية، صوص ثوم و صوص سبايسي",
+     "price": 28,
+     "image": "/demo/prod_classic_burger.webp"
+    },
+    {
+     "id": "p2_3",
+     "name": "شاورما فرن",
+     "desc": "وجبة خاصة محضرة من شرائح الشاورما وطبقة من البطاطا والمغطى بصوص الكريمة الخاص وتحمر بالفرن",
+     "price": 35,
+     "image": "/demo/prod_classic_burger.webp"
+    },
+    {
+     "id": "p2_4",
+     "name": "كوجك شاورما",
+     "desc": "وجبة خاصة تتكون من فطيرتي شاورما وسط وتشكيلة من الصوصات الخاصة وأصابع الطاطا الذهبية",
+     "price": 34,
+     "image": "/demo/prod_classic_burger.webp"
+    }
+   ]
+  },
+  {
+   "id": "c3",
+   "name": "العروض والبوكسات",
+   "image": "/demo/cat_pizza.webp",
+   "products": [
+    {
+     "id": "p3_0",
+     "name": "عرض كوجك الشاورما مع ببسي",
+     "desc": "فطيرتين شاورما مع واحد بيبسى",
+     "price": 40,
+     "image": "/demo/prod_classic_burger.webp"
+    },
+    {
+     "id": "p3_1",
+     "name": "بوكس العائلة شاورما",
+     "desc": "8 فطائر فطيرة شاورما متوسطة مع مجموعة متنوعة من الصوصات الخاصة مع البطاطس المقلية",
+     "price": 98,
+     "image": "/demo/prod_classic_burger.webp"
+    }
+   ]
+  },
+  {
+   "id": "c4",
+   "name": "المشروبات والإضافات",
+   "image": "/demo/cat_drinks.webp",
+   "products": [
+    {
+     "id": "p4_0",
+     "name": "بطاطس مقلية",
+     "desc": "بطاطس مقلية مقرمشة",
+     "price": 10,
+     "image": "/demo/prod_crispy_chicken.webp"
+    },
+    {
+     "id": "p4_1",
+     "name": "مشروبات غازية - بيبسي",
+     "desc": "مشروب غازي منعش",
+     "price": 6,
+     "image": "/demo/prod_cola.webp"
+    },
+    {
+     "id": "p4_2",
+     "name": "صوص ثومية",
+     "desc": "",
+     "price": 3,
+     "image": "/demo/prod_house_salad.webp"
+    }
+   ]
+  }
+ ],
+ "bannerFile": "tools/assets/fatira_banner.jpg",
+ "tileFile": "tools/assets/fatira_tile.jpg"
+}

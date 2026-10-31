@@ -1,0 +1,131 @@
+{
+ "slug": "rukn-al-arabi",
+ "name": "مطعم الركن العربي",
+ "lang": "ar",
+ "color": "#8a6a1f",
+ "currency": "AED",
+ "timezone": "Asia/Dubai",
+ "phone": "+971 50 505 5398",
+ "address": "عجمان، شارع الشيخ خليفة بن زايد",
+ "instagram": "ruknarabi",
+ "logoFile": "tools/assets/rukn.png",
+ "heroTitle": "الركن العربي",
+ "heroText": "مندي ومشاوي وأطباق عربية أصيلة، اطلب مباشرة من مطعمنا للاستلام أو التوصيل.",
+ "branchName": "عجمان - شارع الشيخ خليفة بن زايد",
+ "minimumOrder": 0,
+ "deliveryZones": [
+  {
+   "name": "توصيل",
+   "price": 5
+  }
+ ],
+ "categories": [
+  {
+   "id": "c0",
+   "name": "المندي",
+   "image": "/demo/cat_burgers.webp",
+   "products": [
+    {
+     "id": "p0_0",
+     "name": "مندي دجاج",
+     "desc": "",
+     "price": 40,
+     "image": "/demo/prod_crispy_chicken.webp"
+    },
+    {
+     "id": "p0_1",
+     "name": "مندي لحم",
+     "desc": "لحم ضأن، أرز بسمتي، بصل مفروم، معجون طماطم، مرق دجاج و بقدونس طازج مفروم",
+     "price": 79,
+     "image": "/demo/prod_double_cheese.webp"
+    },
+    {
+     "id": "p0_2",
+     "name": "مضبي دجاج",
+     "desc": "",
+     "price": 41,
+     "image": "/demo/prod_crispy_chicken.webp"
+    }
+   ]
+  },
+  {
+   "id": "c1",
+   "name": "ركن المشاوي",
+   "image": "/demo/cat_burgers.webp",
+   "products": [
+    {
+     "id": "p1_0",
+     "name": "مكس جريل",
+     "desc": "",
+     "price": 47,
+     "image": "/demo/prod_double_cheese.webp"
+    },
+    {
+     "id": "p1_1",
+     "name": "دجاج مسحب",
+     "desc": "",
+     "price": 49,
+     "image": "/demo/prod_crispy_chicken.webp"
+    },
+    {
+     "id": "p1_2",
+     "name": "تكة لحم",
+     "desc": "",
+     "price": 48,
+     "image": "/demo/prod_double_cheese.webp"
+    },
+    {
+     "id": "p1_3",
+     "name": "كباب لحم",
+     "desc": "",
+     "price": 65,
+     "image": "/demo/prod_double_cheese.webp"
+    },
+    {
+     "id": "p1_4",
+     "name": "نصف كيلو مشاوي الركن العربي",
+     "desc": "",
+     "price": 90,
+     "image": "/demo/prod_double_cheese.webp"
+    },
+    {
+     "id": "p1_5",
+     "name": "كيلو مشاوي ركن العربي",
+     "desc": "",
+     "price": 179,
+     "image": "/demo/prod_double_cheese.webp"
+    }
+   ]
+  },
+  {
+   "id": "c2",
+   "name": "أطباق لحم",
+   "image": "/demo/cat_burgers.webp",
+   "products": [
+    {
+     "id": "p2_0",
+     "name": "بامية باللحمة",
+     "desc": "",
+     "price": 29,
+     "image": "/demo/prod_house_salad.webp"
+    }
+   ]
+  },
+  {
+   "id": "c3",
+   "name": "مقبلات وخبز",
+   "image": "/demo/cat_burgers.webp",
+   "products": [
+    {
+     "id": "p3_0",
+     "name": "خبز تنور",
+     "desc": "",
+     "price": 3,
+     "image": "/demo/prod_house_salad.webp"
+    }
+   ]
+  }
+ ],
+ "bannerFile": "tools/assets/rukn_banner.jpg",
+ "tileFile": "tools/assets/rukn_tile.jpg"
+}
