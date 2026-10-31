@@ -359,6 +359,7 @@ test('old saved texts that mention Google are cleaned before visitors see them',
   old.settings.homepage.login = { title: 'Entra', text: 'Inicia sesión con tu cuenta de Google para pedir, ganar puntos y seguir tus pedidos.', button: 'Iniciar sesión con Google' };
   old.pages.login = { title: 'Entra', button: 'Continuar con Google' };
   old.settings.lang = 'es';
+  old.pages.privacy = { title: 'Privacidad', text: 'Respetamos tu privacidad.\n\nDatos que recogemos:\n• Tu nombre y correo de tu cuenta de Google al iniciar sesión.\n• El teléfono que introduces.' };
   const t = await setup(old);
   try {
     const body = await (await siteApi({ request: req('/api/site'), env: t.env, waitUntil: () => {} })).json();
@@ -366,6 +367,7 @@ test('old saved texts that mention Google are cleaned before visitors see them',
     assert.match(body.config.settings.homepage.login.text, /número de móvil/);
     assert.equal(body.config.pages.login.button, 'Continuar con tu número de móvil');
     assert.ok(!/google/i.test(JSON.stringify(body.config)));
+    assert.match(body.config.pages.privacy.text, /Respetamos tu privacidad\.[\s\S]*• Tu número de móvil, con el que inicias sesión\.\n• El teléfono que introduces\./, 'only the Google line of the privacy text changed');
     assert.match(JSON.stringify(JSON.parse(await t.env.STORE.get('config'))), /Google/, 'the stored config is not rewritten');
   } finally { await t.close(); }
 });
