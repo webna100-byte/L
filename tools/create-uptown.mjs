@@ -11,7 +11,7 @@ const { token } = await call(`${BASE}/api/auth/admin`, { method: 'POST', headers
 const { firebase } = await call(`${BASE}/api/site`);
 const tok = (await call(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key=${firebase.apiKey}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ token, returnSecureToken: true }) })).idToken;
 const auth = { authorization: `Bearer ${tok}`, 'content-type': 'application/json' };
-const config = buildUptownConfig();
+const config = process.env.UPTOWN_MODE === 'google' ? JSON.parse(readFileSync(WT + '/public/seed/uptown-config.json')) : buildUptownConfig();
 if (logoFile) {
   const type = /\.png$/i.test(logoFile) ? 'image/png' : /\.webp$/i.test(logoFile) ? 'image/webp' : 'image/jpeg';
   config.settings.logo = (await call(`${BASE}/api/admin/upload`, { method: 'POST', headers: { authorization: auth.authorization, 'content-type': type }, body: readFileSync(logoFile) })).url;
