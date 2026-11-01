@@ -1,0 +1,424 @@
+{
+ "schemaVersion": 8,
+ "version": 1,
+ "settings": {
+  "restaurantName": "أبتاون برغر آند وينغز",
+  "logo": "/demo/uptown-logo.png",
+  "currency": "ILS",
+  "timezone": "Asia/Hebron",
+  "minimumOrder": 0,
+  "taxRate": 0,
+  "multiBranch": true,
+  "phone": "+970 597 101 010",
+  "footerEmail": "hello@example.com",
+  "address": "رام الله",
+  "socialLinks": {
+   "facebook": "facebook.com",
+   "instagram": "instagram.com",
+   "tiktok": "tiktok.com",
+   "x": "",
+   "youtube": ""
+  },
+  "slider": {
+   "images": [
+    "/demo/slide1.webp",
+    "/demo/slide2.webp",
+    "/demo/slide3.webp"
+   ],
+   "intervalSeconds": 3
+  },
+  "colors": {
+   "branches": {
+    "type": "solid",
+    "color1": "#ffffff",
+    "color2": "#ffffff",
+    "angle": 135
+   },
+   "menu": {
+    "type": "solid",
+    "color1": "#ffffff",
+    "color2": "#ffffff",
+    "angle": 135
+   },
+   "checkout": {
+    "type": "solid",
+    "color1": "#ffffff",
+    "color2": "#ffffff",
+    "angle": 135
+   },
+   "secondary": {
+    "type": "gradient",
+    "color1": "#b80000",
+    "color2": "#e00000",
+    "angle": 135
+   },
+   "header": {
+    "type": "solid",
+    "color1": "#ffffff",
+    "color2": "#ffffff",
+    "angle": 135
+   },
+   "homepage": {
+    "type": "solid",
+    "color1": "#ffffff",
+    "color2": "#ffffff",
+    "angle": 135
+   }
+  },
+  "receipt": {
+   "paperWidth": 80
+  },
+  "homepage": {
+   "hero": {
+    "eyebrow": "رام الله",
+    "title": "أبتاون برغر آند وينغز",
+    "text": "برغر وأجنحة طازجة، اطلب الآن للاستلام أو التوصيل.",
+    "button": "تصفّح القائمة",
+    "image": "/demo/hero.webp"
+   },
+   "login": {
+    "title": "سجّل دخولك واجمع النقاط",
+    "text": "كل طلب يقرّبك من هدية مجانية ومستوى أعلى.",
+    "button": "تسجيل الدخول باستخدام Google"
+   },
+   "categories": {
+    "eyebrow": "ماذا نقدّم",
+    "title": "أطباق تشتهيها",
+    "selectedIds": [
+     "burgers",
+     "wings",
+     "sides",
+     "drinks"
+    ]
+   },
+   "featured": {
+    "eyebrow": "المفضّلة لدى زبائننا",
+    "title": "الأكثر طلباً",
+    "button": "اطلب الآن",
+    "selectedIds": [
+     "crispy",
+     "steak",
+     "hawaii",
+     "onion"
+    ]
+   },
+   "cta": {
+    "eyebrow": "جوعان؟",
+    "title": "وجبتك المفضلة على بُعد نقرة.",
+    "button": "ابدأ طلبك"
+   }
+  },
+  "lang": "ar",
+  "auth": {
+   "mode": "google"
+  }
+ },
+ "pages": {
+  "login": {
+   "image": "/demo/page-login.webp",
+   "title": "تسجيل الدخول",
+   "text": "تسجيل الدخول برقم الجوال",
+   "button": "المتابعة برقم الجوال"
+  },
+  "levels": {
+   "image": "/demo/page-levels.webp",
+   "title": "المستويات",
+   "text": "كلما طلبت أكثر ارتفع مستواك وزاد خصمك الدائم.",
+   "lockedText": "سجّل الدخول لتستطيع رؤية مستواك",
+   "button": "تسجيل الدخول"
+  },
+  "gifts": {
+   "image": "/demo/page-gifts.webp",
+   "title": "الهدايا",
+   "text": "استبدل نقاطك بهدايا من اختيارك.",
+   "lockedText": "سجّل الدخول لتستطيع رؤية الهدايا",
+   "button": "تسجيل الدخول"
+  },
+  "orders": {
+   "image": "/demo/page-orders.webp",
+   "title": "طلباتي",
+   "text": "تابع حالة طلباتك لحظة بلحظة.",
+   "lockedText": "سجّل الدخول لتستطيع رؤية طلباتك",
+   "button": "تسجيل الدخول",
+   "emptyText": "لا توجد طلبات بعد."
+  },
+  "notifications": {
+   "image": "/demo/page-notifications.webp",
+   "title": "الإشعارات",
+   "text": "فعّل الإشعارات لتصلك آخر العروض من مطعمنا.",
+   "emptyText": "لا توجد إشعارات حالياً.",
+   "button": "تفعيل الإشعارات"
+  },
+  "privacy": {
+   "image": "/demo/page-privacy.webp",
+   "title": "سياسة الخصوصية",
+   "text": "نحترم خصوصيتك. توضّح هذه السياسة البيانات التي نجمعها وكيف نستخدمها.\n\nالبيانات التي نجمعها:\n• رقم جوالك الذي تسجّل الدخول به.\n• رقم الجوال وعنوان التوصيل الذي تُدخله عند الطلب.\n• تفاصيل طلباتك ونقاطك ومستواك.\n\nكيف نستخدمها:\n• لتجهيز طلبك وتوصيله والتواصل معك بخصوصه.\n• لاحتساب نقاط الولاء والهدايا والمستويات.\n• لإرسال إشعارات العروض إذا وافقت عليها.\n\nلا نبيع بياناتك ولا نشاركها مع أي طرف ثالث إلا بالقدر اللازم لتقديم الخدمة. يمكنك طلب حذف بياناتك في أي وقت بالتواصل معنا."
+  },
+  "returns": {
+   "image": "/demo/page-returns.webp",
+   "title": "سياسة الإرجاع والاستبدال",
+   "text": "رضاك يهمّنا. إذا وصلك طلب غير صحيح أو فيه مشكلة:\n\n• تواصل معنا خلال ساعة من استلام الطلب مع صورة للمشكلة.\n• نستبدل الصنف غير الصحيح أو التالف مجاناً، أو نعيد قيمته.\n• لا يمكن إرجاع الأطعمة بعد استهلاكها أو تغيير الطلب بعد بدء التحضير.\n• إذا رفض المطعم طلبك، تعود نقاط الهدايا إلى حسابك تلقائياً."
+  }
+ },
+ "loyalty": {
+  "enabled": false,
+  "amountPerPoint": 1,
+  "tiers": [],
+  "levels": [
+   {
+    "id": "silver",
+    "name": "المستوى الفضي",
+    "points": 300,
+    "discountPercent": 5,
+    "image": "/demo/level-silver.svg"
+   },
+   {
+    "id": "gold",
+    "name": "المستوى الذهبي",
+    "points": 1000,
+    "discountPercent": 10,
+    "image": "/demo/level-gold.svg"
+   },
+   {
+    "id": "diamond",
+    "name": "المستوى الماسي",
+    "points": 2500,
+    "discountPercent": 15,
+    "image": "/demo/level-diamond.svg"
+   }
+  ]
+ },
+ "discounts": {
+  "invoice": [
+   {
+    "id": "inv_1",
+    "min": 50,
+    "max": 99.99,
+    "type": "percent",
+    "value": 5
+   },
+   {
+    "id": "inv_2",
+    "min": 100,
+    "max": null,
+    "type": "percent",
+    "value": 10
+   }
+  ],
+  "delivery": [
+   {
+    "id": "del_1",
+    "min": 30,
+    "max": 49.99,
+    "type": "percent",
+    "value": 50
+   },
+   {
+    "id": "del_2",
+    "min": 50,
+    "max": null,
+    "type": "free",
+    "value": 0
+   }
+  ]
+ },
+ "branches": [
+  {
+   "id": "irsal",
+   "name": "الإرسال",
+   "image": "/demo/branch_downtown.webp",
+   "pickupEnabled": true,
+   "deliveryEnabled": true,
+   "deliveryZones": [
+    {
+     "id": "z_irsal",
+     "name": "رام الله والبيرة",
+     "price": 15
+    }
+   ]
+  },
+  {
+   "id": "tira",
+   "name": "الطيرة",
+   "image": "/demo/branch_westside.webp",
+   "pickupEnabled": true,
+   "deliveryEnabled": true,
+   "deliveryZones": [
+    {
+     "id": "z_tira",
+     "name": "رام الله والبيرة",
+     "price": 15
+    }
+   ]
+  }
+ ],
+ "categories": [
+  {
+   "id": "burgers",
+   "name": "برغر",
+   "image": "/demo/cat_burgers.webp",
+   "branchIds": [],
+   "order": 0
+  },
+  {
+   "id": "wings",
+   "name": "أجنحة",
+   "image": "/demo/prod_crispy_chicken.webp",
+   "branchIds": [],
+   "order": 1
+  },
+  {
+   "id": "sides",
+   "name": "بطاطا",
+   "image": "/demo/cat_salads.webp",
+   "branchIds": [],
+   "order": 2
+  },
+  {
+   "id": "drinks",
+   "name": "مشروبات",
+   "image": "/demo/cat_drinks.webp",
+   "branchIds": [],
+   "order": 3
+  }
+ ],
+ "products": [
+  {
+   "id": "crispy",
+   "categoryId": "burgers",
+   "name": "كرسبي تشيكن برغر",
+   "description": "دجاج مقرمش مع صوص البيت",
+   "price": 25,
+   "image": "/demo/prod_crispy_chicken.webp",
+   "discountPercent": 0,
+   "branchIds": [],
+   "optionGroups": []
+  },
+  {
+   "id": "steak",
+   "categoryId": "burgers",
+   "name": "ستيك برغر",
+   "description": "قطعة ستيك مع جبنة",
+   "price": 36,
+   "image": "/demo/prod_double_cheese.webp",
+   "discountPercent": 0,
+   "branchIds": [],
+   "optionGroups": []
+  },
+  {
+   "id": "hawaii",
+   "categoryId": "burgers",
+   "name": "هاواي برغر",
+   "description": "مع الأناناس والجبنة",
+   "price": 30,
+   "image": "/demo/prod_classic_burger.webp",
+   "discountPercent": 0,
+   "branchIds": [],
+   "optionGroups": []
+  },
+  {
+   "id": "onion",
+   "categoryId": "burgers",
+   "name": "برغر البصل المكرمل",
+   "description": "بصل مكرمل وصوص خاص",
+   "price": 30,
+   "image": "/demo/prod_classic_burger.webp",
+   "discountPercent": 0,
+   "branchIds": [],
+   "optionGroups": []
+  },
+  {
+   "id": "veggie",
+   "categoryId": "burgers",
+   "name": "برغر نباتي",
+   "description": "خضار طازجة",
+   "price": 30,
+   "image": "/demo/prod_veggie.webp",
+   "discountPercent": 0,
+   "branchIds": [],
+   "optionGroups": []
+  },
+  {
+   "id": "wings6",
+   "categoryId": "wings",
+   "name": "أجنحة (6 قطع)",
+   "description": "سعر مؤقت",
+   "price": 28,
+   "image": "/demo/prod_crispy_chicken.webp",
+   "discountPercent": 0,
+   "branchIds": [],
+   "optionGroups": []
+  },
+  {
+   "id": "fries",
+   "categoryId": "sides",
+   "name": "بطاطا",
+   "description": "سعر مؤقت",
+   "price": 12,
+   "image": "/demo/prod_house_salad.webp",
+   "discountPercent": 0,
+   "branchIds": [],
+   "optionGroups": []
+  },
+  {
+   "id": "cola",
+   "categoryId": "drinks",
+   "name": "مشروب",
+   "description": "سعر مؤقت",
+   "price": 7,
+   "image": "/demo/prod_cola.webp",
+   "discountPercent": 0,
+   "branchIds": [],
+   "optionGroups": []
+  }
+ ],
+ "wheel": {
+  "enabled": true,
+  "title": "لف العجلة واربح!",
+  "minOrder": 100,
+  "validHours": 0,
+  "weeklyBigCap": 10,
+  "prizes": [
+   {
+    "id": "drink",
+    "label": "مشروب",
+    "type": "product",
+    "productId": "cola",
+    "weight": 35,
+    "big": false
+   },
+   {
+    "id": "fries",
+    "label": "بطاطا",
+    "type": "product",
+    "productId": "fries",
+    "weight": 30,
+    "big": false
+   },
+   {
+    "id": "d10",
+    "label": "خصم 10%",
+    "type": "percent",
+    "value": 10,
+    "weight": 20,
+    "big": false
+   },
+   {
+    "id": "wings",
+    "label": "أجنحة",
+    "type": "product",
+    "productId": "wings6",
+    "weight": 12,
+    "big": true
+   },
+   {
+    "id": "classic",
+    "label": "كلاسيك برغر",
+    "type": "product",
+    "productId": "hawaii",
+    "weight": 3,
+    "big": true
+   }
+  ]
+ }
+}

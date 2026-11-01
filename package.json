@@ -4,6 +4,8 @@
   "description": "White-label restaurant ordering site: Cloudflare Pages + Functions, Firebase Auth/Firestore/FCM.",
   "scripts": {
     "dev": "wrangler pages dev public --port 8788 --kv STORE --compatibility-date=2024-09-23",
+    "seed:uptown:local": "wrangler kv key put config --path public/seed/uptown-config.json --binding STORE --local",
+    "seed:uptown": "wrangler kv key put config --path public/seed/uptown-config.json --binding STORE --remote",
     "seed:local": "wrangler kv key put config --path public/seed/demo-config.json --namespace-id STORE --local",
     "emulators": "firebase emulators:start --project demo-test",
     "test": "node --test tests/unit.test.mjs",
